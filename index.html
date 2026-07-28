@@ -1158,6 +1158,36 @@ var TOOLS = [
             "Round logs use the quarter-girth rule (G÷4)² × L ÷ 144, standard at timber depots. Sawn: W × T × L ÷ 144."] };
   }},
 
+
+/* ---------------- जस्ता पाता ---------------- */
+{ id:"roofsheet", cat:"con", ic:"🛖", neu:true,
+  nm:["जस्ता पाता Calculator","Roofing Sheet"],
+  sb:["छानाको नाप → कति पाता","Roof size → sheets needed"],
+  kw:"roofing sheet jasta pata chhana roof tin cgi dhalan",
+  ex:["२४ × १६ ft छाना, ८ ft × 2.75 ft पाता, १५% overlap — २१ पाता",
+      "24 × 16 ft roof, 8 × 2.75 ft sheet, 15% overlap — 21 sheets"],
+  f:[ {k:"l",l:["छानाको लम्बाइ","Roof length"],u:U.ft,d:24,w:1},
+      {k:"w",l:["छानाको चौडाइ (भिरालोतिरको)","Roof width (slope side)"],u:U.ft,d:16,w:1},
+      {k:"sl",l:["पाताको लम्बाइ","Sheet length"],u:U.ft,d:8,w:1},
+      {k:"sw",l:["पाताको चौडाइ","Sheet width"],u:U.ft,d:2.75,w:1},
+      {k:"ov",l:["Overlap (जोडाइ)","Overlap"],u:U.pct,d:15,w:1} ],
+  calc:function(v){
+    var area = n(v.l)*n(v.w);
+    if(area<=0) return {err:["छानाको नाप हाल्नुहोस्।","Enter the roof size."]};
+    var sl = n(v.sl), sw = n(v.sw), ov = n(v.ov)||0;
+    if(sl<=0 || sw<=0) return {err:["पाताको साइज हाल्नुहोस् — supplier अनुसार फरक हुन्छ।","Enter the sheet size — it varies by supplier."]};
+    if(ov>=50) return {err:["Overlap ५०% भन्दा कम हुनुपर्छ।","Overlap must be below 50%."]};
+    var cov = sl*sw*(1-ov/100), sheets = ceil(area/cov);
+    return { rows:[
+      row(["छानाको क्षेत्रफल","Roof area"], fmt(area,2), U.sqft),
+      row(["पाताको नाप","Sheet size"], fmt(sl,2)+" × "+fmt(sw,2), U.ft),
+      row(["प्रति पाताले छोप्ने (overlap घटाई)","Coverage per sheet (less overlap)"], fmt(cov,2), U.sqft, "sub"),
+      row(["थप राख्दा राम्रो (जगेडा)","Suggested spare"], "+ "+Math.max(1,ceil(sheets*0.05)), ["पाता","sheets"], "sub"),
+      row(["चाहिने पाता","Sheets needed"], fmt(sheets,0), ["पाता","sheets"], "big") ],
+      note:["पाताको साइज र overlap supplier/मिस्त्री अनुसार फरक हुन्छ — आफ्नो पाताको नाप हालेर हिसाब गर्नुहोस्। भिरालो छानाको चौडाइ भिरालो नापेर हाल्नुहोस्।",
+            "Sheet size and overlap vary by supplier — type your own sheet size. Measure the width along the slope."] };
+  }},
+
 /* ---------------- 9. जग्गा Converter ---------------- */
 { id:"jagga", cat:"np", star:true, ic:"🗺️",
   nm:["जग्गा Converter","Land Converter"],
@@ -1392,6 +1422,61 @@ var TOOLS = [
     return { rows:rows,
       note:["छुट पहिले घट्छ, VAT घटेको रकममा लाग्छ — नेपालको सामान्य बिलिङ नियम।",
             "Discount first, VAT on the discounted amount — standard Nepali billing."] };
+  }},
+
+
+/* ---------------- प्रतिशत / छुट ---------------- */
+{ id:"pct", cat:"fin", ic:"🏷️", neu:true,
+  nm:["प्रतिशत / छुट","Percent / Discount"],
+  sb:["% का ४ हिसाब एकै ठाउँ","4 percent tools in one"],
+  kw:"percent percentage pratishat discount chut increase decrease badhi kami",
+  ex:["रु २,५०० को १५% = ३७५","15% of Rs 2,500 = 375"],
+  f:[ {k:"m",l:["के निकाल्ने?","What to find"],t:"s",d:"of",o:[["of",["X को Y% कति?","Y% of X"]],["what",["X, Y को कति % हो?","X is what % of Y?"]],["chg",["वृद्धि / कमी %","% increase / decrease"]],["disc",["छुटपछिको मूल्य","Price after discount"]]]},
+      {k:"a",l:["रकम (X)","Amount (X)"],d:2500,w:1,sif:function(v){return v.m==="of";}},
+      {k:"p",l:["प्रतिशत (Y)","Percent (Y)"],u:U.pct,d:15,w:1,sif:function(v){return v.m==="of";}},
+      {k:"xa",l:["X (अंश रकम)","X (the part)"],d:375,w:1,sif:function(v){return v.m==="what";}},
+      {k:"xb",l:["Y (पूरै रकम)","Y (the whole)"],d:2500,w:1,sif:function(v){return v.m==="what";}},
+      {k:"o",l:["पहिलेको रकम","Old value"],d:2000,w:1,sif:function(v){return v.m==="chg";}},
+      {k:"nu",l:["अहिलेको रकम","New value"],d:2500,w:1,sif:function(v){return v.m==="chg";}},
+      {k:"pr",l:["मूल्य","Price"],u:["रु","Rs"],d:2500,w:1,sif:function(v){return v.m==="disc";}},
+      {k:"dp",l:["छुट","Discount"],u:U.pct,d:15,w:1,sif:function(v){return v.m==="disc";}} ],
+  calc:function(v){
+    if(v.m==="what"){
+      var xa = n(v.xa), xb = n(v.xb);
+      if(!xb) return {err:["Y (पूरै रकम) हाल्नुहोस्।","Enter Y (the whole)."]};
+      return { rows:[
+        row(["X","X"], fmt(xa,2), ""), row(["Y","Y"], fmt(xb,2), ""),
+        row(["प्रतिशत","Percent"], fmt(xa/xb*100,3)+"%", "", "big") ],
+        note:["सूत्र: X ÷ Y × १००।","Formula: X ÷ Y × 100."] };
+    }
+    if(v.m==="chg"){
+      var o = n(v.o), nu = n(v.nu);
+      if(!o) return {err:["पहिलेको रकम हाल्नुहोस्।","Enter the old value."]};
+      var ch = (nu-o)/o*100;
+      return { rows:[
+        row(["पहिलेको → अहिलेको","Old → new"], fmt(o,2)+" → "+fmt(nu,2), ""),
+        row(["फरक","Difference"], fmt(nu-o,2), "", "sub"),
+        row([ch>=0?"वृद्धि":"कमी", ch>=0?"Increase":"Decrease"], fmt(Math.abs(ch),3)+"%", "", "big") ],
+        note:["सूत्र: (नयाँ − पुरानो) ÷ पुरानो × १००।","Formula: (new − old) ÷ old × 100."] };
+    }
+    if(v.m==="disc"){
+      var pr = n(v.pr), dp = n(v.dp);
+      if(pr<=0) return {err:["मूल्य हाल्नुहोस्।","Enter the price."]};
+      var dc = pr*dp/100;
+      return { rows:[
+        row(["मूल्य","Price"], rs(pr), ""),
+        row(["छुट ("+fmt(dp,1)+"%)","Discount ("+fmt(dp,1)+"%)"], "− "+rs(dc), ""),
+        row(["तिर्ने मूल्य","Final price"], rs(pr-dc), "", "big") ],
+        note:["VAT पनि जोड्नुपरे “VAT + छुट Calculator” प्रयोग गर्नुहोस्।","Need VAT too? Use the VAT + Discount calculator."] };
+    }
+    var a = n(v.a), p = n(v.p), res = a*p/100;
+    return { rows:[
+      row(["रकम (X)","Amount (X)"], fmt(a,2), ""),
+      row(["प्रतिशत","Percent"], fmt(p,2)+"%", ""),
+      row(["X मा जोड्दा","X + result"], fmt(a+res,2), "", "sub"),
+      row(["X बाट घटाउँदा","X − result"], fmt(a-res,2), "", "sub"),
+      row([fmt(p,2)+"% ले हुने", fmt(p,2)+"% of X"], fmt(res,2), "", "big") ],
+      note:["सूत्र: X × Y ÷ १००।","Formula: X × Y ÷ 100."] };
   }},
 
 /* ---------------- 11. Super Calculator (+ VAT) ---------------- */
@@ -1685,6 +1770,64 @@ var TOOLS = [
       note:["१ फिट = ०.३०४८ मिटर · १ इन्च = २.५४ सेमी।","1 ft = 0.3048 m · 1 inch = 2.54 cm."] };
   }},
 
+
+/* ---------------- तौल Converter ---------------- */
+{ id:"weight", cat:"util", ic:"⚖️", neu:true,
+  nm:["तौल Converter","Weight Converter"],
+  sb:["kg ↔ पाउ ↔ धार्नी ↔ क्विन्टल","kg ↔ pau ↔ dharni ↔ quintal"],
+  kw:"weight taul kg kilo quintal ton pau dharni kwintal",
+  ex:["५ धार्नी → ११.९७ kg = ६० पाउ (परम्परागत)","5 dharni → 11.97 kg = 60 pau (traditional)"],
+  f:[ {k:"v",l:["तौल","Weight"],d:5},
+      {k:"u",l:["एकाइ","Unit"],t:"s",d:"dharni",o:[["kg",["किलो (kg)","Kilogram"]],["quintal",["क्विन्टल","Quintal"]],["ton",["टन (metric)","Ton (metric)"]],["pau",["पाउ","Pau"]],["dharni",["धार्नी","Dharni"]]],w:1},
+      {k:"pt",l:["कुन पाउ?","Which pau?"],t:"s",d:"trad",o:[["trad",["परम्परागत ≈ १९९.४५ g","Traditional ≈ 199.45 g"]],["metric",["पसले / metric = २५० g","Vendor / metric = 250 g"]]],w:1} ],
+  calc:function(v){
+    var val = n(v.v);
+    if(!val) return {err:["तौल हाल्नुहोस्।","Enter a weight."]};
+    var pauKg = (v.pt==="metric") ? 0.25 : 0.19945, DHARNI = 2.3934;
+    var toKg = { kg:1, quintal:100, ton:1000, pau:pauKg, dharni:DHARNI };
+    var kg = val*(toKg[v.u] || 1);
+    var pauLb = (v.pt==="metric") ? L("पाउ (metric २५० g)","Pau (metric 250 g)") : L("पाउ (परम्परागत)","Pau (traditional)");
+    return { rows:[
+      row(["किलो (kg)","Kilogram"], fmt(kg,3), "kg"),
+      row(["क्विन्टल (१०० kg)","Quintal (100 kg)"], fmt(kg/100,4), ""),
+      row(["टन (१००० kg)","Ton (1000 kg)"], fmt(kg/1000,4), "", "sub"),
+      row([pauLb,pauLb], fmt(kg/pauKg,3), ["पाउ","pau"]),
+      row(["धार्नी (२.३९३४ kg)","Dharni (2.3934 kg)"], fmt(kg/DHARNI,4), ["धार्नी","dharni"]),
+      row(["जम्मा तौल","Total weight"], fmt(kg,2)+" kg", "", "big") ],
+      note:["⚠️ पाउका दुई चलन छन् — परम्परागत पाउ ≈ १९९.४५ g (गहना/परम्परागत नापमा), पसले/metric पाउ = २५० g (तरकारी–मासु पसलमा)। माथि रोज्नुहोस्। १ धार्नी = १२ परम्परागत पाउ = २.३९३४ kg · क्विन्टल = १०० kg · टन = १००० kg।",
+            "⚠️ Two pau are in use — traditional ≈ 199.45 g (jewellery/traditional), vendor/metric = 250 g (vegetable and meat shops). Choose above. 1 dharni = 12 traditional pau = 2.3934 kg · quintal = 100 kg · ton = 1000 kg."] };
+  }},
+
+/* ---------------- नोट गन्ती ---------------- */
+{ id:"cashnote", cat:"util", ic:"💵", neu:true,
+  nm:["नोट गन्ती","Cash Note Counter"],
+  sb:["नोटको संख्या → जम्मा रकम","Note counts → total"],
+  kw:"cash note counter ganti paisa money total denomination hisab",
+  ex:["१०००×१२ + ५००×७ + १००×२३ + ...","1000×12 + 500×7 + 100×23 + ..."],
+  f:[ {k:"n1000",l:["रु १००० × ?","Rs 1000 × ?"],d:12,w:1},
+      {k:"n500",l:["रु ५०० × ?","Rs 500 × ?"],d:7,w:1},
+      {k:"n100",l:["रु १०० × ?","Rs 100 × ?"],d:23,w:1},
+      {k:"n50",l:["रु ५० × ?","Rs 50 × ?"],d:4,w:1},
+      {k:"n20",l:["रु २० × ?","Rs 20 × ?"],d:5,w:1},
+      {k:"n10",l:["रु १० × ?","Rs 10 × ?"],d:8,w:1},
+      {k:"n5",l:["रु ५ × ?","Rs 5 × ?"],d:0,w:1},
+      {k:"n2",l:["रु २ × ?","Rs 2 × ?"],d:0,w:1},
+      {k:"n1",l:["रु १ × ?","Re 1 × ?"],d:0,w:1} ],
+  calc:function(v){
+    var DEN = [1000,500,100,50,20,10,5,2,1], tot = 0, pcs = 0, rows = [];
+    for(var i=0;i<DEN.length;i++){
+      var d = DEN[i], c = Math.round(n(v["n"+d])||0);
+      if(c>0){ tot += d*c; pcs += c;
+        rows.push(row(["रु "+d+" × "+c,"Rs "+d+" × "+c], rs(d*c), "", "sub")); }
+    }
+    if(pcs===0) return {err:["नोटको संख्या हाल्नुहोस्।","Enter note counts."]};
+    rows.push(row(["जम्मा नोट/सिक्का","Total pieces"], fmt(pcs,0), ["थान","pcs"]));
+    rows.push(row(["जम्मा रकम","Total amount"], rs(tot), "", "big"));
+    return { rows:rows,
+      note:["नेपाली नोट: रु १०००, ५००, १००, ५०, २०, १०, ५ — रु २ र १ प्रायः सिक्का। गड्डी मिलाउँदा वा दराज बन्द गर्दा प्रयोग गर्नुहोस्।",
+            "Nepali notes: Rs 1000, 500, 100, 50, 20, 10, 5 — Rs 2 and 1 are usually coins. Handy for bundling cash or closing the till."] };
+  }},
+
 /* ---------------- 15. मुद्रा (Currency) ---------------- */
 { id:"fx", cat:"fin", ic:"💱", neu:true,
   nm:["मुद्रा Converter","Currency Converter"],
@@ -1816,7 +1959,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v4.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v4.9 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -1827,6 +1970,10 @@ function chipHtml(){
   }).join("");
 }
 var INFO = {
+weight:["kg, क्विन्टल, टन, पाउ (परम्परागत / metric) र धार्नीबीच तौल बदल्ने — दुवै पाउको चलन सहित।","Convert between kg, quintal, ton, pau (traditional / metric) and dharni."],
+cashnote:["नोट-नोट गनेर जम्मा रकम — रु १००० देखि रु १ सम्म, गड्डी/दराज मिलाउन।","Count cash by denomination — Rs 1000 down to Re 1."],
+roofsheet:["छानाको नापबाट कति जस्ता पाता चाहिन्छ — overlap र जगेडा सहित।","How many roofing sheets a roof needs — overlap and spares included."],
+pct:["प्रतिशतका ४ हिसाब — X को Y%, कति % हो, वृद्धि/कमी % र छुटपछिको मूल्य।","Four percent tools — Y% of X, what %, change % and discounted price."],
 interest:["साधारण (simple) र चक्रवृद्धि (compound) ब्याज — FD/बचतको quarterly compounding सहित।","Simple and compound interest — with quarterly/half-yearly compounding like Nepali bank FDs."],
 age:["उमेर (वर्ष/महिना/दिन), जन्मबार, राशि, नक्षत्र, तिथि र नामाक्षर — नाम सुझाव सहित।","Age in Y/M/D plus birth weekday, rashi, nakshatra, tithi and naming letters with name ideas."],
 vatdisc:["छुट (discount) घटाएर १३% VAT जोड्ने/झिक्ने — बिलको अन्तिम रकम एकैचोटि।","Apply a discount then add or remove 13% VAT — final bill amount in one go."],
@@ -1850,6 +1997,10 @@ conv:["फिट, मिटर, इन्च र वर्ग एकाइहर
 fx:["NPR र विदेशी मुद्रा — आफ्नै दर हालेर दुवैतिर बदल्नुहोस्।","NPR ↔ foreign currency, both ways at your own rate."]
 };
 var ROMAN = {
+weight:"taul weight kg kilo pau dharni quintal kwintal ton",
+cashnote:"cash note ganti counter paisa rupaiya gaddi total",
+roofsheet:"jasta pata roof sheet chhana tin cgi dhalan",
+pct:"percent pratishat chut discount badhi kami increase decrease",
 interest:"byaj interest simple compound fd fixed deposit bachat sawa",
 age:"age umer birthday janma date barsa year",
 vatdisc:"vat discount chut bill tax percent net",
@@ -1905,6 +2056,10 @@ function patro(by,bm,bd){
            rashi:Math.floor(sid/30), ti:Math.floor(phase/12) };
 }
 var ICONS = {
+weight:'<rect x="9.2" y="3.5" width="5.6" height="4" rx="1"/><path d="M6 7.5h12l2 13H4z"/><rect x="6.6" y="12.6" width="10.8" height="2.6" fill="#F5B301" stroke="none"/>',
+cashnote:'<rect x="2.5" y="6" width="19" height="12"/><circle cx="12" cy="12" r="2.7" fill="#F5B301" stroke="none"/><circle cx="12" cy="12" r="2.7"/><line x1="5.6" y1="9.5" x2="5.6" y2="14.5"/><line x1="18.4" y1="9.5" x2="18.4" y2="14.5"/>',
+roofsheet:'<path d="M3.5 10.5L12 4l8.5 6.5"/><circle cx="12" cy="4" r="1.4" fill="#F5B301" stroke="none"/><path d="M4.5 14.2c1.25-1.7 2.5-1.7 3.75 0s2.5 1.7 3.75 0 2.5-1.7 3.75 0 2.5 1.7 3.75 0"/><path d="M4.5 18.4c1.25-1.7 2.5-1.7 3.75 0s2.5 1.7 3.75 0 2.5-1.7 3.75 0 2.5 1.7 3.75 0"/>',
+pct:'<line x1="5.5" y1="18.5" x2="18.5" y2="5.5"/><circle cx="7.6" cy="7.6" r="2.5"/><circle cx="16.4" cy="16.4" r="2.5" fill="#F5B301" stroke="none"/><circle cx="16.4" cy="16.4" r="2.5"/>',
 interest:'<path d="M4 19.5V5.5"/><path d="M4 19.5h16.5"/><path d="M6.5 15.5c3-1 4.5-5.5 7-7.5 1.8-1.4 4-1.5 6-.5" stroke="#F5B301" stroke-width="2.2"/><circle cx="8.5" cy="9" r="1.4" fill="#F5B301" stroke="none"/>',
 age:'<circle cx="12" cy="7.5" r="3.2"/><path d="M5.5 20.5c.6-4 3.2-6.5 6.5-6.5s5.9 2.5 6.5 6.5"/><path d="M12 2.2v1.6" stroke="#F5B301" stroke-width="2.4"/>',
 vatdisc:'<line x1="5" y1="19" x2="19" y2="5"/><circle cx="7.5" cy="7.5" r="2.6"/><circle cx="16.5" cy="16.5" r="2.6" fill="#F5B301"/>',
