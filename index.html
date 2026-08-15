@@ -126,6 +126,11 @@ header{background:var(--ink);color:#fff;padding:14px 16px 12px;position:sticky;t
   background-position:calc(100% - 16px) 18px,calc(100% - 11px) 18px;background-size:5px 5px;background-repeat:no-repeat}
 .f input:focus,.f select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(245,179,1,.28)}
 .f input[type=date]{font-family:var(--fm)}
+.f textarea{width:100%;font-size:15.5px;font-family:var(--fs);padding:10px 11px;resize:vertical;min-height:88px;
+  border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);line-height:1.55}
+.f textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(245,179,1,.28)}
+.row.txt{display:block}
+.row.txt .rv{display:block;text-align:left;font-size:17px;line-height:1.7;font-family:var(--fs);white-space:pre-wrap;word-break:break-word;background:none;padding:6px 0 0;margin:0}
 
 /* ---------- result slip ---------- */
 .slip{position:relative;background:var(--card);border:1px solid var(--line);border-bottom:0;
@@ -203,6 +208,8 @@ body[data-theme="dark"] .ctot{background:#1B2530}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
 .disp .dval{font-family:var(--fm);font-size:37px;font-weight:700;color:var(--tape);line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr}
+.disp .dwords{font-family:var(--fs);font-size:12.5px;color:#AEB9C4;line-height:1.4;margin-top:7px;
+  min-height:16px;text-align:right;white-space:normal;word-break:break-word}
 .vatrow{display:flex;gap:7px;align-items:stretch;margin:11px 0 9px}
 .vlab{flex:0 0 auto;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;
   color:var(--ink2);border:1.5px solid var(--line);border-radius:9px;padding:0 9px;background:var(--card)}
@@ -814,6 +821,109 @@ function fxRate(code){
 /*==LIB_END==*/
 
 /*==TOOLS_START==*/
+/* Preeti → Unicode : FOSS Nepal (2utf8) mapping, Shuvayatra/preeti.js port */
+var PREETI_MAP = JSON.parse('{"\u00f7":"/","v":"\u0916","r":"\u091a","\\"":"\u0942","~":"\u091e\u094d","z":"\u0936","\u00e7":"\u0950","f":"\u093e","b":"\u0926","n":"\u0932","j":"\u0935","\u00d7":"\u00d7","V":"\u0916\u094d","R":"\u091a\u094d","\u00df":"\u0926\u094d\u092e","^":"\u096c","\u00db":"!","Z":"\u0936\u094d","F":"\u0901","B":"\u0926\u094d\u092f","N":"\u0932\u094d","\u00cb":"\u0919\u094d\u0917","J":"\u0935\u094d","6":"\u091f","2":"\u0926\u094d\u0926","\u00bf":"\u0930\u0942",">":"\u0936\u094d\u0930",":":"\u0938\u094d","\u00a7":"\u091f\u094d\u091f","&":"\u096d","\u00a3":"\u0918\u094d","\u2022":"\u0921\u094d\u0921",".":"\u0964","\u00ab":"\u094d\u0930","*":"\u096e","\u201e":"\u0927\u094d\u0930","w":"\u0927","s":"\u0915","g":"\u0928","\u00e6":"\u201c","c":"\u0905","o":"\u092f","k":"\u092a","W":"\u0927\u094d","\u00d6":"=","S":"\u0915\u094d","\u00d2":"\u00a8","_":")","[":"\u0943","\u00da":"\u2019","G":"\u0928\u094d","\u02c6":"\u092b\u094d","C":"\u090b","O":"\u0907","\u00ce":"\u0919\u094d\u0916","K":"\u092a\u094d","7":"\u0920","\u00b6":"\u0920\u094d\u0920","3":"\u0918","9":"\u0922","?":"\u0930\u0941",";":"\u0938","\u0027":"\u0941","#":"\u0969","\u00a2":"\u0926\u094d\u0918","/":"\u0930","+":"\u0902","\u00aa":"\u0919","t":"\u0924","p":"\u0909","|":"\u094d\u0930","x":"\u0939","\u00e5":"\u0926\u094d\u0935","d":"\u092e","`":"\u091e","l":"\u093f","h":"\u091c","T":"\u0924\u094d","P":"\u090f","\u00dd":"\u091f\u094d\u0920","\\\\":"\u094d","\u00d9":";","X":"\u0939\u094d","\u00c5":"\u0939\u0943","D":"\u092e\u094d","@":"\u0968","\u00cd":"\u0919\u094d\u0915","L":"\u0940","H":"\u091c\u094d","4":"\u0926\u094d\u0927","\u00b1":"+","0":"\u0923\u094d","<":"?","8":"\u0921","\u00a5":"\u0930\u094d\u200d","$":"\u096a","\u00a1":"\u091c\u094d\u091e\u094d",",":",","\u00a9":"\u0930","(":"\u096f","\u2018":"\u0945","u":"\u0917","q":"\u0924\u094d\u0930","}":"\u0948","y":"\u0925","e":"\u092d","a":"\u092c","i":"\u0937\u094d","\u2030":"\u091d\u094d","U":"\u0917\u094d","Q":"\u0924\u094d\u0924","]":"\u0947","\u02dc":"\u093d","Y":"\u0925\u094d","\u00d8":"\u094d\u092f","E":"\u092d\u094d","A":"\u092c\u094d","M":"\u0903","\u00cc":"\u0928\u094d\u0928","I":"\u0915\u094d\u0937\u094d","5":"\u091b","\u00b4":"\u091d","1":"\u091c\u094d\u091e","\u00b0":"\u0919\u094d\u0922","=":".","\u00c6":"\u201d","\u2039":"\u0919\u094d\u0918","%":"\u096b","\u00a4":"\u091d\u094d","!":"\u0967","-":"(","\u203a":"\u0926\u094d\u0930",")":"\u0966","\u2026":"\u2018","\u00dc":"%"}');
+var PREETI_RULES = [
+["\u094d\u093e",""],
+["(\u0924\u094d\u0930|\u0924\u094d\u0924)([^\u0909\u092d\u092a]+?)m","$1m$2"],
+["\u0924\u094d\u0930m","\u0915\u094d\u0930"],
+["\u0924\u094d\u0924m","\u0915\u094d\u0924"],
+["([^\u0909\u092d\u092a]+?)m","m$1"],
+["\u0909m","\u090a"],["\u092dm","\u091d"],["\u092am","\u092b"],
+["\u0907{","\u0908"],
+["\u093f((.\u094d)*[^\u094d])","$1\u093f"],
+["(.[\u093e\u093f\u0940\u0941\u0942\u0943\u0947\u0948\u094b\u094c\u0902\u0903\u0901]*?){","{$1"],
+["((.\u094d)*){","{$1"],
+["{","\u0930\u094d"],
+["([\u093e\u0940\u0941\u0942\u0943\u0947\u0948\u094b\u094c\u0902\u0903\u0901]+?)(\u094d(.\u094d)*[^\u094d])","$2$1"],
+["\u094d([\u093e\u0940\u0941\u0942\u0943\u0947\u0948\u094b\u094c\u0902\u0903\u0901]+?)((.\u094d)*[^\u094d])","\u094d$2$1"],
+["([\u0902\u0901])([\u093e\u093f\u0940\u0941\u0942\u0943\u0947\u0948\u094b\u094c\u0903]*)","$2$1"],
+["\u0901\u0901","\u0901"],["\u0902\u0902","\u0902"],["\u0947\u0947","\u0947"],["\u0948\u0948","\u0948"],["\u0941\u0941","\u0941"],["\u0942\u0942","\u0942"],
+["^\u0903",":"],
+["\u091f\u0943","\u091f\u094d\u091f"],
+["\u0947\u093e","\u093e\u0947"],["\u0948\u093e","\u093e\u0948"],
+["\u0905\u093e\u0947","\u0913"],["\u0905\u093e\u0948","\u0914"],["\u0905\u093e","\u0906"],["\u090f\u0947","\u0910"],
+["\u093e\u0947","\u094b"],["\u093e\u0948","\u094c"]];
+function preeti2uni(txt){
+  var out = "";
+  for(var i=0;i<txt.length;i++){ var c = txt[i]; out += (PREETI_MAP[c] !== undefined ? PREETI_MAP[c] : c); }
+  PREETI_RULES.forEach(function(r){ out = out.replace(new RegExp(r[0],"gm"), r[1]); });
+  return out;
+}
+/* Nepali number → words (lakh-crore grouping) */
+var NPW = ["श\u0942न्य","एक","दुई","तीन","चार","पाँच","छ","सात","आठ","नौ","दश","एघार","बाह्र","तेह्र","चौध","पन्ध्र","सोह्र","सत्र","अठार","उन्नाइस","बीस","एक्काइस","बाइस","तेइस","चौबीस","पच्चीस","छब्बीस","सत्ताइस","अठ्ठाइस","उनन्तीस","तीस","एकतीस","बत्तीस","तेत्तीस","चौँतीस","पैँतीस","छत्तीस","सैँतीस","अठतीस","उनन्चालीस","चालीस","एकचालीस","बयालीस","त्रिचालीस","चवालीस","पैँतालीस","छयालीस","सतचालीस","अठचालीस","उनन्चास","पचास","एकाउन्न","बाउन्न","त्रिपन्न","चवन्न","पचपन्न","छपन्न","सन्ताउन्न","अन्ठाउन्न","उनन्साठी","साठी","एकसट्ठी","बयसट्ठी","त्रिसट्ठी","चौंसट्ठी","पैंसट्ठी","छयसट्ठी","सतसट्ठी","अठसट्ठी","उनन्सत्तरी","सत्तरी","एकहत्तर","बहत्तर","त्रिहत्तर","चौहत्तर","पचहत्तर","छयहत्तर","सतहत्तर","अठहत्तर","उनासी","असी","एकासी","बयासी","त्रियासी","चौरासी","पचासी","छयासी","सतासी","अठासी","उनान्नब्बे","नब्बे","एकानब्बे","बयानब्बे","त्रियानब्बे","चौरानब्बे","पन्चानब्बे","छयानब्बे","सन्तानब्बे","अन्ठानब्बे","उनान्सय"];
+function npWords(num){
+  num = Math.floor(Math.abs(num));
+  if(num === 0) return NPW[0];
+  if(num >= 1e14) return null;
+  var parts = [], G = [["खर्ब",1e11],["अर्ब",1e9],["करोड",1e7],["लाख",1e5],["हजार",1e3],["सय",100]];
+  G.forEach(function(g){
+    var q = Math.floor(num/g[1]);
+    if(q > 0){ parts.push((q > 99 ? npWords(q) : NPW[q]) + " " + g[0]); num -= q*g[1]; }
+  });
+  if(num > 0) parts.push(NPW[num]);
+  return parts.join(" ");
+}
+function npTaxCalc(inc, fy, st){
+  var slabs = (fy==="82")
+    ? ((st==="m") ? [[600000,1],[200000,10],[300000,20],[900000,30],[3000000,36],[Infinity,39]]
+                  : [[500000,1],[200000,10],[300000,20],[1000000,30],[3000000,36],[Infinity,39]])
+    : [[1000000,1],[500000,10],[1000000,20],[1500000,27],[Infinity,29]];
+  var left = inc, tax = 0;
+  for(var i=0;i<slabs.length && left>0;i++){ var amt = Math.min(left, slabs[i][0]); tax += amt*slabs[i][1]/100; left -= amt; }
+  return tax;
+}
+var U2P_MAP = null;
+function uni2preeti(txt){
+  if(!U2P_MAP){
+    U2P_MAP = {};
+    var pref = {"\u0930":"/","\u094d\u0930":"|","\u094d":"\\"};
+    for(var k in PREETI_MAP){ var u = PREETI_MAP[k]; if(u && u.length && !(u in U2P_MAP)) U2P_MAP[u] = k; }
+    for(var p in pref) U2P_MAP[p] = pref[p];
+    U2P_MAP["\u092b"]="km"; U2P_MAP["\u091d"]="\u00b4"; U2P_MAP["\u090a"]="pm"; U2P_MAP["\u0908"]="O{";
+    U2P_MAP["\u094b"]=null; U2P_MAP["\u094c"]=null; /* decomposed below */
+  }
+  txt = txt.replace(/\u094b/g,"\u093e\u0947").replace(/\u094c/g,"\u093e\u0948")
+           .replace(/\u0913/g,"\u0905\u093e\u0947").replace(/\u0914/g,"\u0905\u093e\u0948")
+           .replace(/\u0906/g,"\u0905\u093e").replace(/\u0910/g,"\u090f\u0947");
+  /* reph र् + cluster → cluster + {  */
+  txt = txt.replace(/\u0930\u094d((?:[\u0915-\u0939]\u094d)*[\u0915-\u0939][\u093e\u093f\u0940\u0941\u0942\u0943\u0947\u0948\u0902\u0903\u0901]*)/g, "$1{");
+  /* ि before its cluster */
+  txt = txt.replace(/((?:[\u0915-\u0939]\u094d)*[\u0915-\u0939])\u093f/g, "\u093f$1");
+  var out = "";
+  for(var i=0;i<txt.length;){
+    var hit = null, len = 0;
+    for(var l=Math.min(4, txt.length-i); l>=1; l--){
+      var seg = txt.substr(i,l);
+      if(U2P_MAP[seg]){ hit = U2P_MAP[seg]; len = l; break; }
+    }
+    if(hit){ out += hit; i += len; } else { out += txt[i]; i++; }
+  }
+  return out;
+}
+var ENW1 = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+var ENW10 = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+function en99(x){ return x<20 ? ENW1[x] : ENW10[Math.floor(x/10)] + (x%10 ? "-"+ENW1[x%10] : ""); }
+function enWords(num){
+  num = Math.floor(Math.abs(num));
+  if(num === 0) return "zero";
+  if(num >= 1e14) return null;
+  var parts = [], G = [["kharba",1e11],["arba",1e9],["crore",1e7],["lakh",1e5],["thousand",1e3],["hundred",100]];
+  G.forEach(function(g){
+    var q = Math.floor(num/g[1]);
+    if(q > 0){ parts.push((q > 99 ? enWords(q) : en99(q)) + " " + g[0]); num -= q*g[1]; }
+  });
+  if(num > 0) parts.push(en99(num));
+  return parts.join(" ");
+}
+function npGroup(num){
+  var s = String(Math.floor(Math.abs(num))), out = "";
+  if(s.length > 3){ var head = s.slice(0,-3);
+    out = head.replace(/\B(?=(\d{2})+(?!\d))/g,",") + "," + s.slice(-3);
+  } else out = s;
+  return out;
+}
+
 var U = {
   ft:"ft", inch:"inch", sqft:"sq.ft", sqm:"sq.m", cuft:"cu.ft", cum:"cu.m", kg:"kg", pct:"%",
   nos:["वटा","nos"], pcs:["गोटा","pcs"], lit:["लिटर","litre"],
@@ -1163,29 +1273,100 @@ var TOOLS = [
 { id:"roofsheet", cat:"con", ic:"🛖", neu:true,
   nm:["जस्ता पाता Calculator","Roofing Sheet"],
   sb:["छानाको नाप → कति पाता","Roof size → sheets needed"],
-  kw:"roofing sheet jasta pata chhana roof tin cgi dhalan",
+  kw:"roofing sheet jasta pata chhana roof tin cgi dhalan truss teda bhiralo slope pitch",
   ex:["२४ × १६ ft छाना, ८ ft × 2.75 ft पाता, १५% overlap — २१ पाता",
       "24 × 16 ft roof, 8 × 2.75 ft sheet, 15% overlap — 21 sheets"],
-  f:[ {k:"l",l:["छानाको लम्बाइ","Roof length"],u:U.ft,d:24,w:1},
-      {k:"w",l:["छानाको चौडाइ (भिरालोतिरको)","Roof width (slope side)"],u:U.ft,d:16,w:1},
+  f:[ {k:"rt",l:["छानाको किसिम","Roof type"],t:"s",d:"flat",o:[["flat",["सिधा / भिरालो नाप थाहा छ","Flat / slope length known"]],["lean",["एकतर्फी भिरालो (त्रिकोण — half)","Lean-to (one slope)"]],["gable",["दुईतर्फी भिरालो (गेबल)","Gable (two slopes)"]]]},
+      {k:"l",l:["छानाको लम्बाइ","Roof length"],u:U.ft,d:24,w:1},
+      {k:"w",l:["छानाको चौडाइ (भिरालोतिरको)","Roof width (slope side)"],u:U.ft,d:16,w:1,sif:function(v){return v.rt==="flat";}},
+      {k:"sp",l:["तेर्सो चौडाइ (span)","Horizontal span"],u:U.ft,d:16,w:1,sif:function(v){return v.rt!=="flat";}},
+      {k:"rh",l:["धुरीको उचाइ (rise)","Ridge height (rise)"],u:U.ft,d:4,w:1,sif:function(v){return v.rt!=="flat";}},
       {k:"sl",l:["पाताको लम्बाइ","Sheet length"],u:U.ft,d:8,w:1},
       {k:"sw",l:["पाताको चौडाइ","Sheet width"],u:U.ft,d:2.75,w:1},
       {k:"ov",l:["Overlap (जोडाइ)","Overlap"],u:U.pct,d:15,w:1} ],
   calc:function(v){
-    var area = n(v.l)*n(v.w);
+    var Lg = n(v.l), W, slopeRows = [];
+    if(v.rt==="flat"){ W = n(v.w); }
+    else {
+      var span = n(v.sp), rise = n(v.rh);
+      if(span<=0) return {err:["तेर्सो चौडाइ (span) हाल्नुहोस्।","Enter the horizontal span."]};
+      var run = (v.rt==="gable") ? span/2 : span;
+      var slope = Math.sqrt(run*run + rise*rise);
+      W = (v.rt==="gable") ? slope*2 : slope;
+      slopeRows.push(row(["भिरालो नाप (एक साइड) √("+fmt(run,1)+"²+"+fmt(rise,1)+"²)","Slope length (one side)"], fmt(slope,2), U.ft));
+      if(v.rt==="gable") slopeRows.push(row(["दुवै साइड जोड्दा","Both sides"], fmt(W,2), U.ft, "sub"));
+    }
+    var area = Lg*W;
     if(area<=0) return {err:["छानाको नाप हाल्नुहोस्।","Enter the roof size."]};
     var sl = n(v.sl), sw = n(v.sw), ov = n(v.ov)||0;
     if(sl<=0 || sw<=0) return {err:["पाताको साइज हाल्नुहोस् — supplier अनुसार फरक हुन्छ।","Enter the sheet size — it varies by supplier."]};
     if(ov>=50) return {err:["Overlap ५०% भन्दा कम हुनुपर्छ।","Overlap must be below 50%."]};
     var cov = sl*sw*(1-ov/100), sheets = ceil(area/cov);
-    return { rows:[
+    return { rows: slopeRows.concat([
       row(["छानाको क्षेत्रफल","Roof area"], fmt(area,2), U.sqft),
       row(["पाताको नाप","Sheet size"], fmt(sl,2)+" × "+fmt(sw,2), U.ft),
       row(["प्रति पाताले छोप्ने (overlap घटाई)","Coverage per sheet (less overlap)"], fmt(cov,2), U.sqft, "sub"),
       row(["थप राख्दा राम्रो (जगेडा)","Suggested spare"], "+ "+Math.max(1,ceil(sheets*0.05)), ["पाता","sheets"], "sub"),
-      row(["चाहिने पाता","Sheets needed"], fmt(sheets,0), ["पाता","sheets"], "big") ],
-      note:["पाताको साइज र overlap supplier/मिस्त्री अनुसार फरक हुन्छ — आफ्नो पाताको नाप हालेर हिसाब गर्नुहोस्। भिरालो छानाको चौडाइ भिरालो नापेर हाल्नुहोस्।",
-            "Sheet size and overlap vary by supplier — type your own sheet size. Measure the width along the slope."] };
+      row(["चाहिने पाता","Sheets needed"], fmt(sheets,0), ["पाता","sheets"], "big") ]),
+      note:["भिरालो नाप = √(तेर्सो² + उचाइ²) — जस्ता किन्दा भिरालो नापले किन्नुपर्छ, तेर्सोले होइन। पाताको साइज र overlap supplier अनुसार फरक हुन्छ — आफ्नै नाप हाल्नुहोस्।",
+            "Slope = √(span² + rise²) — buy sheets by the slope length, not the horizontal span. Sheet size and overlap vary by supplier — type your own."] };
+  }},
+
+
+/* ---------------- ढलान ---------------- */
+{ id:"dhalan", cat:"con", ic:"🏗️", neu:true,
+  nm:["ढलान Estimator","Slab Concreting"],
+  sb:["Slab को नाप → सिमेन्ट+बालुवा+गिट्टी+रड","Slab size → cement, sand, aggregate, rod"],
+  kw:"dhalan slab concrete rcc chhat roof casting cement rod",
+  ex:["२० × १६ ft slab, ५ inch, M20 (1:1.5:3)","20 × 16 ft slab, 5 inch thick, M20 (1:1.5:3)"],
+  f:[ {k:"l",l:["लम्बाइ","Length"],u:U.ft,d:20,w:1},
+      {k:"w",l:["चौडाइ","Width"],u:U.ft,d:16,w:1},
+      {k:"t",l:["मोटाइ","Thickness"],u:U.inch,d:5,w:1},
+      {k:"mx",l:["Mix (grade)","Mix (grade)"],t:"s",d:"20",o:[["20",["M20 — 1 : 1.5 : 3 (छत/slab)","M20 — 1:1.5:3 (slabs)"]],["15",["M15 — 1 : 2 : 4","M15 — 1:2:4"]]],w:1},
+      {k:"sk",l:["रड (प्रति cu.m)","Steel (per cu.m)"],u:"kg",d:80,w:1},
+      {k:"cr",l:["सिमेन्ट दर (बोरा)","Cement rate (bag)"],u:["रु","Rs"],d:750,w:1,exrate:true,rk:"cement"},
+      {k:"sr",l:["रड दर (kg)","Rod rate (kg)"],u:["रु","Rs"],d:115,w:1,exrate:true,rk:"steel"} ],
+  calc:function(v){
+    var vol = n(v.l)*n(v.w)*n(v.t)/12;
+    if(vol<=0) return {err:["Slab को नाप हाल्नुहोस्।","Enter the slab size."]};
+    var volM = vol*0.0283168, dry = vol*1.54;
+    var R = (v.mx==="15") ? [1,2,4] : [1,1.5,3], sum = R[0]+R[1]+R[2];
+    var cemCft = dry*R[0]/sum, bags = ceil(cemCft/1.226);
+    var sand = dry*R[1]/sum, agg = dry*R[2]/sum;
+    var rod = volM*(n(v.sk)||80);
+    var cost = bags*n(v.cr) + rod*n(v.sr);
+    return { rows:[
+      row(["ढलानको आयतन","Wet volume"], fmt(vol,2)+" cu.ft = "+fmt(volM,2), "cu.m"),
+      row(["सिमेन्ट","Cement"], fmt(bags,0), ["बोरा","bags"]),
+      row(["बालुवा","Sand"], fmt(sand,1), U.cuft),
+      row(["गिट्टी","Aggregate"], fmt(agg,1), U.cuft),
+      row(["रड (approx "+fmt(n(v.sk)||80,0)+" kg/cu.m)","Rod (approx)"], fmt(rod,0), "kg"),
+      row(["सिमेन्ट + रडको लागत","Cement + rod cost"], rs(cost), "", "big") ],
+      note:["Dry volume ×1.54 मानिएको। रडको मात्रा डिजाइन अनुसार फरक पर्छ (slab मा प्रायः ७०–९० kg/cu.m) — engineer को drawing नै अन्तिम हो। बालुवा/गिट्टीको लागत थप्न दर आफ्नो क्षेत्रको हाल्नुहोस्।",
+            "Dry volume ×1.54. Steel varies by design (70–90 kg/cu.m typical for slabs) — the engineer's drawing is final."] };
+  }},
+
+/* ---------------- Septic Tank ---------------- */
+{ id:"septic", cat:"con", ic:"🚽", neu:true,
+  nm:["Septic Tank साइज","Septic Tank Size"],
+  sb:["प्रयोगकर्ता संख्या → ट्याङ्कीको नाप","Users → tank size"],
+  kw:"septic tank safety soak pit toilet charpi sauchalaya",
+  ex:["८ जनाको घर → ≈ ३,४४० लिटर","Home of 8 people → ≈ 3,440 litres"],
+  f:[ {k:"np",l:["प्रयोग गर्ने जना","Number of users"],d:8,w:1},
+      {k:"dep",l:["ट्याङ्कीको गहिराइ","Tank depth"],u:U.ft,d:5,w:1} ],
+  calc:function(v){
+    var N = n(v.np);
+    if(N<=0) return {err:["जना संख्या हाल्नुहोस्।","Enter the number of users."]};
+    var lit = 180*N + 2000;
+    var cuft = lit/28.3168, dep = n(v.dep)||5;
+    var area = cuft/dep, wRatio = Math.sqrt(area/2), Lg = wRatio*2, W = wRatio;
+    return { rows:[
+      row(["चाहिने क्षमता (180N + 2000)","Capacity needed (180N + 2000)"], fmt(lit,0), U.lit),
+      row(["आयतन","Volume"], fmt(cuft,1), U.cuft),
+      row(["सुझाव नाप (L × B × D)","Suggested size (L × B × D)"], fmt(Lg,1)+" × "+fmt(W,1)+" × "+fmt(dep,1), U.ft, "big"),
+      row(["Soak pit (सुझाव)","Soak pit (suggested)"], "≈ 4 × 4 × 6", U.ft, "sub") ],
+      note:["British Standard सूत्र (C = 180N + 2000 litres), L:B ≈ 2:1। सफा गर्ने अन्तराल २ वर्ष मानिएको। स्थानीय निकायको मापदण्ड र जमिन (पानीको सतह) अनुसार engineer सँग सल्लाह गर्नुहोस्।",
+            "British Standard C = 180N + 2000 litres, L:B ≈ 2:1, ~2-year desludging. Confirm local code and water table with an engineer."] };
   }},
 
 /* ---------------- 9. जग्गा Converter ---------------- */
@@ -1479,6 +1660,197 @@ var TOOLS = [
       note:["सूत्र: X × Y ÷ १००।","Formula: X × Y ÷ 100."] };
   }},
 
+
+
+/* ---------------- मजदुरी ---------------- */
+{ id:"majduri", cat:"fin", ic:"👷", neu:true,
+  nm:["मजदुरी हिसाब","Wages Calculator"],
+  sb:["दिन × ज्याला − पेश्की = बाँकी","Days × wage − advance = due"],
+  kw:"majduri jyala wage labour kaam din hajiri peski advance",
+  ex:["२२ दिन × रु १,२०० + OT − पेश्की रु ५,०००","22 days × Rs 1,200 + OT − Rs 5,000 advance"],
+  f:[ {k:"d",l:["काम गरेको दिन","Days worked"],d:22,w:1},
+      {k:"r",l:["दैनिक ज्याला","Daily wage"],u:["रु","Rs"],d:1200,w:1},
+      {k:"oh",l:["Overtime घण्टा","Overtime hours"],d:0,w:1},
+      {k:"or",l:["OT दर (घण्टा)","OT rate (hour)"],u:["रु","Rs"],d:225,w:1},
+      {k:"adv",l:["पेश्की (advance) लिएको","Advance taken"],u:["रु","Rs"],d:5000} ],
+  calc:function(v){
+    var base = n(v.d)*n(v.r);
+    if(base<=0) return {err:["दिन र ज्याला हाल्नुहोस्।","Enter days and wage."]};
+    var ot = n(v.oh)*n(v.or), adv = n(v.adv)||0, due = base+ot-adv;
+    var rows = [ row(["ज्याला ("+fmt(n(v.d),0)+" दिन × "+fmt(n(v.r),0)+")","Wages ("+fmt(n(v.d),0)+" days)"], rs(base), "") ];
+    if(ot>0) rows.push(row(["Overtime","Overtime"], rs(ot), "", "sub"));
+    if(adv>0) rows.push(row(["पेश्की घटाइयो","Less advance"], "− "+rs(adv), "", "sub"));
+    rows.push(row([due>=0?"बुझाउन बाँकी":"बढी दिइसकेको", due>=0?"Amount due":"Overpaid"], rs(Math.abs(due)), "", "big"));
+    return { rows:rows, note:["हाजिरी र पेश्कीको record स्लिपमा share गरेर राख्नुहोस् — पछि विवाद पर्दैन।","Share the slip to keep a record of attendance and advances."] };
+  }},
+
+/* ---------------- तलब TDS ---------------- */
+{ id:"salary", cat:"fin", ic:"💼", neu:true,
+  nm:["तलब TDS हिसाब","Salary TDS"],
+  sb:["मासिक तलब → कर कट्टा र हातमा आउने","Monthly salary → tax and take-home"],
+  kw:"salary talab tds tax katta ssf hatma net pay",
+  ex:["मासिक रु ६०,००० + SSF → हातमा कति?","Rs 60,000/month with SSF → take-home"],
+  f:[ {k:"sal",l:["मासिक तलब (gross)","Monthly gross salary"],u:["रु","Rs"],d:60000},
+      {k:"ssf",l:["SSF मा आबद्ध?","Enrolled in SSF?"],t:"s",d:"y",o:[["y",["छ (११% कट्टा)","Yes (11% deducted)"]],["n",["छैन","No"]]],w:1},
+      {k:"fy",l:["आर्थिक वर्ष","Fiscal year"],t:"s",d:"84",o:[["84",["FY 2083/84","FY 2083/84"]],["82",["FY 2082/83 (एकल)","FY 2082/83 (single)"]]],w:1} ],
+  calc:function(v){
+    var sal = n(v.sal);
+    if(sal<=0) return {err:["मासिक तलब हाल्नुहोस्।","Enter the monthly salary."]};
+    var annual = sal*12, ssfM = (v.ssf==="y") ? sal*0.11 : 0;
+    var taxable = annual - ssfM*12;
+    var tax = npTaxCalc(taxable, v.fy, "s"), taxM = tax/12;
+    var net = sal - ssfM - taxM;
+    var rows = [ row(["वार्षिक तलब","Annual salary"], rs(annual), "") ];
+    if(ssfM>0) rows.push(row(["SSF कट्टा (११%)","SSF deduction (11%)"], "− "+rs(ssfM)+" /महिना", "", "sub"));
+    rows.push(row(["करयोग्य आय (वार्षिक)","Taxable income (annual)"], rs(taxable), "", "sub"));
+    rows.push(row(["TDS (मासिक औसत)","TDS (monthly average)"], "− "+rs(taxM), ""));
+    rows.push(row(["हातमा आउने (मासिक)","Take-home (monthly)"], rs(net), "", "big"));
+    return { rows:rows,
+      note:["⚠️ अनुमान मात्र — SSF ११% पूरै तलबमा मानिएको (नियमले basic मा हुन्छ), बीमा/अन्य deduction समावेश छैन। Exact को लागि accountant वा ird.gov.np।",
+            "⚠️ Estimate — SSF 11% assumed on full salary (rules apply it to basic), other deductions excluded. See an accountant or ird.gov.np."] };
+  }},
+
+/* ---------------- FD Compare ---------------- */
+{ id:"fdcmp", cat:"fin", ic:"🏛️", neu:true,
+  nm:["FD तुलना","FD Compare"],
+  sb:["दुई बैंकको दर — कुन राम्रो?","Two bank rates — which is better?"],
+  kw:"fd fixed deposit muddati compare byaj rate bank tulana",
+  ex:["रु ५ लाख, ३ वर्ष: ७.१% vs ७.६% → फरक कति?","Rs 5 lakh, 3 yrs: 7.1% vs 7.6% → difference"],
+  f:[ {k:"p",l:["रकम","Amount"],u:["रु","Rs"],d:500000},
+      {k:"ra",l:["बैंक A दर","Bank A rate"],u:U.pct,d:7.1,w:1},
+      {k:"rb",l:["बैंक B दर","Bank B rate"],u:U.pct,d:7.6,w:1},
+      {k:"t",l:["अवधि (वर्ष)","Tenure (years)"],d:3,w:1},
+      {k:"cf",l:["Compounding","Compounding"],t:"s",d:"4",o:[["4",["त्रैमासिक (प्रायः)","Quarterly (typical)"]],["2",["अर्ध-वार्षिक","Half-yearly"]],["1",["वार्षिक","Yearly"]]],w:1} ],
+  calc:function(v){
+    var P = n(v.p), T = n(v.t), nf = parseInt(v.cf,10)||4;
+    if(P<=0||T<=0) return {err:["रकम र अवधि हाल्नुहोस्।","Enter amount and tenure."]};
+    function mat(r){ return P*Math.pow(1+(r/100)/nf, nf*T); }
+    var A = mat(n(v.ra)), B = mat(n(v.rb));
+    var best = (B>=A) ? "B" : "A", diff = Math.abs(B-A);
+    return { rows:[
+      row(["बैंक A ("+fmt(n(v.ra),2)+"%) पाकेर","Bank A ("+fmt(n(v.ra),2)+"%) matures to"], rs(A), ""),
+      row(["बैंक B ("+fmt(n(v.rb),2)+"%) पाकेर","Bank B ("+fmt(n(v.rb),2)+"%) matures to"], rs(B), ""),
+      row(["ब्याज A / B","Interest A / B"], rs(A-P)+" / "+rs(B-P), "", "sub"),
+      row(["राम्रो: बैंक "+best,"Better: Bank "+best], "+ "+rs(diff), "", "big") ],
+      note:["कर (५–६% ब्याज कर) घटाएको छैन। नवीकरण नीति, premature penalty र बैंकको स्थायित्व पनि हेर्नुहोस्।",
+            "Interest tax (5–6%) not deducted. Also compare renewal terms, premature penalties and bank stability."] };
+  }},
+
+/* ---------------- उधारो खाता ---------------- */
+{ id:"udharo", cat:"fin", ic:"📒", neu:true, custom:true,
+  nm:["उधारो खाता","Credit Ledger"],
+  sb:["दिएको–लिएको record, फोनमै save","Given–taken records, saved on this phone"],
+  kw:"udharo khata ledger baki paisa dine line record",
+  ex:["राम दाइ — दिएको रु २,५००; सीता — लिएको रु १,०००","Ram — gave Rs 2,500; Sita — took Rs 1,000"],
+  html:function(){
+    return '<div class="fields">'
+      + '<label class="f"><span class="fl">'+L("नाम","Name")+'</span><input type="text" id="udName" placeholder="'+L("जस्तै: राम दाइ","e.g. Ram")+'"></label>'
+      + '<label class="f half"><span class="fl">'+L("रकम","Amount")+' <em>'+L("रु","Rs")+'</em></span><input type="number" inputmode="decimal" id="udAmt"></label>'
+      + '<label class="f half"><span class="fl">'+L("किसिम","Type")+'</span><select id="udType"><option value="g">'+L("दिएको (पाउनु पर्ने)","Given (they owe)")+'</option><option value="t">'+L("लिएको (तिर्नु पर्ने)","Taken (I owe)")+'</option></select></label>'
+      + '<button class="rembtn" id="udAdd" style="grid-column:1/-1">＋ '+L("थप्नुहोस्","Add")+'</button>'
+      + '</div><div id="udOut"></div>';
+  },
+  init:function(){
+    var KEY = "ganak_udharo";
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||"[]"); }catch(e){ return []; } }
+    function save(x){ try{ localStorage.setItem(KEY, JSON.stringify(x)); }catch(e){} }
+    function render(){
+      var D = load(), out = $("#udOut"), tot = 0, html = "";
+      if(!D.length){ out.innerHTML = '<div class="note" style="margin-top:10px">ℹ️ '+L("अहिलेसम्म कुनै उधारो छैन। माथि नाम र रकम हालेर थप्नुहोस् — यही फोनमा save हुन्छ।","No entries yet. Add a name and amount above — saved on this phone.")+'</div>'; setSticky("",""); stickyEl.style.display="none"; return; }
+      html = '<div class="slip"><div class="slip-h"><span>'+L("उधारो खाता","Ledger")+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>';
+      D.forEach(function(e,i){
+        var amt = (e.t==="g"?1:-1)*e.a; tot += amt;
+        html += '<div class="row sub"><span class="rl">'+esc(e.n)+' <em style="font-style:normal;color:var(--mute);font-size:11px">'+esc(e.d)+'</em></span>'
+             + '<span class="rv" style="color:'+(e.t==="g"?"var(--ink)":"#B54708")+'">'+(e.t==="g"?"":"− ")+L("रु ","Rs ")+fmt(e.a,0)+'</span>'
+             + ' <button class="mini" data-udd="'+i+'" style="margin-left:6px">✕</button></div>';
+      });
+      html += '<div class="row big"><span class="rl">'+L(tot>=0?"जम्मा पाउनु पर्ने":"जम्मा तिर्नु पर्ने", tot>=0?"Net to receive":"Net to pay")+'</span><span class="rv">'+L("रु ","Rs ")+fmt(Math.abs(tot),0)+'</span></div>'
+           + '<div class="note">ℹ️ '+L("यो फोनको browser मा मात्र save हुन्छ — फोन/browser फेरे data जाँदैन साथमा।","Saved only in this phone's browser.")+'</div></div>';
+      out.innerHTML = html;
+      setSticky(L(tot>=0?"जम्मा पाउनु पर्ने":"जम्मा तिर्नु पर्ने", tot>=0?"Net to receive":"Net to pay"), L("रु ","Rs ")+fmt(Math.abs(tot),0));
+    }
+    $("#udAdd").addEventListener("click", function(){
+      var nm = $("#udName").value.trim(), a = parseFloat($("#udAmt").value);
+      if(!nm || !(a>0)){ alert(L("नाम र रकम दुवै हाल्नुहोस्।","Enter both name and amount.")); return; }
+      var D = load(); D.unshift({n:nm.slice(0,40), a:a, t:$("#udType").value, d:new Date().toISOString().slice(0,10)});
+      save(D); $("#udName").value=""; $("#udAmt").value=""; render();
+    });
+    $("#udOut").addEventListener("click", function(e){
+      var b = e.target.closest("[data-udd]"); if(!b) return;
+      if(!confirm(L("यो record हटाउने?","Delete this record?"))) return;
+      var D = load(); D.splice(parseInt(b.dataset.udd,10),1); save(D); render();
+    });
+    render();
+  },
+  share:function(){
+    var D = []; try{ D = JSON.parse(localStorage.getItem("ganak_udharo")||"[]"); }catch(e){}
+    var tot = 0, A = [];
+    D.forEach(function(e){ var amt=(e.t==="g"?1:-1)*e.a; tot+=amt; A.push("• "+e.n+" ("+e.d+"): "+(e.t==="g"?"+":"−")+" रु "+fmt(e.a,0)); });
+    A.push("─────────────", (tot>=0?"जम्मा पाउनु पर्ने: ":"जम्मा तिर्नु पर्ने: ")+"रु "+fmt(Math.abs(tot),0));
+    return A.join("\n");
+  }},
+
+/* ---------------- आयकर ---------------- */
+{ id:"tax", cat:"fin", ic:"🧾", neu:true,
+  nm:["आयकर Calculator","Income Tax"],
+  sb:["वार्षिक आय → slab अनुसार कर","Annual income → slab tax"],
+  kw:"income tax aayakar kar slab ird salary talab",
+  ex:["FY 2083/84: रु १२ लाख आय → कर रु ३०,०००","FY 2083/84: Rs 12 lakh income → tax Rs 30,000"],
+  f:[ {k:"fy",l:["आर्थिक वर्ष","Fiscal year"],t:"s",d:"84",o:[["84",["FY 2083/84 (नयाँ)","FY 2083/84 (new)"]],["82",["FY 2082/83 (पुरानो)","FY 2082/83 (old)"]]]},
+      {k:"st",l:["करदाताको किसिम","Filing status"],t:"s",d:"s",o:[["s",["एकल (Single)","Single"]],["m",["दम्पती (Married)","Married couple"]]],sif:function(v){return v.fy==="82";}},
+      {k:"inc",l:["वार्षिक करयोग्य आय","Annual taxable income"],u:["रु","Rs"],d:1200000} ],
+  calc:function(v){
+    var inc = n(v.inc);
+    if(inc<=0) return {err:["वार्षिक आय हाल्नुहोस्।","Enter the annual income."]};
+    var slabs;
+    if(v.fy==="82"){
+      slabs = (v.st==="m")
+        ? [[600000,1],[200000,10],[300000,20],[900000,30],[3000000,36],[Infinity,39]]
+        : [[500000,1],[200000,10],[300000,20],[1000000,30],[3000000,36],[Infinity,39]];
+    } else {
+      slabs = [[1000000,1],[500000,10],[1000000,20],[1500000,27],[Infinity,29]];
+    }
+    var left = inc, from = 0, tax = 0, rows = [ row(["वार्षिक करयोग्य आय","Annual taxable income"], rs(inc), "") ];
+    for(var i=0;i<slabs.length && left>0;i++){
+      var amt = Math.min(left, slabs[i][0]), t = amt*slabs[i][1]/100;
+      tax += t;
+      rows.push(row([ fmt(from/100000,from%100000?1:0)+"–"+(isFinite(slabs[i][0])?fmt((from+slabs[i][0])/100000,(from+slabs[i][0])%100000?1:0):"…")+" लाख @ "+slabs[i][1]+"%",
+                      fmt(from/100000,from%100000?1:0)+"–"+(isFinite(slabs[i][0])?fmt((from+slabs[i][0])/100000,(from+slabs[i][0])%100000?1:0):"…")+" lakh @ "+slabs[i][1]+"%" ], rs(t), "", "sub"));
+      left -= amt; from += slabs[i][0];
+    }
+    rows.push(row(["जम्मा वार्षिक कर","Total annual tax"], rs(tax), "", "big"));
+    rows.push(row(["महिनाको (औसत)","Per month (average)"], rs(tax/12), "", "sub"));
+    rows.push(row(["प्रभावकारी दर","Effective rate"], fmt(tax/inc*100,2)+"%", "", "sub"));
+    return { rows:rows,
+      note:["⚠️ यो अनुमान मात्र हो, exact filing को लागि accountant वा ird.gov.np हेर्नुहोस्। SSF/insurance जस्ता deduction यसमा समावेश छैन।"+(v.fy==="84"?" FY 2083/84 मा single/married भिन्नता छैन।":""),
+            "⚠️ Estimate only — see an accountant or ird.gov.np for exact filing. SSF/insurance deductions are not included."+(v.fy==="84"?" FY 2083/84 has no single/married distinction.":"")] };
+  }},
+
+/* ---------------- रकम शब्दमा ---------------- */
+{ id:"words", cat:"fin", ic:"✍️", neu:true,
+  nm:["रकम शब्दमा","Amount in Words"],
+  sb:["चेक लेख्न — अङ्क → नेपाली शब्द","Number → Nepali words for cheques"],
+  kw:"words shabda cheque check rakam akshar lakh crore anka",
+  ex:["१,२३,४५६ → एक लाख तेइस हजार चार सय छपन्न","1,23,456 → ek lakh teis hajar char saya chhapanna"],
+  f:[ {k:"amt",l:["रकम","Amount"],u:["रु","Rs"],d:123456} ],
+  calc:function(v){
+    var amt = n(v.amt);
+    if(amt<0 || !isFinite(amt) || v.amt==="") return {err:["रकम हाल्नुहोस्।","Enter the amount."]};
+    var rup = Math.floor(amt), paisa = Math.round((amt-rup)*100);
+    if(paisa===100){ rup++; paisa=0; }
+    var w = npWords(rup);
+    if(w===null) return {err:["रकम धेरै ठूलो भयो (खर्बसम्म मात्र)।","Amount too large (up to kharba only)."]};
+    var full = w + " रुपैयाँ" + (paisa>0 ? " " + npWords(paisa) + " पैसा" : "") + " मात्र";
+    var ew = enWords(rup);
+    var enFull = ew ? ew.charAt(0).toUpperCase()+ew.slice(1) + " rupees" + (paisa>0 ? " and " + enWords(paisa) + " paisa" : "") + " only" : "";
+    var rows = [ row(["अङ्कमा","In figures"], "रु "+npGroup(rup)+(paisa>0?"."+(paisa<10?"0":"")+paisa:""), ""),
+                 row(["नेपालीमा (चेकमा लेख्ने)","In Nepali (for the cheque)"], full, "", "txt big"),
+                 row(["English मा","In English"], enFull, "", "txt") ];
+    return { rows:rows,
+      note:["नेपाली लाख–करोड grouping (हजार–million होइन)। चेकमा शब्दको अन्त्यमा “मात्र” लेख्ने चलन छ।",
+            "Nepali lakh–crore grouping (not thousand–million). Cheques customarily end the words with “matra” (only)."] };
+  }},
+
 /* ---------------- 11. Super Calculator (+ VAT) ---------------- */
 (function(){
   var C = { cur:"0", acc:null, op:null, fresh:true, expr:"", vat:null, bad:false };
@@ -1513,12 +1885,28 @@ var TOOLS = [
       h += slipRow(L("आधार रकम (VAT बिना)","Base amount (excl. VAT)"), rs(C.vat.base), "", "");
       h += slipRow("VAT " + fmt(C.vat.r,2) + "%", rs(C.vat.vat), "", "");
       h += slipRow(L("जम्मा रकम (VAT सहित)","Total (incl. VAT)"), rs(C.vat.tot), "", "big");
+      var vw = calcWords(C.vat.tot);
+      if(vw && vw !== "\u00a0") h += '<div class="row txt sub"><span class="rl">'+esc(L("अक्षरमा","In words"))+'</span><span class="rv">'+vw+'</span></div>';
       h += '<div class="note">ℹ️ ' + esc(L("नेपालको मानक VAT दर १३%। माथिको बक्समा दर बदल्न सकिन्छ।",
              "Nepal's standard VAT rate is 13%. You can change the rate in the box above.")) + '</div></div>';
       vo.innerHTML = h;
     } else vo.innerHTML = "";
+    var dw = document.getElementById("dwords");
+    if(dw){
+      var wv = C.vat ? C.vat.tot : num();
+      dw.innerHTML = calcWords(wv);
+    }
     setSticky(C.vat ? L("जम्मा (VAT सहित)","Total (incl. VAT)") : L("नतिजा","Result"),
               C.vat ? rs(C.vat.tot) : show(C.cur));
+  }
+  function calcWords(x){
+    if(!isFinite(x) || Math.abs(x) < 1) return "\u00a0";
+    var neg = x < 0, rup = Math.floor(Math.abs(x));
+    if(rup < 1 || rup >= 1e14) return "\u00a0";
+    var w = (LANG===0) ? npWords(rup) : enWords(rup);
+    if(!w) return "\u00a0";
+    if(LANG!==0) w = w.charAt(0).toUpperCase()+w.slice(1);
+    return (neg ? (LANG===0?"ऋण ":"minus ") : "") + esc(w) + " " + L("रुपैयाँ","rupees");
   }
   function press(a, val){
     if(C.bad && a !== "c"){ reset(); }
@@ -1588,7 +1976,7 @@ var TOOLS = [
       }).join("");
       return '<div class="calcbox">'
         + '<div class="ctot" id="ctot"></div>'
-        + '<div class="disp"><div class="dexp" id="dexp">&nbsp;</div><div class="dval" id="dval">0</div></div>'
+        + '<div class="disp"><div class="dexp" id="dexp">&nbsp;</div><div class="dval" id="dval">0</div><div class="dwords" id="dwords">&nbsp;</div></div>'
         + '<div class="vatrow"><label class="vlab">VAT <input id="vrate" type="number" inputmode="decimal" step="any" value="13">%</label>'
         + '<button class="vbtn" data-a="vadd">'+esc(L("+ VAT थप्ने","+ Add VAT"))+'</button>'
         + '<button class="vbtn" data-a="vrem">'+esc(L("− VAT निकाल्ने","− Remove VAT"))+'</button>'
@@ -1828,6 +2216,63 @@ var TOOLS = [
             "Nepali notes: Rs 1000, 500, 100, 50, 20, 10, 5 — Rs 2 and 1 are usually coins. Handy for bundling cash or closing the till."] };
   }},
 
+
+
+/* ---------------- Unicode → Preeti ---------------- */
+{ id:"u2p", cat:"util", ic:"🔡", neu:true,
+  nm:["Unicode → Preeti","Unicode → Preeti"],
+  sb:["युनिकोड → पुरानो Preeti font को text","Unicode → old Preeti-font text"],
+  kw:"unicode preeti ulto convert press design purano font",
+  ex:["नेपाल सरकार → g]kfn ;/sf/","Nepal Sarkar (unicode) → g]kfn ;/sf/"],
+  f:[ {k:"txt",l:["Unicode नेपाली text","Unicode Nepali text"],t:"ta",d:"नेपाल सरकार"} ],
+  calc:function(v){
+    var txt = String(v.txt||"");
+    if(!txt.trim()) return {err:["Unicode नेपाली text paste गर्नुहोस्।","Paste Unicode Nepali text."]};
+    var out = uni2preeti(txt);
+    return { rows:[ row(["Preeti नतिजा (Preeti font लगाएर हेर्नुहोस्)","Preeti result (view with Preeti font)"], out, "", "txt big") ],
+      note:["⚠️ यो उल्टो रूपान्तरण हो — जटिल conjunct मा कहीँकहीँ फरक पर्न सक्छ, print अघि Preeti font लगाएर एकपटक जाँच्नुहोस्। नतिजा Preeti font बिना यहाँ अनौठो देखिनु सामान्य हो।",
+            "⚠️ Reverse conversion — rare complex conjuncts may differ; proof-read in Preeti font before printing. The output looks odd here without the Preeti font — that is normal."] };
+  }},
+
+/* ---------------- भाडा हिसाब ---------------- */
+{ id:"bhada", cat:"util", ic:"🚚", neu:true,
+  nm:["गाडी भाडा हिसाब","Freight / Fare"],
+  sb:["km × दर + लोड/अनलोड — जम्मा भाडा","km × rate + loading — total fare"],
+  kw:"bhada gadi truck tipper fare freight dhuwani km rate",
+  ex:["८५ km × रु ९०, दोहोरो + लोड रु १,५००","85 km × Rs 90, round trip + Rs 1,500 loading"],
+  f:[ {k:"km",l:["दुरी (एकतर्फ)","Distance (one way)"],u:"km",d:85,w:1},
+      {k:"r",l:["दर (प्रति km)","Rate (per km)"],u:["रु","Rs"],d:90,w:1},
+      {k:"rt",l:["यात्रा","Trip"],t:"s",d:"2",o:[["2",["दोहोरो (जाने-आउने)","Round trip"]],["1",["एकतर्फ मात्र","One way"]]],w:1},
+      {k:"ex",l:["लोड/अनलोड + अन्य","Loading + extras"],u:["रु","Rs"],d:1500,w:1} ],
+  calc:function(v){
+    var km = n(v.km), r = n(v.r);
+    if(km<=0||r<=0) return {err:["दुरी र दर हाल्नुहोस्।","Enter distance and rate."]};
+    var mult = (v.rt==="2")?2:1, run = km*mult*r, ex = n(v.ex)||0;
+    return { rows:[
+      row(["चल्ने दुरी","Distance run"], fmt(km*mult,0)+" km"+(mult===2?" ("+fmt(km,0)+" × 2)":""), ""),
+      row(["भाडा ("+fmt(r,0)+" /km)","Fare ("+fmt(r,0)+"/km)"], rs(run), ""),
+      row(["लोड/अनलोड + अन्य","Loading + extras"], rs(ex), "", "sub"),
+      row(["जम्मा भाडा","Total fare"], rs(run+ex), "", "big") ],
+      note:["ठेक्का गर्दा फर्किंदाको खाली यात्रा (dead run) समेत जोड्ने चलन छ — दर मिलाएर हाल्नुहोस्।",
+            "Contracts usually price the empty return run too — set the rate accordingly."] };
+  }},
+
+/* ---------------- Preeti → Unicode ---------------- */
+{ id:"preeti", cat:"util", ic:"🔤", neu:true,
+  nm:["Preeti → Unicode","Preeti → Unicode"],
+  sb:["पुरानो Preeti font को text → युनिकोड","Old Preeti text → Unicode Nepali"],
+  kw:"preeti unicode font convert yunikod purano document",
+  ex:["g]kfn ;/sf/ → नेपाल सरकार","g]kfn ;/sf/ → Nepal Sarkar (unicode)"],
+  f:[ {k:"txt",l:["Preeti text (पुरानो document बाट paste गर्नुहोस्)","Preeti text (paste from the old document)"],t:"ta",d:"g]kfn ;/sf/"} ],
+  calc:function(v){
+    var txt = String(v.txt||"");
+    if(!txt.trim()) return {err:["Preeti मा टाइप गरिएको text paste गर्नुहोस्।","Paste text typed in Preeti."]};
+    var out = preeti2uni(txt);
+    return { rows:[ row(["Unicode नतिजा","Unicode result"], out, "", "txt big") ],
+      note:["FOSS Nepal समुदायको प्रमाणित mapping प्रयोग गरिएको। Preeti बाहेकका font (Kantipur, Sagarmatha…) मा नतिजा फरक पर्छ — केही अक्षर नमिले स्रोत font Preeti हो कि जाँच्नुहोस्। Copy गरेर जहाँ पनि टाँस्नुहोस्।",
+            "Uses the proven FOSS Nepal community mapping. Other fonts (Kantipur, Sagarmatha…) map differently — if characters look wrong, confirm the source font is Preeti. Copy and paste anywhere."] };
+  }},
+
 /* ---------------- 15. मुद्रा (Currency) ---------------- */
 { id:"fx", cat:"fin", ic:"💱", neu:true,
   nm:["मुद्रा Converter","Currency Converter"],
@@ -1959,7 +2404,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v4.9 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v5.7 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -1970,9 +2415,20 @@ function chipHtml(){
   }).join("");
 }
 var INFO = {
+dhalan:["Slab ढलानको लागि सिमेन्ट, बालुवा, गिट्टी र रड — grade रोजेर एकैचोटि।","Cement, sand, aggregate and rod for slab casting — pick the grade, get it all."],
+septic:["परिवार संख्याबाट septic tank को क्षमता र L×B×D नाप — soak pit सुझाव सहित।","Septic tank capacity and dimensions from household size, with a soak-pit suggestion."],
+majduri:["हाजिरी दिन, OT र पेश्की जोडघटाउ — मजदुरलाई बुझाउन बाँकी रकम।","Days, overtime and advances — the amount due to a labourer."],
+salary:["मासिक तलबबाट SSF/कर कट्टा र हातमा आउने रकमको अनुमान।","SSF and TDS off a monthly salary — estimated take-home."],
+fdcmp:["दुई बैंकको FD दर राखेर पाकेको रकम र फरक — quarterly compounding सहित।","Two FD rates side by side with maturity difference, quarterly compounding."],
+udharo:["दिएको–लिएको उधारोको खाता — नाम, रकम, मिति फोनमै save, जम्मा बाँकी एकै नजरमा।","A given–taken credit ledger saved on the phone — net balance at a glance."],
+u2p:["Unicode नेपाली text लाई पुरानो Preeti font को text मा बदल्ने — press/design लाई पठाउन।","Converts Unicode Nepali back to Preeti-font text for presses and old designs."],
+bhada:["गाडी/ट्रकको भाडा — दुरी, दर, दोहोरो यात्रा र लोड/अनलोड सहित।","Vehicle freight from distance, rate, round trip and loading extras."],
+tax:["नेपालको आयकर slab (FY 2082/83 र 2083/84 दुवै) अनुसार वार्षिक करको अनुमान — तह-तह breakdown सहित।","Nepal income-tax estimate for FY 2082/83 and 2083/84 slabs, with the slab-by-slab breakdown."],
+words:["चेक लेख्दा चाहिने — रकमलाई नेपाली शब्दमा (लाख–करोड grouping, “मात्र” सहित)।","Turns an amount into Nepali words for cheque writing — lakh-crore grouping, ends with matra."],
+preeti:["पुरानो Preeti font मा टाइप गरिएको document लाई Unicode नेपालीमा बदल्ने — FOSS Nepal mapping।","Converts old Preeti-font text to Unicode Nepali using the FOSS Nepal mapping."],
 weight:["kg, क्विन्टल, टन, पाउ (परम्परागत / metric) र धार्नीबीच तौल बदल्ने — दुवै पाउको चलन सहित।","Convert between kg, quintal, ton, pau (traditional / metric) and dharni."],
 cashnote:["नोट-नोट गनेर जम्मा रकम — रु १००० देखि रु १ सम्म, गड्डी/दराज मिलाउन।","Count cash by denomination — Rs 1000 down to Re 1."],
-roofsheet:["छानाको नापबाट कति जस्ता पाता चाहिन्छ — overlap र जगेडा सहित।","How many roofing sheets a roof needs — overlap and spares included."],
+roofsheet:["छानाको नापबाट कति जस्ता पाता — भिरालो/truss (√ तेर्सो²+उचाइ²), overlap र जगेडा सहित।","How many roofing sheets a roof needs — overlap and spares included."],
 pct:["प्रतिशतका ४ हिसाब — X को Y%, कति % हो, वृद्धि/कमी % र छुटपछिको मूल्य।","Four percent tools — Y% of X, what %, change % and discounted price."],
 interest:["साधारण (simple) र चक्रवृद्धि (compound) ब्याज — FD/बचतको quarterly compounding सहित।","Simple and compound interest — with quarterly/half-yearly compounding like Nepali bank FDs."],
 age:["उमेर (वर्ष/महिना/दिन), जन्मबार, राशि, नक्षत्र, तिथि र नामाक्षर — नाम सुझाव सहित।","Age in Y/M/D plus birth weekday, rashi, nakshatra, tithi and naming letters with name ideas."],
@@ -1997,9 +2453,20 @@ conv:["फिट, मिटर, इन्च र वर्ग एकाइहर
 fx:["NPR र विदेशी मुद्रा — आफ्नै दर हालेर दुवैतिर बदल्नुहोस्।","NPR ↔ foreign currency, both ways at your own rate."]
 };
 var ROMAN = {
+dhalan:"dhalan slab concrete rcc chhat casting",
+septic:"septic tank charpi sauchalaya soak pit",
+majduri:"majduri jyala wage labour hajiri peski",
+salary:"talab salary tds katta ssf hatma",
+fdcmp:"fd muddati fixed deposit tulana compare byaj",
+udharo:"udharo khata baki ledger dine line",
+u2p:"unicode preeti ulto convert press",
+bhada:"bhada gadi truck dhuwani fare freight km",
+tax:"income tax aayakar kar slab ird talab salary",
+words:"rakam shabda words cheque check matra lakh",
+preeti:"preeti unicode font yunikod convert",
 weight:"taul weight kg kilo pau dharni quintal kwintal ton",
 cashnote:"cash note ganti counter paisa rupaiya gaddi total",
-roofsheet:"jasta pata roof sheet chhana tin cgi dhalan",
+roofsheet:"jasta pata roof sheet chhana tin cgi dhalan truss teda bhiralo slope",
 pct:"percent pratishat chut discount badhi kami increase decrease",
 interest:"byaj interest simple compound fd fixed deposit bachat sawa",
 age:"age umer birthday janma date barsa year",
@@ -2056,6 +2523,17 @@ function patro(by,bm,bd){
            rashi:Math.floor(sid/30), ti:Math.floor(phase/12) };
 }
 var ICONS = {
+  dhalan:'<rect x="3" y="13.5" width="18" height="4" fill="#F5B301" stroke="none"/><rect x="3" y="13.5" width="18" height="4"/><line x1="6" y1="17.5" x2="6" y2="20.5"/><line x1="18" y1="17.5" x2="18" y2="20.5"/><path d="M7 10.5c1-3 3-4.5 5-4.5s4 1.5 5 4.5"/><line x1="12" y1="3.5" x2="12" y2="6"/>',
+  septic:'<rect x="4" y="9" width="16" height="9.5"/><line x1="4" y1="12.5" x2="20" y2="12.5"/><path d="M10 9V5.5h4V9"/><circle cx="12" cy="15.5" r="1.4" fill="#F5B301" stroke="none"/>',
+  majduri:'<circle cx="12" cy="8" r="3.2"/><path d="M8.8 6.2h6.4M12 4.8V3.5"/><path d="M5.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><rect x="10.5" y="16.5" width="3" height="2.2" fill="#F5B301" stroke="none"/>',
+  salary:'<rect x="3.5" y="7" width="17" height="12.5"/><path d="M9 7V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v2"/><rect x="9.8" y="11" width="4.4" height="3.4" fill="#F5B301" stroke="none"/>',
+  fdcmp:'<path d="M12 4v16M4.5 7h15"/><path d="M2.8 13l2-5 2 5a2.2 2.2 0 0 1-4 0z" fill="#F5B301" stroke="none"/><path d="M2.8 13l2-5 2 5a2.2 2.2 0 0 1-4 0z"/><path d="M17.2 13l2-5 2 5a2.2 2.2 0 0 1-4 0z"/><line x1="9" y1="20" x2="15" y2="20"/>',
+  udharo:'<rect x="4.5" y="3.5" width="15" height="17"/><line x1="8" y1="3.5" x2="8" y2="20.5"/><line x1="10.5" y1="8" x2="16.5" y2="8"/><line x1="10.5" y1="12" x2="16.5" y2="12"/><rect x="10.5" y="15.5" width="6" height="2.4" fill="#F5B301" stroke="none"/>',
+  u2p:'<rect x="12.5" y="4.5" width="8" height="8" fill="#F5B301" stroke="none"/><rect x="12.5" y="4.5" width="8" height="8"/><path d="M10.5 7h-6l2-2M13.5 17.5h6l-2 2"/><rect x="3.5" y="11.5" width="8" height="8"/>',
+  bhada:'<rect x="2.5" y="7" width="12" height="8.5"/><path d="M14.5 10h4l3 3v2.5h-7z"/><circle cx="6.5" cy="17.5" r="1.8" fill="#F5B301" stroke="none"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+  tax:'<rect x="5" y="3.5" width="14" height="17"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="11.5" x2="13" y2="11.5"/><line x1="8.6" y1="18" x2="15.4" y2="14.2"/><circle cx="9.4" cy="14.6" r="1.5" fill="#F5B301" stroke="none"/><circle cx="14.6" cy="17.6" r="1.5"/>',
+  words:'<rect x="2.5" y="6" width="19" height="12"/><line x1="5.5" y1="10" x2="12.5" y2="10"/><line x1="5.5" y1="13" x2="14.5" y2="13"/><line x1="5.5" y1="15.7" x2="10" y2="15.7"/><rect x="15.5" y="8.5" width="3.8" height="2.8" fill="#F5B301" stroke="none"/>',
+  preeti:'<rect x="3.5" y="4.5" width="8" height="8"/><path d="M13.5 7h6l-2-2M10.5 17.5h-6l2 2"/><rect x="12.5" y="11.5" width="8" height="8" fill="#F5B301" stroke="none"/><rect x="12.5" y="11.5" width="8" height="8"/>',
 weight:'<rect x="9.2" y="3.5" width="5.6" height="4" rx="1"/><path d="M6 7.5h12l2 13H4z"/><rect x="6.6" y="12.6" width="10.8" height="2.6" fill="#F5B301" stroke="none"/>',
 cashnote:'<rect x="2.5" y="6" width="19" height="12"/><circle cx="12" cy="12" r="2.7" fill="#F5B301" stroke="none"/><circle cx="12" cy="12" r="2.7"/><line x1="5.6" y1="9.5" x2="5.6" y2="14.5"/><line x1="18.4" y1="9.5" x2="18.4" y2="14.5"/>',
 roofsheet:'<path d="M3.5 10.5L12 4l8.5 6.5"/><circle cx="12" cy="4" r="1.4" fill="#F5B301" stroke="none"/><path d="M4.5 14.2c1.25-1.7 2.5-1.7 3.75 0s2.5 1.7 3.75 0 2.5-1.7 3.75 0 2.5 1.7 3.75 0"/><path d="M4.5 18.4c1.25-1.7 2.5-1.7 3.75 0s2.5 1.7 3.75 0 2.5-1.7 3.75 0 2.5 1.7 3.75 0"/>',
@@ -2124,6 +2602,8 @@ function fieldHtml(f, val){
     inp = '<select data-k="'+f.k+'">' + f.o.map(function(o){
       return '<option value="'+esc(o[0])+'"'+(String(val)===String(o[0])?" selected":"")+'>'+esc(S(o[1]))+'</option>';
     }).join("") + '</select>';
+  } else if(f.t === "ta"){
+    inp = '<textarea data-k="'+f.k+'" rows="4" spellcheck="false">'+esc(val)+'</textarea>';
   } else if(f.t === "date"){
     inp = '<input type="date" data-k="'+f.k+'" value="'+esc(val)+'">';
   } else {
@@ -2151,6 +2631,22 @@ function tableText(t){
   t.rows.forEach(function(r){ A.push(r.g ? r.g : r.join("\t")); });
   return A.join("\n");
 }
+function moneyWords(val){
+  if(typeof val !== "string") return "";
+  var s = val.trim().replace(/^[+]\s*/,"").replace(/^[−-]\s*/,"-");
+  var mm = s.match(/^(-?)(रु|Rs)?\s*([\d,]+(?:\.\d+)?)\s*(%?)$/);
+  if(!mm) return "";
+  var neg = mm[1]==="-", isMoney = !!mm[2], isPct = mm[4]==="%";
+  var x = parseFloat(mm[3].replace(/,/g,""));
+  if(!isFinite(x) || x < 1 || x >= 1e14) return "";
+  var rup = Math.floor(x), frac = x - rup;
+  if(!isMoney && frac >= 0.005) return "";
+  var w = LANG ? enWords(rup) : npWords(rup);
+  if(!w) return "";
+  if(LANG) w = w.charAt(0).toUpperCase()+w.slice(1);
+  var suffix = isMoney ? (LANG?" rupees":" रुपैयाँ") : (isPct ? (LANG?" percent":" प्रतिशत") : "");
+  return (neg ? (LANG?"minus ":"ऋण ") : "") + w + suffix;
+}
 function compute(){
   var t = cur, v = state[t.id], out;
   try { out = t.calc(v); } catch(e){ out = {err:["हिसाब मिलेन — नाप फेरि हेर्नुहोस्।","That didn't compute — please check the inputs."]}; }
@@ -2158,7 +2654,13 @@ function compute(){
   var box = $("#out");
   if(out.err){ box.innerHTML = '<div class="err">⚠️ '+esc(S(out.err))+'</div>'; stickyEl.style.display = "none"; return; }
   var html = printHead() + '<div class="slip"><div class="slip-h"><span>'+esc(S(UI.result))+' · '+esc(S(t.nm))+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>';
-  out.rows.forEach(function(r){ html += slipRow(S(r.l), r.v, S(r.u), r.c); });
+  out.rows.forEach(function(r){
+    html += slipRow(S(r.l), r.v, S(r.u), r.c);
+    if(r.c.indexOf("big") >= 0){
+      var mw = moneyWords(r.v);
+      if(mw) html += '<div class="row txt sub"><span class="rl">'+esc(L("अक्षरमा","In words"))+'</span><span class="rv">'+esc(mw)+'</span></div>';
+    }
+  });
   if(out.note) html += '<div class="note">ℹ️ '+esc(S(out.note))+'</div>';
   html += '</div>';
   if(out.table) html += tableHtml(out.table);
@@ -2183,6 +2685,7 @@ function shareText(){
     if(lastOut && lastOut.rows){
       lastOut.rows.forEach(function(r){
         A.push((r.c.indexOf("big") >= 0 ? "➡️ " : "") + S(r.l) + ": " + r.v + (S(r.u) ? " " + S(r.u) : ""));
+        if(r.c.indexOf("big") >= 0){ var mw = moneyWords(r.v); if(mw) A.push("   ("+mw+")"); }
       });
       if(lastOut.note) A.push("ℹ️ " + S(lastOut.note));
     } else if(lastOut && lastOut.err){ A.push("⚠️ " + S(lastOut.err)); }
@@ -2813,7 +3316,7 @@ renderHome=function(){
   var g=[]; RECENT.forEach(function(id){ TOOLS.forEach(function(t){ if(t.id===id) g.push(t); }); });
   if(!g.length) return;
   listEl.insertAdjacentHTML("afterbegin",
-    '<div class="eyebrow">'+L("हालै प्रयोग गरेको","Recently used")+'</div><div class="grid">'+g.map(cardHtml).join("")+'</div>');
+    '<div class="eyebrow">🕘 '+L("हालै चलाएका — छिटो फर्कन (तल सूचीमा पनि छन्)","Recently used — quick access (also listed below)")+'</div><div class="grid">'+g.map(cardHtml).join("")+'</div>');
 };
 renderHome();
 
