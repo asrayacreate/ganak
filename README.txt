@@ -21,3 +21,9 @@ GANAK v3.9 — LIVE गर्ने अन्तिम निर्देशन
   - Settings → Profile मा नाम/व्यवसाय/logo save गर्नुहोस्
 
 भर्सन: v3.9 · cache ganak-v3-9 · 21 tools · पूर्ण offline
+
+
+TWA / PLAY STORE:
+- .well-known/assetlinks.json ftp/hosting ma sangai upload garnuhos (URL: https://YOURDOMAIN/.well-known/assetlinks.json ma khulnu parchha)
+- Package: io.github.asrayacreate.twa
+- Yo file thik bhaye TWA app ma browser address bar dekhidaina.
