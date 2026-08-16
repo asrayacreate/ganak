@@ -1,0 +1,1 @@
+[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "io.github.asrayacreate.twa", "sha256_cert_fingerprints": ["E0:A3:14:D4:C5:D6:96:CB:C6:24:96:31:F0:C4:8B:A7:DA:A1:84:C9:E3:30:5F:3D:77:DF:B7:07:50:EA:25:18"]}}]
