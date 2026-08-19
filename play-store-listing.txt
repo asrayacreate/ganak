@@ -1,0 +1,79 @@
+# GANAK — Google Play Store Listing Content
+(Play Console → Store presence → Main store listing मा copy-paste गर्नुहोस्)
+
+═══════════════════════════════════════
+1. APP NAME (30 chars भित्र)
+═══════════════════════════════════════
+Ganak — नेपाली हिसाब Tools
+
+═══════════════════════════════════════
+2. SHORT DESCRIPTION (80 chars भित्र — यो 68 chars छ)
+═══════════════════════════════════════
+निर्माण, जग्गा, मिति, ब्याज र पैसाको ३६ हिसाब — offline चल्ने नेपाली app
+
+═══════════════════════════════════════
+3. FULL DESCRIPTION (4000 chars भित्र — यो ~2600 chars छ)
+═══════════════════════════════════════
+गणक (Ganak) — नेपालीको दैनिक हिसाबको एउटै साथी। निर्माण साइटदेखि जग्गा किनबेच, बैंक किस्तादेखि चेक लेख्ने सम्म — ३६ वटा calculator एउटै app मा, पूरै नेपालीमा, internet बिना नै।
+
+⚡ किन Ganak?
+• १००% offline चल्छ — साइटमा network नभए पनि काम रोकिँदैन
+• पूरै नेपाली + English दुवै भाषा
+• हरेक नतिजा शब्दमा पनि (जस्तै: "एक लाख तेइस हजार...") — चेक/बिल लेख्न सजिलो
+• नतिजाको slip सिधै WhatsApp मा share, copy वा PDF print
+• आफ्नै दर (rate) save गर्नुहोस् — हरेक हिसाबमा आफैं आउँछ
+• Dark mode, reminder, उधारो खाता — सबै फोनमै save हुन्छ
+
+🏗️ निर्माणको हिसाब
+• सिसा/झ्याल area • False ceiling (बोर्ड, section, hanger) • जस्ता पाता (भिरालो छाना सहित) • ढलान — सिमेन्ट, बालुवा, गिट्टी, रड • इँटा • प्लास्टर • Tile/Marble • रङ • Solar • पानी ट्याङ्की • काठ (cft) • Septic tank
+
+📐 जग्गा र नाप
+• रोपनी–आना–पैसा–दाम ⇄ sq.ft ⇄ sq.m
+• बिघा–कठ्ठा–धुर ⇄ sq.ft — दुवैतर्फ
+• लम्बाइ/क्षेत्रफल converter • तौल (पाउ, धार्नी, क्विन्टल)
+
+📅 मिति र उमेर
+• BS ⇄ AD मिति converter
+• उमेर calculator — नेपाली मिति, जन्मबार, राशि अक्षर सहित
+
+💰 पैसाको हिसाब
+• बैंक EMI/किस्ता • साधारण + चक्रवृद्धि ब्याज • FD तुलना
+• आयकर (नयाँ FY 2083/84 + पुरानो slab) • तलब TDS/SSF
+• VAT + छुट • प्रतिशत • रकम शब्दमा (नेपाली + English)
+• मजदुरी हिसाब • उधारो खाता • गाडी भाडा • नोट गन्ती
+
+🔤 थप tools
+• Preeti ⇄ Unicode font converter • मुद्रा exchange • Super Calculator (VAT सहित, रकम शब्दमा देखिने)
+
+📱 App install गरेपछि phone को home screen बाट सिधै खुल्छ, कुनै account/login चाहिँदैन, कुनै personal data collect गरिँदैन।
+
+⚠️ नोट: सामग्रीका दरहरू example मात्र हुन् — Settings मा आफ्नो क्षेत्रको दर हालेर save गर्नुहोस्। कर/ब्याज हिसाब अनुमान हो, exact filing को लागि accountant वा ird.gov.np हेर्नुहोस्।
+
+Powered by PRERAK MULTIPURPOSE PVT LTD, हेटौंडा
+Email: asrayacreate.ac@gmail.com
+
+═══════════════════════════════════════
+4. SCREENSHOTS — 8 वटा + caption
+═══════════════════════════════════════
+(अहिले 4 वटा छन्: ss1–ss4। बाँकी 4 phone बाट यी screen खोलेर खिच्नुहोस्)
+
+1. ss1-home.png — "३६ हिसाब एकै ठाउँ — पूरै नेपालीमा"
+2. ss2-nirman.png — "निर्माणको हिसाब — सिमेन्टदेखि जस्ता पातासम्म"
+3. ss3-jagga.png — "रोपनी–आना ⇄ sq.ft — जग्गाको नाप सजिलै"
+4. ss4-emi.png — "बैंक किस्ता (EMI) — महिनाको कति तिर्ने?"
+5. [नयाँ: Calculator + VAT खोलेर] — "Calculator मै VAT र रकम शब्दमा"
+6. [नयाँ: उमेर tool खोलेर] — "उमेर + नेपाली मिति + जन्मबार"
+7. [नयाँ: dark mode मा home] — "Dark mode — आँखालाई आराम"
+8. [नयाँ: result slip share गर्दै] — "नतिजा सिधै WhatsApp मा share"
+
+═══════════════════════════════════════
+5. अरू अनिवार्य field (Play Console मा)
+═══════════════════════════════════════
+• App icon 512×512: icon-512.png ✓ (repo मा छ)
+• Feature graphic 1024×500: feature-graphic.png ✓ (repo मा छ)
+• Privacy policy URL: https://asrayacreate.github.io/ganak/privacy.html
+• Category: Tools (वा Productivity)
+• Contact email: asrayacreate.ac@gmail.com
+• Content rating questionnaire: "Everyone" — app मा violence/ads/user content केही छैन
+• Data safety form: "No data collected" रोज्नुहोस् (app ले कुनै data बाहिर पठाउँदैन; Google Analytics page-view मात्र भए "Analytics" declare गर्नुहोस्)
+• Countries: Nepal + India + सबै (नेपाली diaspora को लागि)

@@ -2404,7 +2404,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v5.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3208,6 +3208,52 @@ hsStart();
 ntStart();
 setTimeout(notiCheck, 1200);
 setInterval(function(){ notiCheck(); }, 180000);
+
+/* ===== exit confirm (Android back on home) ===== */
+(function(){
+  var css=document.createElement("style");
+  css.textContent='.exwrap{position:fixed;inset:0;background:rgba(21,32,42,.55);z-index:9000;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .18s}'
+   +'.exwrap.show{opacity:1}'
+   +'.exbox{background:var(--card);border:1.5px solid var(--line);border-radius:16px 16px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:560px;transform:translateY(24px);transition:transform .18s}'
+   +'.exwrap.show .exbox{transform:none}'
+   +'.ext{font-weight:800;font-size:17px;color:var(--ink);margin-bottom:4px}'
+   +'.exs{font-size:13px;color:var(--mut);margin-bottom:14px}'
+   +'.exrow{display:flex;gap:10px}'
+   +'.exrow button{flex:1;padding:13px;border-radius:11px;font-size:15px;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}'
+   +'.exrow .exyes{background:var(--tape);border-color:var(--tape-dk);color:#15202A}'
+   +'body[data-theme="dark"] .exbox{background:#1B2732}'
+   +'body[data-theme="dark"] .exrow button{background:#243140;border-color:#33414F;color:#E8ECF0}'
+   +'body[data-theme="dark"] .exrow .exyes{background:var(--tape);border-color:var(--tape-dk);color:#15202A}';
+  document.head.appendChild(css);
+  var armed=false;
+  function showExit(){
+    var d=document.createElement("div");
+    d.className="exwrap"; d.id="exwrap";
+    d.innerHTML='<div class="exbox"><div class="ext">'+L("बाहिर निस्कने?","Exit Ganak?")+'</div>'
+      +'<div class="exs">'+L("तपाईंको सबै डाटा phone मै save छ — फेरि खोल्दा यहीँ हुनेछ।","All your data is saved on this phone.")+'</div>'
+      +'<div class="exrow"><button class="exno">'+L("रहने","Stay")+'</button><button class="exyes">'+L("निस्कने","Exit")+'</button></div></div>';
+    document.body.appendChild(d);
+    requestAnimationFrame(function(){ d.classList.add("show"); });
+    function close(){ d.classList.remove("show"); setTimeout(function(){ d.remove(); },200); }
+    d.addEventListener("click",function(e){
+      if(e.target.closest(".exyes")){ armed=true; d.remove(); history.back(); return; }
+      if(e.target.closest(".exno")||e.target===d){ close(); history.pushState({g:1},""); }
+    });
+  }
+  /* seed one history entry so back on home lands on our guard */
+  try{ history.replaceState({g:0},""); history.pushState({g:1},""); }catch(e){}
+  window.addEventListener("popstate",function(){
+    if(armed) return;
+    /* open overlays close first */
+    var dr=document.getElementById("drawer");
+    if(dr && dr.classList.contains("on")){ closeDrawer(); history.pushState({g:1},""); return; }
+    if(document.body.classList.contains("sideopen")){ closeSide(); history.pushState({g:1},""); return; }
+    var pv=document.getElementById("pdfview");
+    if(pv){ pv.remove(); document.body.classList.remove("pdfmode"); history.pushState({g:1},""); return; }
+    if(location.hash){ return; } /* hash back = tool close, handled by hashchange */
+    if(!cur){ showExit(); } else { closeTool(); history.pushState({g:1},""); }
+  });
+})();
 
 /* ===== first-run language chooser ===== */
 (function(){
