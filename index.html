@@ -2404,7 +2404,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.2 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -2807,10 +2807,30 @@ function copyText(txt, msg){
   } else fallback();
 }
 $("#btnCopy").addEventListener("click", function(){ copyText(shareText(), S(UI.copied)); });
-$("#btnWa").addEventListener("click", function(){
+/* Share transport. wa.me?text= is a URL: in the TWA (Chrome→WhatsApp intent) long
+   URL-encoded Devanagari text gets cut, so only the slip header survives. The Web Share
+   API hands the complete string to Android as EXTRA_TEXT (no URL, no length limit);
+   wa.me stays as the fallback for browsers without it. */
+function shareOut(text){
   try{ gtag('event','whatsapp_click'); }catch(e){}
-  window.open("https://wa.me/?text=" + encodeURIComponent(shareText()), "_blank", "noopener");
-});
+  var waUrl = "https://wa.me/?text=" + encodeURIComponent(text);
+  function viaUrl(){
+    var w = null;
+    try{ w = window.open(waUrl, "_blank", "noopener"); }catch(e){}
+    if(!w){ location.href = waUrl; }
+  }
+  if(navigator.share){
+    navigator.share({ text: text }).then(function(){
+      try{ gtag('event','share_complete'); }catch(e){}
+    }, function(err){
+      if(err && err.name === "AbortError") return;   /* user closed the sheet */
+      viaUrl();
+    });
+    return;
+  }
+  viaUrl();
+}
+$("#btnWa").addEventListener("click", function(){ shareOut(shareText()); });
 function pdfRows(){
   if(lastOut && lastOut.rows && !lastOut.err){
     var rh='';
@@ -2856,7 +2876,7 @@ function openPdfView(){
       var ta=document.createElement("textarea"); ta.value=shareText(); document.body.appendChild(ta);
       ta.select(); try{document.execCommand("copy");}catch(err){} ta.remove();
       toast(L("Copy भयो ✓","Copied ✓")); return; }
-    if(e.target.closest("#pvShare")){ try{ gtag('event','whatsapp_click'); }catch(e2){} window.open("https://wa.me/?text="+encodeURIComponent(shareText()),"_blank","noopener"); return; }
+    if(e.target.closest("#pvShare")){ shareOut(shareText()); return; }
   });
   document.addEventListener("keydown",function esc2(e){ if(e.key==="Escape"){ closePv(); document.removeEventListener("keydown",esc2); } });
 }
