@@ -1,1 +1,1 @@
-[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "io.github.asrayacreate.twa", "sha256_cert_fingerprints": ["BB:60:7D:7A:55:E6:83:97:1E:10:A5:E9:BA:0D:D1:F4:B9:B7:14:09:DD:6E:AC:DD:4A:F6:44:23:51:0D:D1:F8"]}}]
+[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "io.github.asrayacreate.twa", "sha256_cert_fingerprints": ["2E:B5:06:7D:2A:CB:4B:08:81:E9:66:F2:13:9D:C6:1A:89:7C:80:DC:ED:B9:F2:BA:01:71:74:B2:FE:A4:14:3D"]}}]
