@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ganak">
 <meta property="og:title" content="Ganak — नेपाली हिसाब: निर्माण, जग्गा, सुन, EMI, पात्रो">
-<meta property="og:description" content="५२ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
+<meta property="og:description" content="५३ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
 <meta property="og:url" content="https://asrayacreate.github.io/ganak/">
 <meta property="og:image" content="https://asrayacreate.github.io/ganak/icon-512.png">
 <meta property="og:image:width" content="512"><meta property="og:image:height" content="512">
@@ -812,6 +812,116 @@ body[data-theme="dark"] .row.big .rv{background:linear-gradient(transparent 66%,
 .vin-l{animation:vInL .38s var(--emph) both}
 .vghost{position:fixed;z-index:15;margin:0;pointer-events:none;animation:vOut .26s cubic-bezier(.3,0,.8,.15) both}
 #out{animation:fadeUp .4s .08s var(--ease) both}
+/* ---- v8.8 logo: the ग ring is a 3D coin that turns (ग ↔ G); गणक is extruded and sways; tap / hover = spin ---- */
+.gring{background:none;box-shadow:none;transform-style:preserve-3d;animation:coin 10s cubic-bezier(.45,0,.2,1) infinite;cursor:pointer}
+.gring::before{display:none}
+.gring::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(#F5B301,#7FE0A7,#4AA3E0,#B48CE0,#E0705A,#F5B301);
+  animation:gspin 9s linear infinite;box-shadow:0 0 12px rgba(245,179,1,.4)}
+.gring i{inset:3px;border-radius:50%;background:radial-gradient(circle at 34% 28%,#2A3D6E,#0F1832 72%);animation:none;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;transform:translateZ(1.6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.gring i.gb{transform:rotateY(180deg) translateZ(1.6px);font-family:"Saira Stencil One",var(--fs);font-weight:400;font-size:17px}
+@keyframes coin{0%,40%{transform:perspective(200px) rotateY(0)}50%,90%{transform:perspective(200px) rotateY(180deg)}100%{transform:perspective(200px) rotateY(360deg)}}
+.brandrow .logo-np{cursor:pointer;transform-origin:50% 60%;animation:npsway 6s ease-in-out infinite;
+  text-shadow:0 1px 0 #B98200,0 2px 0 #8A6000,0 3px 4px rgba(0,0,0,.45)}
+@keyframes npsway{0%,100%{transform:perspective(220px) rotateY(-20deg) rotateX(8deg)}50%{transform:perspective(220px) rotateY(20deg) rotateX(-4deg) translateZ(6px)}}
+/* गणक now stays on 341–374px phones too — the row tightens instead of hiding it */
+@media(max-width:374px){.brandrow{gap:5px}.brandrow .logo-np{display:block}.brandrow .logo{font-size:22px}.brandrow .langsw button{min-width:44px;padding:7px 9px}}
+@media(max-width:340px){.brandrow .logo-np{display:none}.brandrow .logo{font-size:20px}}
+.brandrow.spin .gring{animation:coinspin .95s var(--emph)}
+.brandrow.spin .logo-np{animation:npspin .95s var(--emph)}
+@keyframes coinspin{50%{transform:perspective(200px) translateZ(26px) rotateY(400deg) scale(1.12)}100%{transform:perspective(200px) rotateY(720deg)}}
+@keyframes npspin{0%{transform:perspective(220px) rotateY(0)}50%{transform:perspective(220px) translateZ(34px) rotateY(200deg)}100%{transform:perspective(220px) rotateY(360deg)}}
+/* ---- v8.8 पात्रो: "आज" / selected-day banner + tappable month grid ---- */
+.pban{position:relative;overflow:hidden;margin:0 0 14px;padding:12px 14px 14px;border-radius:20px;color:#fff;scroll-margin-top:96px;perspective:700px;
+  background:radial-gradient(120% 140% at 100% 0,rgba(255,255,255,.16),transparent 55%),var(--g-np);box-shadow:var(--m2);animation:fadeUp .35s var(--ease) both}
+.pban.today{background:radial-gradient(120% 140% at 100% 0,rgba(255,214,120,.24),transparent 55%),linear-gradient(110deg,#6E0C1B 0%,#AA162C 52%,#D63A2E 100%)}
+.pban-k{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;min-height:28px}
+.pbadge{font-size:12px;font-weight:800;letter-spacing:.8px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.26)}
+.pban .pback{border:0;border-radius:999px;background:#FFFEF8;color:#15402C}
+.pban-b{display:flex;gap:13px;align-items:flex-start}
+.ptile{flex:0 0 76px;display:flex;flex-direction:column;align-items:center;border-radius:14px;overflow:hidden;background:#FFFEF8;color:#15202A;
+  transform:rotateX(12deg);transform-origin:50% 0;box-shadow:0 1px 0 #E6E0CC,0 2px 0 #D8D1BA,0 3px 0 #C6BEA3,0 4px 0 #B3AA8E,0 12px 18px -6px rgba(0,0,0,.55)}
+.ptm{align-self:stretch;text-align:center;background:#C62828;color:#fff;font-size:12px;font-weight:800;padding:4px 2px;white-space:nowrap}
+.pban.today .ptm{background:#15202A}
+.ptn{font-family:var(--fm);font-size:34px;font-weight:800;line-height:1.12;padding-top:2px}
+.ptw{font-size:11px;font-weight:700;color:#5B6672;padding:0 4px 6px;white-space:nowrap}
+.pinfo{flex:1 1 auto;min-width:0}
+.pdate{font-size:16px;font-weight:800;line-height:1.3}
+.pban-ad{font-size:12px;opacity:.86;margin-top:2px}
+.ptithi{font-size:13px;font-weight:600;margin-top:6px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.pchip{display:inline-flex;flex-direction:column;max-width:100%;font-size:12.5px;font-weight:800;line-height:1.25;padding:6px 10px;border-radius:12px;background:#FFFEF8;color:#15202A;box-shadow:0 3px 8px -3px rgba(0,0,0,.4)}
+.pchip em{font-style:normal;font-weight:600;font-size:10.5px;color:#5B6672}
+.pchip.h{color:#B71C1C}.pchip.v{color:#7A5200}
+.pchip.s{background:rgba(255,255,255,.18);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.pchip.n{background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);font-weight:600;box-shadow:none}
+.pban.flip .ptile{animation:pflip .65s var(--emph)}
+.pban.flip .pinfo{animation:fadeUp .4s .08s var(--ease) both}
+@keyframes pflip{from{transform:rotateX(-100deg);opacity:.3}}
+.tw.pgrid{max-height:none;overflow:visible}
+.tw.pgrid table{table-layout:fixed;font-family:var(--fs)}
+.tw.pgrid th,.tw.pgrid th:first-child{position:static;text-align:center;padding:7px 0;font-size:11px}
+.tw.pgrid th:last-child{color:#FF8A80}
+.tw.pgrid td,.tw.pgrid td:first-child,.tw.pgrid tr:nth-child(even) td{position:relative;height:46px;padding:5px 1px 6px;text-align:center;vertical-align:top;
+  color:var(--ink);background:none;border:1px solid var(--line2)}
+.pcell{cursor:pointer;transition:background-color .2s}
+.pcell:focus-visible{outline:2px solid #D99A00;outline-offset:-3px}
+.pcell:active{background:rgba(245,179,1,.14)!important}
+.pdn{display:block;font-size:16px;font-weight:800;line-height:1.25}
+.pda{display:block;font-family:var(--fm);font-size:10px;color:var(--mute)}
+.psat .pdn,.phol .pdn{color:#C62828}
+.pdot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#F5B301}
+.pdot.h{background:#E53935}
+.pcell.ptd{box-shadow:inset 0 0 0 2px #F5B301}
+.tw.pgrid td.psel{background:rgba(245,179,1,.24);box-shadow:inset 0 0 0 2px #D99A00}
+.prow{cursor:pointer;border-radius:6px;transition:background-color .2s,box-shadow .2s}
+.prow.psel{background:rgba(245,179,1,.2);box-shadow:0 0 0 5px rgba(245,179,1,.2)}
+body[data-theme="dark"] .psat .pdn,body[data-theme="dark"] .phol .pdn{color:#FF8A80}
+body[data-theme="dark"] .ptile{background:#EEE8D8}
+/* ---- v8.8 विश्व घडी: a CSS watch — brushed-metal bezel, deep dial, sweeping hands, glass glare ---- */
+.wcwrap{display:flex;flex-direction:column;align-items:center;padding:16px 0 4px}
+.wc{--sz:min(74vw,290px);position:relative;width:var(--sz);height:var(--sz);border-radius:50%;padding:calc(var(--sz)*.045);box-sizing:border-box;
+  background:conic-gradient(from 20deg,#F4F6F8,#9AA3AD,#E9ECEF,#7E8792,#F4F6F8,#A7B0BA,#E3E7EA,#868F99,#F4F6F8);
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.75),inset 0 -3px 6px rgba(0,0,0,.28),0 1px 2px rgba(0,0,0,.3),0 18px 34px -12px rgba(10,20,40,.55),0 44px 60px -34px rgba(10,20,40,.5);
+  transition:transform .35s var(--ease);touch-action:pan-y}
+.wc::before{content:"";position:absolute;inset:calc(var(--sz)*.03);border-radius:50%;background:linear-gradient(160deg,#5E6772,#D8DDE2 45%,#4F5862);z-index:0}
+.wc-face{position:relative;z-index:1;width:100%;height:100%;border-radius:50%;overflow:hidden;font-family:var(--fs);
+  background:radial-gradient(circle at 50% 36%,#283D69 0%,#16244A 52%,#0A1228 100%);
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.55),inset 0 8px 16px rgba(0,0,0,.6),inset 0 -2px 8px rgba(255,255,255,.08)}
+.wc-ticks{position:absolute;inset:3%;border-radius:50%;background:repeating-conic-gradient(from -1.2deg,#F3EEDF 0 2.4deg,transparent 2.4deg 30deg);
+  -webkit-mask:radial-gradient(closest-side,transparent 85%,#000 86%);mask:radial-gradient(closest-side,transparent 85%,#000 86%)}
+.wc-ticks.m{background:repeating-conic-gradient(from -.45deg,rgba(243,238,223,.55) 0 .9deg,transparent .9deg 6deg);
+  -webkit-mask:radial-gradient(closest-side,transparent 93%,#000 94%);mask:radial-gradient(closest-side,transparent 93%,#000 94%)}
+.wc-n{position:absolute;transform:translate(-50%,-50%);font-weight:800;font-size:calc(var(--sz)*.064);line-height:1;color:#F3EEDF;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+.wc-brand{position:absolute;left:0;right:0;top:29%;text-align:center;font-family:"Saira Stencil One",var(--fs);font-size:calc(var(--sz)*.042);letter-spacing:3px;color:#F5B301}
+.wc-date{position:absolute;left:50%;top:65%;transform:translateX(-50%);padding:2px 7px;border-radius:4px;white-space:nowrap;
+  font-family:var(--fm);font-size:calc(var(--sz)*.038);font-weight:700;color:#15202A;background:linear-gradient(#FFFEF8,#E3DDCB);box-shadow:inset 0 1px 3px rgba(0,0,0,.5),0 0 0 1.5px #8E97A1}
+.wc-hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:99px 99px 2px 2px;will-change:transform}
+.wc-hand.h,.wc-hand.m{background:linear-gradient(90deg,#AEB6BF 0,#FFFFFF 44%,#7E8792 56%,#C8CED5 100%);box-shadow:0 0 0 .5px rgba(0,0,0,.35),0 0 7px 1px rgba(0,0,0,.55)}
+.wc-hand.h{width:4.4%;margin-left:-2.2%;height:25%}
+.wc-hand.m{width:3%;margin-left:-1.5%;height:37%}
+.wc-hand.s{width:1%;margin-left:-.5%;height:43%;background:#F5B301;box-shadow:0 0 6px rgba(0,0,0,.6)}
+.wc-hand.s::after{content:"";position:absolute;left:50%;top:100%;width:300%;margin-left:-150%;height:26%;border-radius:0 0 99px 99px;background:#F5B301}
+.wc-cap{position:absolute;left:50%;top:50%;width:6.5%;height:6.5%;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#FFF6D6,#F5B301 45%,#8F6300);box-shadow:0 1px 4px rgba(0,0,0,.7)}
+.wc-glass{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at var(--gx,30%) var(--gy,20%),rgba(255,255,255,.3),rgba(255,255,255,.07) 26%,transparent 46%),linear-gradient(155deg,rgba(255,255,255,.09) 0 40%,transparent 40.5%)}
+.wc-face.set .wc-hand{transition:transform .9s var(--emph)}
+.wc-read{text-align:center;margin-top:18px}
+.wc-zone{font-size:13px;font-weight:700;color:var(--mute)}
+.wc-time{margin-top:2px;font-family:var(--fm);font-size:clamp(25px,7.6vw,34px);font-weight:800;color:var(--ink);letter-spacing:.3px}
+.wc-sub{margin-top:2px;font-size:13px;color:var(--ink2)}
+.wcbar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:32px;margin:4px 0 16px;font-size:13px;font-weight:700;color:var(--ink2)}
+.wcl{overflow:hidden;border:1px solid var(--ol);border-radius:18px;background:var(--card);box-shadow:var(--m1)}
+.wcr{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;padding:10px 14px;border:0;border-top:1px solid var(--ol);
+  background:none;text-align:left;font-family:var(--fs);color:var(--ink);cursor:pointer}
+.wcr:first-child{border-top:0}
+.wcr.on{background:linear-gradient(90deg,rgba(255,179,0,.2),rgba(255,179,0,.02))}
+.wcf{font-size:21px;line-height:1}
+.wcn b{display:block;font-size:14px}
+.wcn em,.wct .wd{display:block;font-style:normal;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wct{text-align:right}
+.wct .wt{display:block;font-family:var(--fm);font-size:13.5px;white-space:nowrap}
 @media print{.slip{box-shadow:none;border:1.5px solid #000;background:#fff}.slip::before,.slip::after,.slip .note::after,g-rw,.vghost{display:none}
   #out,.vin-r,.vin-l{animation:none}}
 </style>
@@ -824,7 +934,7 @@ body[data-theme="dark"] .row.big .rv{background:linear-gradient(transparent 66%,
     <button class="hdr-back" id="back">← पछाडि</button>
     <div class="brandrow">
       <button class="hdr-menu" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#F5B301" stroke-width="2" stroke-linecap="round"><path d="M3.5 6h17M3.5 12h17M3.5 18h11"/></svg></button>
-      <span class="gring" aria-hidden="true"><i>ग</i></span>
+      <span class="gring" aria-hidden="true"><i>ग</i><i class="gb">G</i></span>
       <span class="logo">GANA<b>K</b></span>
       <span class="logo-np">गणक</span>
       <div class="langsw" id="lang" role="group" aria-label="Language">
@@ -1207,7 +1317,7 @@ var HOLI = { 2082:[[9,15,"h","तमु ल्होसार","Tamu Lhosar"],[1
   [9,9,"h","उधौली पर्व · योमरी पुन्ही","Udhauli · Yomari Punhi"],[9,10,"h","क्रिसमस","Christmas"],[9,15,"h","तमु ल्होसार","Tamu Lhosar"],[10,1,"h","माघे संक्रान्ति","Maghe Sankranti"],[10,16,"h","शहीद दिवस","Martyrs' Day"],[10,24,"h","सोनाम ल्होसार","Sonam Lhosar"],
   [10,28,"f","सरस्वती पूजा (शैक्षिक संस्था)","Saraswati Puja (schools)"],[11,22,"h","महाशिवरात्रि","Maha Shivaratri"],[11,25,"h","ग्याल्पो ल्होसार","Gyalpo Lhosar"],[12,8,"h","फागु पूर्णिमा (तराई)","Fagu Purnima (Terai)"],[12,23,"v","घोडेजात्रा (उपत्यका)","Ghode Jatra (valley)"]] };
 var HOLI_PART = { 2082:1 };
-function tithiName(ti){ return (ti===14) ? ["पूर्णिमा","Purnima"] : (ti===29) ? ["औंसी","Aunsi"] : [(ti<15?"शुक्ल ":"कृष्ण ")+TITHI[ti%15], (ti<15?"Shukla ":"Krishna ")+TITHI[ti%15]]; }
+function tithiName(ti){ return (ti===14) ? ["पूर्णिमा","Purnima"] : (ti===29) ? ["औंसी","Aunsi"] : [(ti<15?"शुक्ल ":"कृष्ण ")+TITHI[ti%15], (ti<15?"Shukla ":"Krishna ")+TITHI_EN[ti%15]]; }
 function rupeeWords(x){                                 /* "… रुपैयाँ … पैसा मात्र" for बिजक */
   var rup = Math.floor(Math.abs(x)), ps = Math.round((Math.abs(x)-rup)*100); if(ps===100){ rup++; ps=0; }
   var nw = npWords(rup), ew = enWords(rup); if(nw===null) return ["",""];
@@ -1803,8 +1913,7 @@ var TOOLS = [
       var letter = sy[pt.pada];
       rows.push(row(["राशि (चन्द्र)","Rashi (moon sign)"], L(RASHI[pt.rashi][0],RASHI[pt.rashi][1]), ""));
       rows.push(row(["नक्षत्र","Nakshatra"], L(nk[0],nk[1])+" · "+npd(pt.pada+1)+L(" चरण"," pada"), "", "sub"));
-      var tn = (pt.ti===14) ? ["पूर्णिमा","Purnima"] : (pt.ti===29) ? ["औंसी","Aunsi"]
-        : [(pt.ti<15?"शुक्ल ":"कृष्ण ")+TITHI[pt.ti%15], (pt.ti<15?"Shukla ":"Krishna ")+TITHI[pt.ti%15]];
+      var tn = tithiName(pt.ti);
       rows.push(row(["तिथि","Tithi"], L(tn[0],tn[1]), "", "sub"));
       rows.push(row(["नामाक्षर (जुर्ने अक्षर)","Naming letter"], letter, ""));
       rows.push(row(["यो नक्षत्रका अक्षर","Letters of this nakshatra"], sy.join(" "), "", "sub"));
@@ -3149,6 +3258,7 @@ var TOOLS = [
   ex:["२०८३ कात्तिक — दशैं, तिहार, छठ र हरेक दिनको तिथि","Kartik 2083 — Dashain, Tihar, Chhath and each day's tithi"],
   f:[ {k:"y",l:["साल","Year"],u:"BS",d:TB.y,w:1},
       {k:"m",l:["महिना","Month"],t:"s",d:String(TB.m),o:BS_MONTH_OPTS,w:1} ],
+  post:function(out, box){ patroDecorate(out, box); },
   calc:function(v){
     var y = n(v.y), m = n(v.m) || 1;
     if(y < BS_START_YEAR || y > BS_MAX_YEAR) return {err:["साल "+npd(BS_START_YEAR)+" देखि "+npd(BS_MAX_YEAR)+" BS सम्म मात्र मिल्छ।","Year must be between "+BS_START_YEAR+" and "+BS_MAX_YEAR+" BS."]};
@@ -3166,14 +3276,80 @@ var TOOLS = [
       if(ev && ev[2]==="h") nh++;
       rows.push(row([mark+npd(d)+" "+WD[a.wd]+" · "+AD_MONTHS[a.m-1].slice(0,3)+" "+a.d+(isT?" ← आज":""), mark+d+" "+WDE[a.wd]+" · "+AD_MONTHS[a.m-1].slice(0,3)+" "+a.d+(isT?" ← today":"")],
         L(tn[0],tn[1]) + (ev ? " · "+L(ev[3],ev[4]) : ""), "", (ev || a.wd===6 || isT) ? "" : "sub"));
+      rows[rows.length-1].pd = y+"-"+m+"-"+d;
       wk.push(npd(d)+" ("+a.d+")"); if(wk.length===7){ grid.push(wk); wk = []; }
     }
     if(wk.length){ while(wk.length<7) wk.push(""); grid.push(wk); }
     if(hl.length && !HOLI_PART[y]) rows.push(row(["यो महिनाका सार्वजनिक बिदा (सूचीमा)","Listed public holidays this month"], npd(nh), L("दिन","days"), "sub"));
     return { rows:rows,
-      table:{ title:L("🗓️ महिनाको पात्रो","🗓️ Month grid"), sub:npd(y)+" "+bsM(m-1), head:LANG ? WDE : WD, rows:grid },
+      table:{ title:L("🗓️ महिनाको पात्रो","🗓️ Month grid"), sub:npd(y)+" "+bsM(m-1), head:LANG ? WDE : WD, rows:grid, pym:[y,m] },
       note:["मिति: Bikram Sambat तालिका (२०००–"+npd(BS_MAX_YEAR)+")। तिथि: सूर्योदय (बिहान ६ बजे) को चन्द्र–सूर्य कोणबाट (हरेक १२° = एक तिथि) अनुमान — तिथि फेरिने दिन पात्रोसँग फरक पर्न सक्छ। चाडपर्व/बिदा: २०८३ — सरकारी सूची (राजपत्र र गृह मन्त्रालयको सूचना, समाचारअनुसार); २०८२ — महाशिवरात्रि, रामनवमी, इद र ल्होसार मात्र। इदको मिति चन्द्रदर्शनअनुसार तोकिन्छ — २०८२ को बकर इद र २०८३ को इद-उल-फित्र पुष्टि नभएकाले राखिएको छैन। २०८३ मा रामनवमी पर्दैन (२०८४ बैशाख २)। 🔴 सार्वजनिक बिदा · 🟡 उपत्यका/विशेष।",
             "Dates: Bikram Sambat table (2000–"+BS_MAX_YEAR+"). Tithi: estimated from the moon–sun angle at sunrise (6 am; every 12° is one tithi) — may differ from a printed patro on days the tithi changes. Festivals/holidays: 2083 — the government list (Gazette and Home Ministry notices, as reported); 2082 — Maha Shivaratri, Ram Navami, Eid and Lhosar only. Eid follows the moon sighting — 2082 Bakar Eid and 2083 Eid ul-Fitr are left out until confirmed. No Ram Navami falls in 2083 (it is Baisakh 2, 2084). 🔴 public holiday · 🟡 valley/special."] };
+  }},
+
+/* ---------------- विश्व घडी (v8.8) ---------------- */
+{ id:"wclock", cat:"util", ic:"🕰️", neu:true, custom:true,
+  nm:["विश्व घडी","World Clock"],
+  sb:["नेपाल समय ↔ विदेशको समय","Nepal time ↔ world time"],
+  kw:"world clock time zone samay ghadi converter dubai qatar saudi malaysia korea japan usa uk australia canada nepal time bajyo",
+  ex:["नेपालमा बेलुका ८ बजे — दुबई, अमेरिका, अस्ट्रेलियामा कति बजे?","8 pm in Nepal — what time is it in Dubai, the USA, Australia?"],
+  html:function(){
+    var nums = "";
+    for(var i = 1; i <= 12; i++){ var a = i*Math.PI/6; nums += '<span class="wc-n" style="left:'+(50+36*Math.sin(a)).toFixed(2)+'%;top:'+(50-36*Math.cos(a)).toFixed(2)+'%">'+npd(i)+'</span>'; }
+    var opts = WZ.map(function(z){ return '<option value="'+z[0]+'">'+z[1]+' '+esc(L(z[4]+" ("+z[2]+")", z[5]+" ("+z[3]+")"))+'</option>'; }).join("");
+    return '<div class="wcwrap"><div class="wc" id="wcWatch"><div class="wc-face" id="wcFace">'
+      + '<div class="wc-ticks"></div><div class="wc-ticks m"></div>' + nums
+      + '<div class="wc-brand">GANAK</div><div class="wc-date" id="wcDate"></div>'
+      + '<div class="wc-hand h" id="wcH"></div><div class="wc-hand m" id="wcM"></div><div class="wc-hand s" id="wcS"></div><div class="wc-cap"></div>'
+      + '<div class="wc-glass"></div></div></div>'
+      + '<div class="wc-read"><div class="wc-zone" id="wcZone"></div><div class="wc-time" id="wcTime"></div><div class="wc-sub" id="wcSub"></div></div></div>'
+      + '<div class="eyebrow" style="margin-top:14px">'+L("समय मिलाउने (Converter)","Convert a time")+'</div>'
+      + '<div class="fields"><label class="f"><span class="fl">'+L("कहाँको समय?","Time in")+'</span><select id="wcSrc">'+opts+'</select></label>'
+      + '<label class="f half"><span class="fl">'+L("समय","Time")+'</span><input type="time" id="wcT"></label>'
+      + '<label class="f half"><span class="fl">'+L("मिति (AD)","Date (AD)")+'</span><input type="date" id="wcD"></label></div>'
+      + '<div class="wcbar"><span id="wcNote"></span><button class="mini" id="wcLive" hidden>⟲ '+L("अहिले (Live)","Now (live)")+'</button></div>'
+      + '<div class="eyebrow">'+L("विश्वका सहर — थिचेर घडीमा हेर्नुहोस्","World cities — tap to show on the watch")+'</div>'
+      + '<div class="wcl" id="wcList"></div>'
+      + '<div class="note" style="margin-top:10px">ℹ️ '+L("समय तपाईंको फोनको घडी र विश्व समय-क्षेत्र (daylight saving सहित) अनुसार। नेपाल = UTC+५:४५।","Times follow your phone's clock and world time zones (daylight saving included). Nepal = UTC+5:45.")+'</div>';
+  },
+  init:function(){
+    WC.mode = "live"; WC.z = WC.z || "np"; WC.lastSec = -1;
+    function fillInputs(){
+      var src = wzOf($("#wcSrc").value), p = tzParts(src[6], Date.now()); if(!p) return;
+      $("#wcT").value = pad2(p.h)+":"+pad2(p.mi); $("#wcD").value = p.y+"-"+pad2(p.m)+"-"+pad2(p.d);
+    }
+    function setFromInputs(){
+      var t = ($("#wcT").value || "").split(":"), d = ($("#wcD").value || "").split("-");
+      if(t.length < 2 || d.length < 3) return;
+      WC.T = tzToUtc(wzOf($("#wcSrc").value)[6], +d[0], +d[1], +d[2], +t[0], +t[1]); WC.mode = "set"; wcShow();
+    }
+    $("#wcSrc").value = "np"; fillInputs(); wcRows(); wcShow();
+    $("#cust").addEventListener("change", function(e){
+      if(e.target.id === "wcSrc"){ if(WC.mode === "live") fillInputs(); else setFromInputs(); }
+      if(e.target.id === "wcT" || e.target.id === "wcD") setFromInputs();
+    });
+    $("#cust").addEventListener("input", function(e){ if(e.target.id === "wcT") setFromInputs(); });
+    $("#cust").addEventListener("click", function(e){
+      var r = e.target.closest("[data-wz]");
+      if(r){ WC.z = r.dataset.wz; [].forEach.call($("#wcList").children, function(b){ b.classList.toggle("on", b.dataset.wz === WC.z); }); WC.offZ = ""; wcShow();
+        var w = document.getElementById("wcWatch"); if(w) w.scrollIntoView({behavior: RMQ.matches ? "auto" : "smooth", block:"center"}); return; }
+      if(e.target.closest("#wcLive")){ WC.mode = "live"; WC.offZ = ""; fillInputs(); wcShow(); }
+    });
+    /* tilt the watch toward the finger / pointer */
+    var w = $("#wcWatch");
+    w.addEventListener("pointermove", function(e){
+      if(RMQ.matches) return;
+      var r = w.getBoundingClientRect(), x = (e.clientX - r.left)/r.width - 0.5, y = (e.clientY - r.top)/r.height - 0.5;
+      w.style.transform = "perspective(900px) rotateX("+(-y*16).toFixed(1)+"deg) rotateY("+(x*16).toFixed(1)+"deg)";
+      w.style.setProperty("--gx", (50 + x*40).toFixed(0)+"%"); w.style.setProperty("--gy", (30 + y*40).toFixed(0)+"%");
+    });
+    w.addEventListener("pointerleave", function(){ w.style.transform = ""; w.style.removeProperty("--gx"); w.style.removeProperty("--gy"); });
+    if(!WC.raf) WC.raf = requestAnimationFrame(wcTick);
+  },
+  share:function(){
+    var T = wcAt(), np = tzParts("Asia/Kathmandu", T), A = ["🕰️ " + L("विश्व समय — नेपाल ","World time — Nepal ") + hm12(np.h, np.mi), "─────────────"];
+    WZ.forEach(function(z){ if(z[0] === "np") return; var p = tzParts(z[6], T); if(p) A.push(z[1]+" "+L(z[4], z[5])+": "+hm12(p.h, p.mi)); });
+    return A.join("\n");
   }},
 
 /* ---------------- एकाइ मूल्य तुलना (v6.8) ---------------- */
@@ -3439,7 +3615,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.7 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3500,6 +3676,7 @@ digits:["नेपाली (१२३) र अंग्रेजी (123) अ�
 patro:["महिनाभरिको नेपाली पात्रो — हरेक दिनको अंग्रेजी मिति, तिथि, चाडपर्व र सार्वजनिक बिदा।","A month of the Nepali calendar — each day's AD date, tithi, festivals and public holidays."],
 uprice:["फरक साइजका प्याकमध्ये कुन सस्तो — प्रति kg, लिटर वा गोटाको मूल्य।","Which pack size is cheaper — price per kg, litre or piece."],
 stackdisc:["छुटमाथि छुटको वास्तविक प्रतिशत र तिर्ने मूल्य — VAT सहित।","The real percentage of stacked discounts and the final price — with VAT."],
+wclock:["नेपालको समय र विश्वका सहरको समय — असली जस्तो घडीमा हेर्नुहोस्, वा कुनै समय रोजेर अरू ठाउँमा कति बजे मिलाउनुहोस्।","Nepal time and world cities — on a real-looking watch, or pick a time and convert it."],
 gpa:["NEB (SEE, ११–१२) र TU सेमेस्टरको grade, GPA र CGPA — credit hour सहित।","Grades, GPA and CGPA for NEB (SEE, 11–12) and TU semesters — with credit hours."],
 nepse:["बोनस/हकप्रदपछि सेयरको समायोजित मूल्य र कमिसनसहित औसत लागत (WACC)।","Share price after bonus/right and average cost (WACC) with commission."]
 };
@@ -3555,6 +3732,7 @@ patro:"patro calendar tithi chadparba bida holiday dashain tihar mahina",
 uprice:"ekai mulya unit price sasto tulana pack kg litre",
 stackdisc:"chut mathi chut discount double offer sale",
 gpa:"gpa cgpa grade neb see tu result marks",
+wclock:"ghadi samay time world clock timezone bajyo dubai qatar saudi kuwait malaysia korea japan usa america uk london australia sydney canada portugal converter",
 nepse:"nepse share sheyar bonus hakprad right wacc kitta"
 };
 function printHead(){
@@ -3574,6 +3752,7 @@ function slipMeta(){
 var NAK=[["अश्विनी","Ashwini","चु,चे,चो,ला"],["भरणी","Bharani","ली,लू,ले,लो"],["कृत्तिका","Krittika","अ,ई,उ,ए"],["रोहिणी","Rohini","ओ,वा,वी,वू"],["मृगशिरा","Mrigashira","वे,वो,का,की"],["आर्द्रा","Ardra","कु,घ,ङ,छ"],["पुनर्वसु","Punarvasu","के,को,हा,ही"],["पुष्य","Pushya","हु,हे,हो,ड"],["अश्लेषा","Ashlesha","डी,डू,डे,डो"],["मघा","Magha","मा,मी,मू,मे"],["पूर्वफाल्गुनी","Purva Phalguni","मो,टा,टी,टू"],["उत्तरफाल्गुनी","Uttara Phalguni","टे,टो,पा,पी"],["हस्त","Hasta","पू,ष,ण,ठ"],["चित्रा","Chitra","पे,पो,रा,री"],["स्वाती","Swati","रू,रे,रो,ता"],["विशाखा","Vishakha","ती,तू,ते,तो"],["अनुराधा","Anuradha","ना,नी,नू,ने"],["ज्येष्ठा","Jyeshtha","नो,या,यी,यू"],["मूल","Mula","ये,यो,भा,भी"],["पूर्वाषाढा","Purva Ashadha","भू,धा,फा,ढा"],["उत्तराषाढा","Uttara Ashadha","भे,भो,जा,जी"],["श्रवण","Shravan","खी,खू,खे,खो"],["धनिष्ठा","Dhanishtha","गा,गी,गू,गे"],["शतभिषा","Shatabhisha","गो,सा,सी,सू"],["पूर्वभाद्रपद","Purva Bhadrapad","से,सो,दा,दी"],["उत्तरभाद्रपद","Uttara Bhadrapad","दू,थ,झ,ञ"],["रेवती","Revati","दे,दो,च,ची"]];
 var RASHI=[["मेष","Mesh (Aries)"],["वृष","Brish (Taurus)"],["मिथुन","Mithun (Gemini)"],["कर्कट","Karkat (Cancer)"],["सिंह","Simha (Leo)"],["कन्या","Kanya (Virgo)"],["तुला","Tula (Libra)"],["वृश्चिक","Brischik (Scorpio)"],["धनु","Dhanu (Sagittarius)"],["मकर","Makar (Capricorn)"],["कुम्भ","Kumbha (Aquarius)"],["मीन","Meen (Pisces)"]];
 var TITHI=["प्रतिपदा","द्वितीया","तृतीया","चतुर्थी","पञ्चमी","षष्ठी","सप्तमी","अष्टमी","नवमी","दशमी","एकादशी","द्वादशी","त्रयोदशी","चतुर्दशी"];
+var TITHI_EN=["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi"];
 var NAMESUG={"चु":"चूडामणि","चे":"चेतन, चेतना","ला":"लक्ष्मी, लता, लाजु","ली":"लीला, लीलाराज","ले":"लेखनाथ","लो":"लोकेश, लोचन","अ":"अनिल, अञ्जना, अशोक","ई":"ईश्वर, ईश्वरी","उ":"उमेश, उमा, उज्ज्वल","ए":"एकराज, एलिना","ओ":"ओमप्रकाश, ओजस्वी","वा":"वासुदेव","वी":"वीरेन्द्र, वीणा","वे":"वेदप्रसाद, वेदिका","का":"कार्तिक, कामना","की":"कीर्ति, कीर्तिमान","कु":"कुमार, कुसुम, कुन्ती","घ":"घनश्याम","छ":"छविलाल","के":"केशव, केसाङ","को":"कोपिला, कोमल","हा":"हार्दिक","ही":"हीरा, हीरामणि","हु":"हुमकला","हे":"हेमन्त, हेमा","हो":"होमनाथ","ड":"डम्बर","डो":"डोलराज, डोल्मा","मा":"माधव, माया, मानिता","मी":"मीरा, मीना","मे":"मेघराज, मेनुका","मो":"मोहन, मोनिका","टी":"टीकाराम, टीका","टे":"टेकबहादुर, टेकराज","पा":"पार्वती, पासाङ","पी":"पीताम्बर","पू":"पूजा, पूर्णिमा, पूर्ण","ठ":"ठाकुरप्रसाद","पे":"पेम्बा","रा":"राम, राधा, राजेश","री":"रीता, रीना","रू":"रूपा, रूपक","रे":"रेणुका, रेशम","रो":"रोशन, रोजिना","ता":"तारा, ताराप्रसाद","ती":"तीर्थ, तीर्थराज","ते":"तेजेन्द्र, तेन्जिङ","तो":"तोयराज","ना":"नारायण, नारायणी","नी":"नीलम, नीता","नू":"नूतन","ने":"नेत्रप्रसाद","नो":"नोर्बु","या":"यादव, याम","ये":"येशी","यो":"योगेन्द्र, योजना","भा":"भावना, भानु","भी":"भीम, भीमबहादुर","भू":"भूपेन्द्र, भूमिका","धा":"धावा","जा":"जानकी, जागृति","जी":"जीवन, जीतबहादुर","खे":"खेमराज, खेम","गा":"गायत्री","गी":"गीता, गीतेन्द्र","गे":"गेहेन्द्र","गो":"गोपाल, गोमा, गोविन्द","सा":"सागर, सावित्री","सी":"सीता, सीमा","सू":"सूर्य","से":"सेजल","सो":"सोम, सोनम, सोमनाथ","दा":"दामोदर, दावा","दी":"दीपक, दीपा","झ":"झलक, झलकमान","दे":"देवी, देवेन्द्र, देवकी","दो":"दोर्जे","च":"चन्द्र, चम्पा"};
 function patro(by,bm,bd,uh){
   var d = (uh===undefined ? Date.UTC(by,bm-1,bd,6,15) : Date.UTC(by,bm-1,bd) + uh*3600000)/86400000 + 2440587.5 - 2451545;
@@ -3590,6 +3769,7 @@ function patro(by,bm,bd,uh){
            rashi:Math.floor(sid/30), ti:Math.floor(phase/12) };
 }
 var ICONS = {
+  wclock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 6.8V12l3.4 2.1"/><circle cx="12" cy="12" r="1.5" fill="#F5B301" stroke="none"/><path d="M12 2.2v1.6M12 20.2v1.6M2.2 12h1.6M20.2 12h1.6"/>',
   dhalan:'<rect x="3" y="13.5" width="18" height="4" fill="#F5B301" stroke="none"/><rect x="3" y="13.5" width="18" height="4"/><line x1="6" y1="17.5" x2="6" y2="20.5"/><line x1="18" y1="17.5" x2="18" y2="20.5"/><path d="M7 10.5c1-3 3-4.5 5-4.5s4 1.5 5 4.5"/><line x1="12" y1="3.5" x2="12" y2="6"/>',
   septic:'<rect x="4" y="9" width="16" height="9.5"/><line x1="4" y1="12.5" x2="20" y2="12.5"/><path d="M10 9V5.5h4V9"/><circle cx="12" cy="15.5" r="1.4" fill="#F5B301" stroke="none"/>',
   majduri:'<circle cx="12" cy="8" r="3.2"/><path d="M8.8 6.2h6.4M12 4.8V3.5"/><path d="M5.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><rect x="10.5" y="16.5" width="3" height="2.2" fill="#F5B301" stroke="none"/>',
@@ -3822,6 +4002,7 @@ function showOut(t, out){
   out.rows.forEach(function(r){ if(!big && r.c.indexOf("big") >= 0) big = r; });
   if(!big) big = out.rows[0];
   setSticky(S(big.l), big.v + (S(big.u) ? " " + S(big.u) : ""));
+  if(t.post) t.post(out, box);   /* tool-specific decoration (पात्रो: tappable dates + day banner) */
 }
 function shareText(){
   var t = cur, A = ["📐 Ganak — " + S(t.nm), "─────────────"];
@@ -3896,6 +4077,7 @@ function openTool(id){
   /* same tool drawn again (language switch, "fill example" reset): no slide, stay where you were */
   var redraw = (SHOWN === id && toolEl.style.display === "block"), keepY = window.pageYOffset || 0;
   cur = t;
+  if(!redraw) PSEL = null;   /* पात्रो opens on "आज" */
   if(!t.custom){
     /* saved inputs may come from an older version: fill new fields with their default
        and reset a select whose stored value is no longer one of its options */
@@ -4127,6 +4309,188 @@ function openPdfView(){
   document.addEventListener("keydown",function esc2(e){ if(e.key==="Escape"){ closePv(); document.removeEventListener("keydown",esc2); } });
 }
 $("#btnPrint").addEventListener("click", openPdfView);
+
+/* logo: a tap (or mouse hover) spins the ग coin and गणक out in 3D */
+function logoSpin(e){
+  var b = e.target.closest && e.target.closest(".gring,.brandrow .logo,.brandrow .logo-np"); if(!b || RMQ.matches) return;
+  var r = b.closest(".brandrow");
+  if(e.type === "pointerover" && (e.pointerType !== "mouse" || b.contains(e.relatedTarget) || r.classList.contains("spin"))) return;
+  r.classList.remove("spin"); void r.offsetWidth; r.classList.add("spin");
+}
+document.addEventListener("click", logoSpin);
+document.addEventListener("pointerover", logoSpin);
+document.addEventListener("animationend", function(e){ if(e.animationName === "coinspin"){ var r = e.target.closest(".brandrow"); if(r) r.classList.remove("spin"); } });
+
+/* ---- पात्रो: tappable dates + a day banner at the top ("आज" or the tapped date) ---- */
+var PSEL = null;   /* tapped date {y,m,d}; null = today */
+var WDN = ["आइतबार","सोमबार","मङ्गलबार","बुधबार","बिहीबार","शुक्रबार","शनिबार"], WDNE = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function patroDecorate(out, box){
+  var ym = out.table && out.table.pym;
+  if(ym){
+    var y = ym[0], m = ym[1], hl = (HOLI[y]||[]).filter(function(h){ return h[0] === m; }), sel = PSEL || TB;
+    var dom = box.querySelectorAll(".slip > .row");
+    if(dom.length === out.rows.length) out.rows.forEach(function(r, i){
+      if(!r.pd) return;
+      dom[i].dataset.pd = r.pd; dom[i].classList.add("prow");
+      if(r.pd === sel.y+"-"+sel.m+"-"+sel.d) dom[i].classList.add("psel");
+    });
+    var tw = box.querySelector(".tw");
+    if(tw){
+      tw.classList.add("pgrid");
+      [].forEach.call(tw.querySelectorAll("tbody tr"), function(tr){
+        [].forEach.call(tr.children, function(td, ci){
+          var t = td.textContent.trim(); if(!t) return;
+          var bd = parseInt(t.replace(/[०-९]/g, function(c){ return "०१२३४५६७८९".indexOf(c); }), 10), ad = (t.match(/\((\d+)\)/) || [])[1];
+          if(!bd) return;
+          var ev = hl.filter(function(h){ return h[1] === bd; }), hol = ev.some(function(h){ return h[2] === "h"; });
+          td.innerHTML = '<span class="pdn">'+npd(bd)+'</span><span class="pda">'+(ad || "")+'</span>' + (ev.length ? '<i class="pdot'+(hol ? " h" : "")+'"></i>' : '');
+          td.dataset.pd = y+"-"+m+"-"+bd; td.tabIndex = 0; td.className = "pcell" + (ci === 6 ? " psat" : "") + (hol ? " phol" : "")
+            + (y === TB.y && m === TB.m && bd === TB.d ? " ptd" : "") + (y === sel.y && m === sel.m && bd === sel.d ? " psel" : "");
+        });
+      });
+    }
+  }
+  patroBanner();
+}
+function patroBanner(anim){
+  var old = document.getElementById("pban");
+  if(!cur || cur.id !== "patro"){ if(old) old.remove(); return; }
+  var s = PSEL || TB, isT = (s.y === TB.y && s.m === TB.m && s.d === TB.d), a = bsToAd(s.y, s.m, s.d);
+  if(!a) return;
+  var pt = patro(a.y, a.m, a.d, 0.25), tn = tithiName(pt.ti), nk = NAK[pt.nak];
+  var ev = (HOLI[s.y] || []).filter(function(h){ return h[0] === s.m && h[1] === s.d; });
+  var chips = ev.map(function(h){
+    return '<span class="pchip '+(h[2] === "h" ? "h" : "v")+'">'+(h[2] === "h" ? "🔴 " : "🟡 ")+esc(L(h[3], h[4]))
+      + '<em>'+(h[2] === "h" ? L("सार्वजनिक बिदा","public holiday") : L("उपत्यका / विशेष","valley / special"))+'</em></span>'; });
+  if(a.wd === 6) chips.push('<span class="pchip s">'+L("शनिबार — साप्ताहिक बिदा","Saturday — weekly holiday")+'</span>');
+  if(!ev.length) chips.push('<span class="pchip n">'+(HOLI[s.y] ? L("यो दिन सूचीमा चाडपर्व/बिदा छैन","No festival or holiday listed") : L("यो सालको चाडपर्व सूची छैन","No festival list for this year"))+'</span>');
+  var t0 = bsToAd(TB.y, TB.m, TB.d), diff = Math.round((Date.UTC(a.y, a.m-1, a.d) - Date.UTC(t0.y, t0.m-1, t0.d)) / 864e5);
+  var rel = diff === 0 ? L("आज","today") : diff === 1 ? L("भोलि","tomorrow") : diff === -1 ? L("हिजो","yesterday")
+          : diff > 0 ? L("आजबाट "+npd(diff)+" दिनपछि", "in "+diff+" days") : L(npd(-diff)+" दिनअघि", (-diff)+" days ago");
+  var el = old;
+  if(!el){ el = document.createElement("div"); el.id = "pban"; var th = toolEl.querySelector(".thero"); toolEl.insertBefore(el, th || toolEl.firstChild); }
+  el.className = "pban" + (isT ? " today" : "");
+  el.innerHTML = '<div class="pban-k"><span class="pbadge">'+(isT ? "📅 "+L("आज","TODAY") : "📌 "+L("रोजिएको मिति","SELECTED DATE"))+'</span>'
+    + (isT ? '' : '<button class="mini pback" id="pToday">↺ '+L("आज","Today")+'</button>')+'</div>'
+    + '<div class="pban-b"><div class="ptile"><span class="ptm">'+esc(bsM(s.m-1))+'</span><span class="ptn">'+npd(s.d)+'</span><span class="ptw">'+esc(L(WDN[a.wd], WDNE[a.wd]))+'</span></div>'
+    + '<div class="pinfo"><div class="pdate">'+npd(s.y)+' '+esc(bsM(s.m-1))+' '+npd(s.d)+', '+esc(L(WDN[a.wd], WDNE[a.wd]))+'</div>'
+    + '<div class="pban-ad">'+esc(AD_MONTHS[a.m-1]+" "+a.d+", "+a.y)+' · '+esc(rel)+'</div>'
+    + '<div class="ptithi">🌙 '+esc(L(tn[0], tn[1]))+' · '+L("नक्षत्र ","Nakshatra ")+esc(L(nk[0], nk[1]))+'</div>'
+    + '<div class="pchips">'+chips.join("")+'</div></div></div>';
+  if(anim && !RMQ.matches){ el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); }
+}
+toolEl.addEventListener("click", function(e){
+  if(!cur || cur.id !== "patro") return;
+  var p = e.target.closest("[data-pd]"), back = e.target.closest("#pToday");
+  if(!p && !back) return;
+  var key;
+  if(back){ PSEL = null; key = TB.y+"-"+TB.m+"-"+TB.d; }
+  else { key = p.dataset.pd; var q = key.split("-").map(Number); PSEL = {y:q[0], m:q[1], d:q[2]}; }
+  [].forEach.call(toolEl.querySelectorAll(".psel"), function(x){ x.classList.remove("psel"); });
+  [].forEach.call(toolEl.querySelectorAll('[data-pd="'+key+'"]'), function(x){ x.classList.add("psel"); });
+  patroBanner(true);
+  var bn = document.getElementById("pban"); if(bn && !back) bn.scrollIntoView({behavior: RMQ.matches ? "auto" : "smooth", block:"start"});
+});
+toolEl.addEventListener("keydown", function(e){   /* grid dates: Enter / Space = tap */
+  if((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("pcell")){ e.preventDefault(); e.target.click(); }
+});
+
+/* ---- विश्व घडी: time in any zone via Intl (handles daylight saving) ---- */
+var WZ = [
+  ["np","🇳🇵","नेपाल","Nepal","काठमाडौं","Kathmandu","Asia/Kathmandu"],
+  ["in","🇮🇳","भारत","India","दिल्ली","Delhi","Asia/Kolkata"],
+  ["ae","🇦🇪","UAE","UAE","दुबई","Dubai","Asia/Dubai"],
+  ["qa","🇶🇦","कतार","Qatar","दोहा","Doha","Asia/Qatar"],
+  ["sa","🇸🇦","साउदी अरब","Saudi Arabia","रियाद","Riyadh","Asia/Riyadh"],
+  ["kw","🇰🇼","कुवेत","Kuwait","कुवेत सिटी","Kuwait City","Asia/Kuwait"],
+  ["my","🇲🇾","मलेसिया","Malaysia","क्वालालम्पुर","Kuala Lumpur","Asia/Kuala_Lumpur"],
+  ["kr","🇰🇷","दक्षिण कोरिया","South Korea","सोल","Seoul","Asia/Seoul"],
+  ["jp","🇯🇵","जापान","Japan","टोकियो","Tokyo","Asia/Tokyo"],
+  ["au","🇦🇺","अस्ट्रेलिया","Australia","सिड्नी","Sydney","Australia/Sydney"],
+  ["gb","🇬🇧","बेलायत (UK)","United Kingdom","लन्डन","London","Europe/London"],
+  ["pt","🇵🇹","पोर्चुगल","Portugal","लिस्बन","Lisbon","Europe/Lisbon"],
+  ["us","🇺🇸","अमेरिका (पूर्व)","USA (East)","न्युयोर्क","New York","America/New_York"],
+  ["usw","🇺🇸","अमेरिका (पश्चिम)","USA (West)","लस एन्जलस","Los Angeles","America/Los_Angeles"],
+  ["ca","🇨🇦","क्यानडा","Canada","टोरन्टो","Toronto","America/Toronto"] ];
+var TZF = {};
+function wzOf(k){ for(var i = 0; i < WZ.length; i++) if(WZ[i][0] === k) return WZ[i]; return WZ[0]; }
+function tzParts(tz, ms){
+  var f = TZF[tz];
+  if(!f){ try{ f = TZF[tz] = new Intl.DateTimeFormat("en-US", {timeZone:tz, hourCycle:"h23", year:"numeric", month:"numeric", day:"numeric", hour:"numeric", minute:"numeric", second:"numeric"}); }catch(e){ return null; } }
+  var o = {}; f.formatToParts(new Date(ms)).forEach(function(p){ o[p.type] = p.value; });
+  return {y:+o.year, m:+o.month, d:+o.day, h:(+o.hour) % 24, mi:+o.minute, s:+o.second};
+}
+function tzOff(tz, ms){   /* minutes ahead of UTC at that instant */
+  var p = tzParts(tz, ms); if(!p) return tz === "Asia/Kathmandu" ? 345 : 0;
+  return Math.round((Date.UTC(p.y, p.m-1, p.d, p.h, p.mi, p.s) - Math.floor(ms/1000)*1000) / 60000);
+}
+function tzToUtc(tz, y, m, d, h, mi){ var g = Date.UTC(y, m-1, d, h, mi); return g - tzOff(tz, g - tzOff(tz, g)*60000)*60000; }
+function hm12(h, mi){
+  var w = LANG ? (h < 12 ? "AM" : "PM") : (h < 4 ? "राति" : h < 12 ? "बिहान" : h < 17 ? "दिउँसो" : h < 20 ? "बेलुका" : "राति");
+  return npd(h % 12 || 12) + ":" + npd(pad2(mi)) + " " + w;
+}
+var WC = {z:"np", mode:"live", T:0, raf:0, off:0, offAt:0, offZ:"", lastSec:-1};
+function wcAt(){ return WC.mode === "live" ? Date.now() : WC.T; }
+function wcHands(h, mi, sec){
+  var H = document.getElementById("wcH"), M = document.getElementById("wcM"), Sx = document.getElementById("wcS");
+  if(!H) return;
+  H.style.transform = "rotate("+((h % 12)*30 + mi*0.5 + sec/120)+"deg)";
+  M.style.transform = "rotate("+(mi*6 + sec*0.1)+"deg)";
+  Sx.style.transform = "rotate("+(sec*6)+"deg)";
+}
+function wcText(T){
+  var z = wzOf(WC.z), p = tzParts(z[6], T); if(!p) return;
+  var ad = new Date(Date.UTC(p.y, p.m-1, p.d)), wd = ad.getUTCDay(), b = adToBs(p.y, p.m, p.d);
+  document.getElementById("wcZone").textContent = z[1]+" "+L(z[4]+", "+z[2], z[5]+", "+z[3]);
+  document.getElementById("wcTime").textContent = hm12(p.h, p.mi) + (WC.mode === "live" ? "" : " · "+L("रोजिएको","set"));
+  document.getElementById("wcSub").textContent = (z[0] === "np" && b ? npd(b.y)+" "+bsM(b.m-1)+" "+npd(b.d) : AD_MONTHS[p.m-1]+" "+p.d+", "+p.y) + ", " + L(WDN[wd], WDNE[wd]);
+  document.getElementById("wcDate").textContent = L(WDN[wd].replace("बार",""), WDNE[wd].slice(0,3)) + " " + npd(z[0] === "np" && b ? b.d : p.d);
+  var npP = tzParts("Asia/Kathmandu", T); if(npP) setSticky(L("नेपाल समय","Nepal time"), hm12(npP.h, npP.mi));
+}
+function wcRows(){
+  var box = document.getElementById("wcList"); if(!box) return;
+  box.innerHTML = WZ.map(function(z){
+    return '<button class="wcr'+(z[0] === WC.z ? " on" : "")+'" data-wz="'+z[0]+'"><span class="wcf">'+z[1]+'</span>'
+      + '<span class="wcn"><b>'+esc(L(z[4], z[5]))+'</b><em>'+esc(L(z[2], z[3]))+'</em></span>'
+      + '<span class="wct"><b class="wt"></b><em class="wd"></em></span></button>';
+  }).join("");
+  wcFill(wcAt());
+}
+function wcFill(T){
+  var box = document.getElementById("wcList"); if(!box) return;
+  var np = tzParts("Asia/Kathmandu", T), npOff = tzOff("Asia/Kathmandu", T), npDay = np ? Date.UTC(np.y, np.m-1, np.d) : 0;
+  [].forEach.call(box.querySelectorAll("[data-wz]"), function(b){
+    var z = wzOf(b.dataset.wz), p = tzParts(z[6], T); if(!p) return;
+    var dm = tzOff(z[6], T) - npOff, ab = Math.abs(dm), day = (Date.UTC(p.y, p.m-1, p.d) - npDay) / 864e5;
+    b.querySelector(".wt").textContent = (p.h >= 6 && p.h < 18 ? "☀️ " : "🌙 ") + hm12(p.h, p.mi);
+    b.querySelector(".wd").textContent = (day > 0 ? L("भोलि · ","+1 day · ") : day < 0 ? L("हिजो · ","−1 day · ") : "")
+      + (z[0] === "np" ? L("नेपाल","Nepal") : dm === 0 ? L("नेपाल जस्तै","same as Nepal")
+         : L("नेपालभन्दा "+npd(Math.floor(ab/60))+":"+npd(pad2(ab % 60))+(dm < 0 ? " पछाडि" : " अगाडि"), (dm < 0 ? "−" : "+")+Math.floor(ab/60)+":"+pad2(ab % 60)+" vs Nepal"));
+  });
+}
+function wcTick(){
+  if(!document.getElementById("wcFace")){ WC.raf = 0; return; }
+  if(WC.mode === "live"){
+    var now = Date.now();
+    if(now - WC.offAt > 30000 || WC.offZ !== WC.z){ WC.off = tzOff(wzOf(WC.z)[6], now); WC.offAt = now; WC.offZ = WC.z; }
+    var t = new Date(now + WC.off*60000);
+    wcHands(t.getUTCHours(), t.getUTCMinutes(), t.getUTCSeconds() + t.getUTCMilliseconds()/1000);
+    var sec = Math.floor(now/1000);
+    if(sec !== WC.lastSec){ WC.lastSec = sec; wcText(now); wcFill(now); }
+  }
+  WC.raf = requestAnimationFrame(wcTick);
+}
+function wcShow(){   /* clock + list for the current mode / zone */
+  var face = document.getElementById("wcFace"); if(!face) return;
+  var T = wcAt();
+  face.classList.toggle("set", WC.mode !== "live");
+  if(WC.mode !== "live"){ var p = tzParts(wzOf(WC.z)[6], T); if(p) wcHands(p.h, p.mi, 0); }
+  wcText(T); wcFill(T);
+  document.getElementById("wcLive").hidden = (WC.mode === "live");
+  document.getElementById("wcNote").textContent = WC.mode === "live" ? L("अहिलेको समय (Live)","Live — right now")
+    : (function(){ var z = wzOf(document.getElementById("wcSrc").value), p = tzParts(z[6], T);
+        return "🕗 " + L(z[4]+" मा ", "In "+z[5]+" ") + hm12(p.h, p.mi) + L(" हुँदा —"," is —"); })();
+}
 
 /* ---- documents: result photo, invoice, EMI schedule → canvas → PNG / PDF (no library) ----
    cvKit = shared drawing helpers. A renderer (lay) is a plain function of k: the first pass (draw=false)
@@ -4621,7 +4985,7 @@ var HOMEIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="
 var GEARIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#C3CDD6" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8M5.2 5.2l2 2M16.8 16.8l2 2M18.8 5.2l-2 2M7.2 16.8l-2 2"/></svg>';
 var BELLIC='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#C3CDD6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 4.8 1.8 5.8 1.8 5.8H4.2S6 14.3 6 9.5"/><path d="M10.5 19a1.7 1.7 0 0 0 3 0"/></svg>';
 function sideHtml(){
-  var h='<div class="side-brand"><div class="brandrow"><span class="gring" aria-hidden="true"><i>ग</i></span><span class="logo">GANA<b>K</b></span><span class="logo-np">गणक</span></div>'
+  var h='<div class="side-brand"><div class="brandrow"><span class="gring" aria-hidden="true"><i>ग</i><i class="gb">G</i></span><span class="logo">GANA<b>K</b></span><span class="logo-np">गणक</span></div>'
     +'<div class="tagline">'+esc(S(UI.tag))+'</div></div><div class="side-ruler"></div><nav class="side-nav">';
   h+='<button class="sn-item'+(cur?'':' on')+'" data-act="home">'+HOMEIC+'<span>'+L("गृहपृष्ठ — सबै tools","Home — all tools")+'</span></button>';
   ["con","np","fin","util"].forEach(function(c){
