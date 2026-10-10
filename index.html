@@ -858,7 +858,7 @@ body[data-theme="dark"] .row.big .rv{background:linear-gradient(transparent 66%,
 .pban.flip .ptile{animation:pflip .65s var(--emph)}
 .pban.flip .pinfo{animation:fadeUp .4s .08s var(--ease) both}
 @keyframes pflip{from{transform:rotateX(-100deg);opacity:.3}}
-.tw.pgrid{max-height:none;overflow:visible}
+.tw.pgrid{max-height:none;overflow:visible;touch-action:pan-y}
 .tw.pgrid table{table-layout:fixed;font-family:var(--fs)}
 .tw.pgrid th,.tw.pgrid th:first-child{position:static;text-align:center;padding:7px 0;font-size:11px}
 .tw.pgrid th:last-child{color:#FF8A80}
@@ -922,6 +922,36 @@ body[data-theme="dark"] .ptile{background:#EEE8D8}
 .wcn em,.wct .wd{display:block;font-style:normal;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wct{text-align:right}
 .wct .wt{display:block;font-family:var(--fm);font-size:13.5px;white-space:nowrap}
+/* ---- v8.9: पात्रो month nav, coming-up festivals, banner actions · home "आज" card · world-clock search ---- */
+.pnav{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 2px}
+.pnav b{font-size:14px;font-weight:800;color:var(--ink);text-align:center}
+.pnav .mini{min-width:86px;border-radius:999px}
+.pnav .mini:disabled{opacity:.35;cursor:default}
+.pnext{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.2)}
+.pnk{margin-right:2px;font-size:11px;font-weight:800;letter-spacing:.6px;opacity:.85}
+.pnext button{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:6px 11px;border:0;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24);color:#fff;font-family:var(--fs);font-size:12.5px;font-weight:700;text-align:left}
+.pnext em{font-style:normal;font-weight:600;font-size:11.5px;opacity:.85;white-space:nowrap}
+.pact{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pact .mini,body[data-theme="dark"] .pact .mini{border:0;border-radius:999px;background:#FFFEF8;color:#15202A;box-shadow:0 3px 8px -3px rgba(0,0,0,.45)}
+.htoday{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 13px}
+.htoday[hidden],.wcr[hidden]{display:none}
+.htd-m,.htd-c{display:flex;align-items:center;border:1px solid var(--ol);border-radius:18px;background:var(--card);box-shadow:var(--m1);color:var(--ink);font-family:var(--fs);text-align:left;cursor:pointer}
+.htd-m{flex:999 1 260px;gap:12px;min-width:0;padding:10px 12px}
+.htd-c{flex:1 0 auto;justify-content:center;gap:6px;padding:10px 14px;font-size:13px}
+.htd-c b{font-family:var(--fm)}
+.ptile.sm{flex:0 0 52px;border-radius:11px;transform:none;box-shadow:0 1px 0 #E6E0CC,0 2px 0 #D8D1BA,0 3px 0 #C6BEA3,0 8px 12px -6px rgba(0,0,0,.4)}
+.ptile.sm .ptm{padding:3px 2px;font-size:10.5px}
+.ptile.sm .ptn{padding:1px 0 4px;font-size:22px}
+.htd-t{flex:1 1 auto;display:flex;flex-direction:column;gap:2px;min-width:0}
+.htd-t b{font-size:13.5px}
+.htd-e{font-size:12.5px;font-weight:700;color:#B71C1C}
+.htd-n{overflow:hidden;font-size:12.5px;color:var(--ink2);white-space:nowrap;text-overflow:ellipsis}
+.htd-n em{font-style:normal;font-weight:800;color:var(--ink)}
+.htd-go{font-size:24px;line-height:1;color:var(--mute)}
+body[data-theme="dark"] .htd-e{color:#FF8A80}
+.wcq{margin:0 0 10px}
+.wcnone{padding:14px;text-align:center;font-size:13px;color:var(--mute)}
 @media print{.slip{box-shadow:none;border:1.5px solid #000;background:#fff}.slip::before,.slip::after,.slip .note::after,g-rw,.vghost{display:none}
   #out,.vin-r,.vin-l{animation:none}}
 </style>
@@ -3309,7 +3339,8 @@ var TOOLS = [
       + '<label class="f half"><span class="fl">'+L("मिति (AD)","Date (AD)")+'</span><input type="date" id="wcD"></label></div>'
       + '<div class="wcbar"><span id="wcNote"></span><button class="mini" id="wcLive" hidden>⟲ '+L("अहिले (Live)","Now (live)")+'</button></div>'
       + '<div class="eyebrow">'+L("विश्वका सहर — थिचेर घडीमा हेर्नुहोस्","World cities — tap to show on the watch")+'</div>'
-      + '<div class="wcl" id="wcList"></div>'
+      + '<input class="search wcq" id="wcQ" type="search" autocomplete="off" placeholder="🔍 '+L("देश / सहर खोज्नुहोस् — जस्तै: कतार, Korea","Find a country / city — e.g. Qatar, Korea")+'">'
+      + '<div class="wcl" id="wcList"></div><div class="wcnone" id="wcNone" hidden>'+L("यो नामको सहर सूचीमा छैन","No city by that name in the list")+'</div>'
       + '<div class="note" style="margin-top:10px">ℹ️ '+L("समय तपाईंको फोनको घडी र विश्व समय-क्षेत्र (daylight saving सहित) अनुसार। नेपाल = UTC+५:४५।","Times follow your phone's clock and world time zones (daylight saving included). Nepal = UTC+5:45.")+'</div>';
   },
   init:function(){
@@ -3328,10 +3359,17 @@ var TOOLS = [
       if(e.target.id === "wcSrc"){ if(WC.mode === "live") fillInputs(); else setFromInputs(); }
       if(e.target.id === "wcT" || e.target.id === "wcD") setFromInputs();
     });
-    $("#cust").addEventListener("input", function(e){ if(e.target.id === "wcT") setFromInputs(); });
+    $("#cust").addEventListener("input", function(e){
+      if(e.target.id === "wcT") setFromInputs();
+      if(e.target.id === "wcQ"){
+        var q = e.target.value.trim().toLowerCase(), n = 0;
+        [].forEach.call($("#wcList").children, function(b){ b.hidden = !!q && b.dataset.q.indexOf(q) < 0; if(!b.hidden) n++; });
+        $("#wcNone").hidden = n > 0;
+      }
+    });
     $("#cust").addEventListener("click", function(e){
       var r = e.target.closest("[data-wz]");
-      if(r){ WC.z = r.dataset.wz; [].forEach.call($("#wcList").children, function(b){ b.classList.toggle("on", b.dataset.wz === WC.z); }); WC.offZ = ""; wcShow();
+      if(r){ WC.z = r.dataset.wz; try{ localStorage.setItem("ganak_wz", WC.z); }catch(err){} [].forEach.call($("#wcList").children, function(b){ b.classList.toggle("on", b.dataset.wz === WC.z); }); WC.offZ = ""; wcShow();
         var w = document.getElementById("wcWatch"); if(w) w.scrollIntoView({behavior: RMQ.matches ? "auto" : "smooth", block:"center"}); return; }
       if(e.target.closest("#wcLive")){ WC.mode = "live"; WC.offZ = ""; fillInputs(); wcShow(); }
     });
@@ -3348,7 +3386,10 @@ var TOOLS = [
   },
   share:function(){
     var T = wcAt(), np = tzParts("Asia/Kathmandu", T), A = ["🕰️ " + L("विश्व समय — नेपाल ","World time — Nepal ") + hm12(np.h, np.mi), "─────────────"];
-    WZ.forEach(function(z){ if(z[0] === "np") return; var p = tzParts(z[6], T); if(p) A.push(z[1]+" "+L(z[4], z[5])+": "+hm12(p.h, p.mi)); });
+    /* the picked city first, then the cities left visible by the search box */
+    var q = ($("#wcQ") && $("#wcQ").value.trim().toLowerCase()) || "";
+    WZ.filter(function(z){ return z[0] === WC.z; }).concat(WZ.filter(function(z){ return z[0] !== WC.z && (!q || wzHay(z).indexOf(q) >= 0); }))
+      .forEach(function(z){ if(z[0] === "np") return; var p = tzParts(z[6], T); if(p) A.push(z[1]+" "+L(z[4], z[5])+": "+hm12(p.h, p.mi)); });
     return A.join("\n");
   }},
 
@@ -3615,7 +3656,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.9 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3732,7 +3773,7 @@ patro:"patro calendar tithi chadparba bida holiday dashain tihar mahina",
 uprice:"ekai mulya unit price sasto tulana pack kg litre",
 stackdisc:"chut mathi chut discount double offer sale",
 gpa:"gpa cgpa grade neb see tu result marks",
-wclock:"ghadi samay time world clock timezone bajyo dubai qatar saudi kuwait malaysia korea japan usa america uk london australia sydney canada portugal converter",
+wclock:"ghadi samay time world clock timezone bajyo dubai qatar saudi kuwait malaysia korea japan usa america uk london australia sydney canada portugal converter israel cyprus malta poland romania croatia germany hong kong bahrain oman new zealand",
 nepse:"nepse share sheyar bonus hakprad right wacc kitta"
 };
 function printHead(){
@@ -4324,6 +4365,24 @@ document.addEventListener("animationend", function(e){ if(e.animationName === "c
 /* ---- पात्रो: tappable dates + a day banner at the top ("आज" or the tapped date) ---- */
 var PSEL = null;   /* tapped date {y,m,d}; null = today */
 var WDN = ["आइतबार","सोमबार","मङ्गलबार","बुधबार","बिहीबार","शुक्रबार","शनिबार"], WDNE = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function relDays(n){ return n === 0 ? L("आज","today") : n === 1 ? L("भोलि","tomorrow") : n === -1 ? L("हिजो","yesterday")
+  : n > 0 ? L(npd(n)+" दिनपछि", "in "+n+" days") : L(npd(-n)+" दिनअघि", (-n)+" days ago"); }
+function evKind(k){ return k === "h" ? ["🔴", L("सार्वजनिक बिदा","public holiday")] : k === "v" ? ["🟡", L("उपत्यकामा बिदा","valley holiday")] : ["🟡", L("चाडपर्व · आंशिक बिदा","festival · partial holiday")]; }
+/* listed festivals/holidays from BS date s on (incl: the day itself too), soonest first, one per name */
+function nextEvents(s, n, incl){
+  var a0 = bsToAd(s.y, s.m, s.d); if(!a0) return [];
+  var base = Date.UTC(a0.y, a0.m-1, a0.d), all = [], seen = {};
+  Object.keys(HOLI).forEach(function(yk){
+    var y = +yk; if(y < s.y) return;
+    HOLI[y].forEach(function(h){
+      var a = bsToAd(y, h[0], h[1]); if(!a) return;
+      var days = Math.round((Date.UTC(a.y, a.m-1, a.d) - base) / 864e5);
+      if(days > 0 || (incl && days === 0)) all.push({y:y, m:h[0], d:h[1], k:h[2], ne:h[3], en:h[4], days:days});
+    });
+  });
+  all.sort(function(p, q){ return p.days - q.days; });
+  return all.filter(function(e){ if(seen[e.ne]) return false; seen[e.ne] = 1; return true; }).slice(0, n);
+}
 function patroDecorate(out, box){
   var ym = out.table && out.table.pym;
   if(ym){
@@ -4348,25 +4407,56 @@ function patroDecorate(out, box){
             + (y === TB.y && m === TB.m && bd === TB.d ? " ptd" : "") + (y === sel.y && m === sel.m && bd === sel.d ? " psel" : "");
         });
       });
+      /* ‹ previous month · next month › (or swipe the grid) */
+      var nav = document.createElement("div"), pm = m === 1 ? 12 : m-1, nm = m === 12 ? 1 : m+1;
+      nav.className = "pnav";
+      nav.innerHTML = '<button class="mini" data-pm="-1"'+(y <= BS_START_YEAR && m === 1 ? " disabled" : "")+'>‹ '+esc(bsM(pm-1))+'</button>'
+        + '<b>'+npd(y)+' '+esc(bsM(m-1))+'</b>'
+        + '<button class="mini" data-pm="1"'+(y >= BS_MAX_YEAR && m === 12 ? " disabled" : "")+'>'+esc(bsM(nm-1))+' ›</button>';
+      tw.parentNode.insertBefore(nav, tw);
     }
   }
   patroBanner();
 }
+function patroShow(y, m){   /* switch the month on screen (fields + result) */
+  var v = state.patro;
+  if(+v.y === y && +v.m === m) return false;
+  v.y = String(y); v.m = String(m); renderFields(); compute(); saveState();
+  return true;
+}
+function patroGo(dir){
+  var v = state.patro, y = +v.y || TB.y, m = (+v.m || 1) + dir;
+  if(m < 1){ m = 12; y--; } if(m > 12){ m = 1; y++; }
+  if(y < BS_START_YEAR || y > BS_MAX_YEAR) return;
+  patroShow(y, m);
+  var g = toolEl.querySelector(".tw.pgrid"); if(g && !RMQ.matches) g.classList.add(dir > 0 ? "vin-r" : "vin-l");
+}
+function patroPick(q, scroll){   /* select a date (null = today), bring its month up, turn the banner */
+  PSEL = q; var s = q || TB, key = s.y+"-"+s.m+"-"+s.d;
+  if(!patroShow(s.y, s.m)){
+    [].forEach.call(toolEl.querySelectorAll(".psel"), function(x){ x.classList.remove("psel"); });
+    [].forEach.call(toolEl.querySelectorAll('[data-pd="'+key+'"]'), function(x){ x.classList.add("psel"); });
+  }
+  patroBanner(true);
+  var bn = document.getElementById("pban"); if(bn && scroll) bn.scrollIntoView({behavior: RMQ.matches ? "auto" : "smooth", block:"start"});
+}
+function patroDay(s){   /* everything about one BS date, for the banner and its share text */
+  var a = bsToAd(s.y, s.m, s.d); if(!a) return null;
+  var pt = patro(a.y, a.m, a.d, 0.25), t0 = bsToAd(TB.y, TB.m, TB.d);
+  return { a:a, tn:tithiName(pt.ti), nk:NAK[pt.nak], ev:(HOLI[s.y] || []).filter(function(h){ return h[0] === s.m && h[1] === s.d; }),
+           diff:Math.round((Date.UTC(a.y, a.m-1, a.d) - Date.UTC(t0.y, t0.m-1, t0.d)) / 864e5) };
+}
 function patroBanner(anim){
   var old = document.getElementById("pban");
   if(!cur || cur.id !== "patro"){ if(old) old.remove(); return; }
-  var s = PSEL || TB, isT = (s.y === TB.y && s.m === TB.m && s.d === TB.d), a = bsToAd(s.y, s.m, s.d);
-  if(!a) return;
-  var pt = patro(a.y, a.m, a.d, 0.25), tn = tithiName(pt.ti), nk = NAK[pt.nak];
-  var ev = (HOLI[s.y] || []).filter(function(h){ return h[0] === s.m && h[1] === s.d; });
-  var chips = ev.map(function(h){
-    return '<span class="pchip '+(h[2] === "h" ? "h" : "v")+'">'+(h[2] === "h" ? "🔴 " : "🟡 ")+esc(L(h[3], h[4]))
-      + '<em>'+(h[2] === "h" ? L("सार्वजनिक बिदा","public holiday") : L("उपत्यका / विशेष","valley / special"))+'</em></span>'; });
+  var s = PSEL || TB, isT = (s.y === TB.y && s.m === TB.m && s.d === TB.d), D = patroDay(s);
+  if(!D) return;
+  var a = D.a, chips = D.ev.map(function(h){
+    var k = evKind(h[2]);
+    return '<span class="pchip '+(h[2] === "h" ? "h" : "v")+'">'+k[0]+' '+esc(L(h[3], h[4]))+'<em>'+k[1]+'</em></span>'; });
   if(a.wd === 6) chips.push('<span class="pchip s">'+L("शनिबार — साप्ताहिक बिदा","Saturday — weekly holiday")+'</span>');
-  if(!ev.length) chips.push('<span class="pchip n">'+(HOLI[s.y] ? L("यो दिन सूचीमा चाडपर्व/बिदा छैन","No festival or holiday listed") : L("यो सालको चाडपर्व सूची छैन","No festival list for this year"))+'</span>');
-  var t0 = bsToAd(TB.y, TB.m, TB.d), diff = Math.round((Date.UTC(a.y, a.m-1, a.d) - Date.UTC(t0.y, t0.m-1, t0.d)) / 864e5);
-  var rel = diff === 0 ? L("आज","today") : diff === 1 ? L("भोलि","tomorrow") : diff === -1 ? L("हिजो","yesterday")
-          : diff > 0 ? L("आजबाट "+npd(diff)+" दिनपछि", "in "+diff+" days") : L(npd(-diff)+" दिनअघि", (-diff)+" days ago");
+  if(!D.ev.length) chips.push('<span class="pchip n">'+(HOLI[s.y] ? L("यो दिन सूचीमा चाडपर्व/बिदा छैन","No festival or holiday listed") : L("यो सालको चाडपर्व सूची छैन","No festival list for this year"))+'</span>');
+  var up = isT ? nextEvents(TB, 3) : [];
   var el = old;
   if(!el){ el = document.createElement("div"); el.id = "pban"; var th = toolEl.querySelector(".thero"); toolEl.insertBefore(el, th || toolEl.firstChild); }
   el.className = "pban" + (isT ? " today" : "");
@@ -4374,45 +4464,84 @@ function patroBanner(anim){
     + (isT ? '' : '<button class="mini pback" id="pToday">↺ '+L("आज","Today")+'</button>')+'</div>'
     + '<div class="pban-b"><div class="ptile"><span class="ptm">'+esc(bsM(s.m-1))+'</span><span class="ptn">'+npd(s.d)+'</span><span class="ptw">'+esc(L(WDN[a.wd], WDNE[a.wd]))+'</span></div>'
     + '<div class="pinfo"><div class="pdate">'+npd(s.y)+' '+esc(bsM(s.m-1))+' '+npd(s.d)+', '+esc(L(WDN[a.wd], WDNE[a.wd]))+'</div>'
-    + '<div class="pban-ad">'+esc(AD_MONTHS[a.m-1]+" "+a.d+", "+a.y)+' · '+esc(rel)+'</div>'
-    + '<div class="ptithi">🌙 '+esc(L(tn[0], tn[1]))+' · '+L("नक्षत्र ","Nakshatra ")+esc(L(nk[0], nk[1]))+'</div>'
-    + '<div class="pchips">'+chips.join("")+'</div></div></div>';
+    + '<div class="pban-ad">'+esc(AD_MONTHS[a.m-1]+" "+a.d+", "+a.y)+' · '+esc(D.diff > 1 ? L("आजबाट ","")+relDays(D.diff) : relDays(D.diff))+'</div>'
+    + '<div class="ptithi">🌙 '+esc(L(D.tn[0], D.tn[1]))+' · '+L("नक्षत्र ","Nakshatra ")+esc(L(D.nk[0], D.nk[1]))+'</div>'
+    + '<div class="pchips">'+chips.join("")+'</div></div></div>'
+    + (up.length ? '<div class="pnext"><span class="pnk">'+L("आउँदै गरेका","Coming up")+'</span>' + up.map(function(u){
+        return '<button data-pgo="'+u.y+'-'+u.m+'-'+u.d+'">'+evKind(u.k)[0]+' '+esc(L(u.ne, u.en))+' <em>'+esc(relDays(u.days))+'</em></button>'; }).join("")+'</div>' : '')
+    + '<div class="pact">'+(D.diff >= 0 ? '<button class="mini" id="pRem">🔔 '+L("रिमाइन्डर राख्ने","Set a reminder")+'</button>' : '')
+    + '<button class="mini" id="pShare">💬 '+L("यो दिन पठाउने","Share this day")+'</button></div>';
   if(anim && !RMQ.matches){ el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); }
+}
+function patroDayText(){
+  var s = PSEL || TB, D = patroDay(s), a = D.a, A = ["📅 Ganak — " + L("नेपाली पात्रो","Nepali Patro"), "─────────────",
+    npd(s.y)+" "+bsM(s.m-1)+" "+npd(s.d)+", "+L(WDN[a.wd], WDNE[a.wd]) + " (" + AD_MONTHS[a.m-1]+" "+a.d+", "+a.y + ")",
+    "🌙 " + L(D.tn[0], D.tn[1]) + " · " + L("नक्षत्र ","Nakshatra ") + L(D.nk[0], D.nk[1])];
+  D.ev.forEach(function(h){ var k = evKind(h[2]); A.push(k[0] + " " + L(h[3], h[4]) + " — " + k[1]); });
+  if(a.wd === 6) A.push(L("शनिबार — साप्ताहिक बिदा","Saturday — weekly holiday"));
+  A.push("─────────────", "Powered by PRERAK MULTIPURPOSE PVT LTD · Hetauda");
+  return A.join("\n");
 }
 toolEl.addEventListener("click", function(e){
   if(!cur || cur.id !== "patro") return;
-  var p = e.target.closest("[data-pd]"), back = e.target.closest("#pToday");
-  if(!p && !back) return;
-  var key;
-  if(back){ PSEL = null; key = TB.y+"-"+TB.m+"-"+TB.d; }
-  else { key = p.dataset.pd; var q = key.split("-").map(Number); PSEL = {y:q[0], m:q[1], d:q[2]}; }
-  [].forEach.call(toolEl.querySelectorAll(".psel"), function(x){ x.classList.remove("psel"); });
-  [].forEach.call(toolEl.querySelectorAll('[data-pd="'+key+'"]'), function(x){ x.classList.add("psel"); });
-  patroBanner(true);
-  var bn = document.getElementById("pban"); if(bn && !back) bn.scrollIntoView({behavior: RMQ.matches ? "auto" : "smooth", block:"start"});
+  var t = e.target;
+  if(t.closest("#pToday")){ patroPick(null, false); return; }
+  if(t.closest("#pShare")){ shareOut(patroDayText()); return; }
+  if(t.closest("#pRem")){
+    var s = PSEL || TB, D = patroDay(s), a = D.a;
+    openDrawer(true);
+    var di = document.getElementById("remD"), ti = document.getElementById("remT");
+    if(di) di.value = a.y+"-"+pad2(a.m)+"-"+pad2(a.d);
+    if(ti){ if(D.ev.length) ti.value = L(D.ev[0][3], D.ev[0][4]); try{ ti.focus({preventScroll:true}); }catch(err){} }
+    return;
+  }
+  var nv = t.closest("[data-pm]"); if(nv){ patroGo(+nv.dataset.pm); return; }
+  var p = t.closest("[data-pd],[data-pgo]"); if(!p) return;
+  var q = (p.dataset.pd || p.dataset.pgo).split("-").map(Number);
+  patroPick({y:q[0], m:q[1], d:q[2]}, !!p.dataset.pd);
 });
 toolEl.addEventListener("keydown", function(e){   /* grid dates: Enter / Space = tap */
   if((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("pcell")){ e.preventDefault(); e.target.click(); }
 });
+var PSW = null;   /* swipe the month grid sideways = next / previous month */
+toolEl.addEventListener("touchstart", function(e){
+  PSW = (cur && cur.id === "patro" && e.touches.length === 1 && e.target.closest(".pgrid")) ? [e.touches[0].clientX, e.touches[0].clientY] : null;
+}, {passive:true});
+toolEl.addEventListener("touchend", function(e){
+  if(!PSW) return; var t = e.changedTouches[0], dx = t.clientX - PSW[0], dy = t.clientY - PSW[1]; PSW = null;
+  if(Math.abs(dx) > 60 && Math.abs(dx) > 2*Math.abs(dy)) patroGo(dx < 0 ? 1 : -1);
+}, {passive:true});
 
 /* ---- विश्व घडी: time in any zone via Intl (handles daylight saving) ---- */
-var WZ = [
-  ["np","🇳🇵","नेपाल","Nepal","काठमाडौं","Kathmandu","Asia/Kathmandu"],
-  ["in","🇮🇳","भारत","India","दिल्ली","Delhi","Asia/Kolkata"],
-  ["ae","🇦🇪","UAE","UAE","दुबई","Dubai","Asia/Dubai"],
-  ["qa","🇶🇦","कतार","Qatar","दोहा","Doha","Asia/Qatar"],
-  ["sa","🇸🇦","साउदी अरब","Saudi Arabia","रियाद","Riyadh","Asia/Riyadh"],
-  ["kw","🇰🇼","कुवेत","Kuwait","कुवेत सिटी","Kuwait City","Asia/Kuwait"],
-  ["my","🇲🇾","मलेसिया","Malaysia","क्वालालम्पुर","Kuala Lumpur","Asia/Kuala_Lumpur"],
-  ["kr","🇰🇷","दक्षिण कोरिया","South Korea","सोल","Seoul","Asia/Seoul"],
-  ["jp","🇯🇵","जापान","Japan","टोकियो","Tokyo","Asia/Tokyo"],
-  ["au","🇦🇺","अस्ट्रेलिया","Australia","सिड्नी","Sydney","Australia/Sydney"],
-  ["gb","🇬🇧","बेलायत (UK)","United Kingdom","लन्डन","London","Europe/London"],
-  ["pt","🇵🇹","पोर्चुगल","Portugal","लिस्बन","Lisbon","Europe/Lisbon"],
-  ["us","🇺🇸","अमेरिका (पूर्व)","USA (East)","न्युयोर्क","New York","America/New_York"],
-  ["usw","🇺🇸","अमेरिका (पश्चिम)","USA (West)","लस एन्जलस","Los Angeles","America/Los_Angeles"],
-  ["ca","🇨🇦","क्यानडा","Canada","टोरन्टो","Toronto","America/Toronto"] ];
+var WZ = [   /* key, flag, country, city (ne/en), IANA zone, extra search words */
+  ["np","🇳🇵","नेपाल","Nepal","काठमाडौं","Kathmandu","Asia/Kathmandu","nepal kathmandu"],
+  ["in","🇮🇳","भारत","India","दिल्ली","Delhi","Asia/Kolkata","india bharat delhi mumbai"],
+  ["ae","🇦🇪","UAE","UAE","दुबई","Dubai","Asia/Dubai","uae dubai abu dhabi"],
+  ["qa","🇶🇦","कतार","Qatar","दोहा","Doha","Asia/Qatar","qatar katar doha"],
+  ["sa","🇸🇦","साउदी अरब","Saudi Arabia","रियाद","Riyadh","Asia/Riyadh","saudi saudi arab riyadh jeddah"],
+  ["kw","🇰🇼","कुवेत","Kuwait","कुवेत सिटी","Kuwait City","Asia/Kuwait","kuwait kuwet"],
+  ["bh","🇧🇭","बहराइन","Bahrain","मनामा","Manama","Asia/Bahrain","bahrain manama"],
+  ["om","🇴🇲","ओमान","Oman","मस्कट","Muscat","Asia/Muscat","oman muscat"],
+  ["il","🇮🇱","इजरायल","Israel","तेल अभिभ","Tel Aviv","Asia/Jerusalem","israel ijrayal tel aviv"],
+  ["my","🇲🇾","मलेसिया","Malaysia","क्वालालम्पुर","Kuala Lumpur","Asia/Kuala_Lumpur","malaysia malesiya kuala lumpur"],
+  ["hk","🇭🇰","हङकङ","Hong Kong","हङकङ","Hong Kong","Asia/Hong_Kong","hong kong hongkong"],
+  ["kr","🇰🇷","दक्षिण कोरिया","South Korea","सोल","Seoul","Asia/Seoul","korea koriya seoul"],
+  ["jp","🇯🇵","जापान","Japan","टोकियो","Tokyo","Asia/Tokyo","japan tokyo"],
+  ["au","🇦🇺","अस्ट्रेलिया","Australia","सिड्नी","Sydney","Australia/Sydney","australia sydney melbourne"],
+  ["nz","🇳🇿","न्युजिल्यान्ड","New Zealand","अकल्यान्ड","Auckland","Pacific/Auckland","new zealand auckland"],
+  ["gb","🇬🇧","बेलायत (UK)","United Kingdom","लन्डन","London","Europe/London","uk england belayat london britain"],
+  ["pt","🇵🇹","पोर्चुगल","Portugal","लिस्बन","Lisbon","Europe/Lisbon","portugal lisbon"],
+  ["de","🇩🇪","जर्मनी","Germany","बर्लिन","Berlin","Europe/Berlin","germany berlin"],
+  ["mt","🇲🇹","माल्टा","Malta","भ्यालेटा","Valletta","Europe/Malta","malta"],
+  ["hr","🇭🇷","क्रोएसिया","Croatia","जाग्रेब","Zagreb","Europe/Zagreb","croatia zagreb"],
+  ["pl","🇵🇱","पोल्यान्ड","Poland","वार्सा","Warsaw","Europe/Warsaw","poland warsaw"],
+  ["ro","🇷🇴","रोमानिया","Romania","बुखारेस्ट","Bucharest","Europe/Bucharest","romania bucharest"],
+  ["cy","🇨🇾","साइप्रस","Cyprus","निकोसिया","Nicosia","Asia/Nicosia","cyprus nicosia"],
+  ["us","🇺🇸","अमेरिका (पूर्व)","USA (East)","न्युयोर्क","New York","America/New_York","usa us america amerika new york"],
+  ["usw","🇺🇸","अमेरिका (पश्चिम)","USA (West)","लस एन्जलस","Los Angeles","America/Los_Angeles","usa us america amerika california los angeles"],
+  ["ca","🇨🇦","क्यानडा","Canada","टोरन्टो","Toronto","America/Toronto","canada toronto"] ];
 var TZF = {};
+function wzHay(z){ return (z[2]+" "+z[3]+" "+z[4]+" "+z[5]+" "+z[7]).toLowerCase(); }   /* search text of a zone */
 function wzOf(k){ for(var i = 0; i < WZ.length; i++) if(WZ[i][0] === k) return WZ[i]; return WZ[0]; }
 function tzParts(tz, ms){
   var f = TZF[tz];
@@ -4430,6 +4559,7 @@ function hm12(h, mi){
   return npd(h % 12 || 12) + ":" + npd(pad2(mi)) + " " + w;
 }
 var WC = {z:"np", mode:"live", T:0, raf:0, off:0, offAt:0, offZ:"", lastSec:-1};
+try{ WC.z = wzOf(localStorage.getItem("ganak_wz") || "np")[0]; }catch(e){}   /* the city picked last time (home card shows it too) */
 function wcAt(){ return WC.mode === "live" ? Date.now() : WC.T; }
 function wcHands(h, mi, sec){
   var H = document.getElementById("wcH"), M = document.getElementById("wcM"), Sx = document.getElementById("wcS");
@@ -4450,7 +4580,7 @@ function wcText(T){
 function wcRows(){
   var box = document.getElementById("wcList"); if(!box) return;
   box.innerHTML = WZ.map(function(z){
-    return '<button class="wcr'+(z[0] === WC.z ? " on" : "")+'" data-wz="'+z[0]+'"><span class="wcf">'+z[1]+'</span>'
+    return '<button class="wcr'+(z[0] === WC.z ? " on" : "")+'" data-wz="'+z[0]+'" data-q="'+esc(wzHay(z))+'"><span class="wcf">'+z[1]+'</span>'
       + '<span class="wcn"><b>'+esc(L(z[4], z[5]))+'</b><em>'+esc(L(z[2], z[3]))+'</em></span>'
       + '<span class="wct"><b class="wt"></b><em class="wd"></em></span></button>';
   }).join("");
@@ -5179,6 +5309,7 @@ document.getElementById("setBtn").addEventListener("click",function(){ openDrawe
 document.getElementById("hhero").addEventListener("click",function(e){
   if(e.target.closest("#bizEdit")||e.target.closest("#rateNudge")){ openDrawer(false); return; }
   if(e.target.closest("#hnotice")){ openDrawer(true); return; }
+  var go=e.target.closest("[data-go]"); if(go){ openedInApp=true; location.hash="#"+go.dataset.go; return; }
   var hs=e.target.closest("#hslide");
   if(hs && hs.dataset.id){ openedInApp=true; location.hash="#"+hs.dataset.id; }
 });
@@ -5273,7 +5404,25 @@ function renderHomeHero(){
     +'<span class="hnotice" id="hnotice" hidden></span>'
     +'<button class="hslide" id="hslide" aria-label="tools showcase"></button>'
     +'<button class="instb'+(window.__dp?' on':'')+'" id="instBtn">📲 '+L("Phone मा install गर्नुहोस्","Install on your phone")+'</button>'
-    +'<span class="hic2">'+TAPEIC+'</span></div>';
+    +'<span class="hic2">'+TAPEIC+'</span></div>'
+    +'<div class="htoday" id="htoday" hidden></div>';
+  htToday();
+}
+/* home "आज" card: today's BS date + tithi, today's / the next listed festival, and the World Clock city if one was picked */
+function htToday(){
+  var el = document.getElementById("htoday"); if(!el) return;
+  var d = new Date(), b = adToBs(d.getFullYear(), d.getMonth()+1, d.getDate()); if(!b){ el.hidden = true; return; }
+  var tn = tithiName(patro(d.getFullYear(), d.getMonth()+1, d.getDate(), 0.25).ti), ev = nextEvents(b, 4, true);
+  var now = ev.filter(function(u){ return u.days === 0; }), nx = ev.filter(function(u){ return u.days > 0; })[0];
+  var z = WC.z !== "np" ? wzOf(WC.z) : null, zp = z && tzParts(z[6], Date.now());
+  var h = '<button class="htd-m" data-go="patro"><span class="ptile sm"><span class="ptm">'+esc(bsM(b.m-1))+'</span><span class="ptn">'+npd(b.d)+'</span></span>'
+    + '<span class="htd-t"><b>'+esc(L("आज "+WDN[b.wd], "Today · "+WDNE[b.wd]))+' · '+esc(L(tn[0], tn[1]))+'</b>'
+    + (now.length ? '<span class="htd-e">🎉 '+esc(now.map(function(u){ return L(u.ne, u.en); }).join(" · "))+'</span>' : '')
+    + (nx ? '<span class="htd-n">'+evKind(nx.k)[0]+' '+esc(L(nx.ne, nx.en))+' — <em>'+esc(relDays(nx.days))+'</em></span>' : '')
+    + '</span><span class="htd-go" aria-hidden="true">›</span></button>'
+    + (zp ? '<button class="htd-c" data-go="wclock">'+z[1]+' '+esc(L(z[4], z[5]))+' <b>'+esc(hm12(zp.h, zp.mi))+'</b></button>' : '');
+  el.hidden = false;
+  if(el._h !== h){ el._h = h; el.innerHTML = h; }   /* the 20-second ticker repaints only when something changed */
 }
 /* in-app notification banner (due/today reminders) */
 function notiShow(r, isDue){
@@ -5302,6 +5451,7 @@ function notiCheck(){
   if(q.length>1) setTimeout(notiCheck, 8000);
 }
 function htFill(){
+  htToday();
   var el=document.getElementById("htime"); if(!el) return;
   var d=new Date(), hr=d.getHours(), mi=d.getMinutes();
   var g = hr<4  ? ["🌙",["शुभ रात्री","Good night"]]
