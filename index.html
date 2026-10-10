@@ -733,7 +733,7 @@ var BS_DATA = [
 [31,32,31,32,31,30,30,30,29,29,30,30],[31,32,31,32,31,30,30,30,29,30,29,31],
 [31,31,31,32,31,31,30,29,30,29,30,30],[31,31,32,31,31,31,30,29,30,29,30,30],
 [31,32,31,32,31,30,30,30,29,29,30,30],[31,31,32,32,31,30,30,30,29,30,30,30],
-[30,32,31,32,31,30,30,30,29,30,30,30],[31,31,32,31,31,30,30,30,29,30,30,30],
+[31,31,32,31,31,31,30,29,30,29,30,30],[31,32,31,31,31,31,30,29,30,29,30,30],   /* 2082, 2083: Hamro Patro month starts (2026-10) */
 [31,31,32,31,31,30,30,30,29,30,30,30],[31,32,31,32,30,31,30,30,29,30,30,30],
 [30,32,31,32,31,30,30,30,29,30,30,30],[31,31,32,31,31,31,30,30,29,30,30,30],
 [30,31,32,32,30,31,30,30,29,30,30,30],[30,32,31,32,31,30,30,30,29,30,30,30],
@@ -794,24 +794,24 @@ var BS_MONTH_OPTS = BS_MONTHS.map(function(m,i){
    EXCHANGE RATES — update these by hand (NPR per 1 unit)
    मिति फेर्न नबिर्सनुहोस् / remember to change the date too
    =================================================================== */
-var FX_DATE = ["२०८३ साउन ७ (2026-07-23)","2026-07-23"];
+var FX_DATE = ["२०८३ असोज २३ (2026-10-09) · NRB खरिद दर","2026-10-09 · NRB buying rate"];
 var FX = [
   ["INR",["भारतीय रुपैयाँ","Indian Rupee"],       1.60],
-  ["USD",["अमेरिकी डलर","US Dollar"],            138.00],
-  ["AED",["यूएई दिरहम","UAE Dirham"],             37.60],
-  ["QAR",["कतारी रियाल","Qatari Riyal"],          37.90],
-  ["SAR",["साउदी रियाल","Saudi Riyal"],           36.80],
-  ["MYR",["मलेसियन रिंगिट","Malaysian Ringgit"],  31.00],
-  ["KWD",["कुवेती दिनार","Kuwaiti Dinar"],       450.00],
-  ["OMR",["ओमानी रियाल","Omani Rial"],           358.00],
-  ["BHD",["बहराइनी दिनार","Bahraini Dinar"],     366.00],
-  ["EUR",["युरो","Euro"],                        150.00],
-  ["GBP",["बेलायती पाउन्ड","British Pound"],     175.00],
-  ["AUD",["अस्ट्रेलियन डलर","Australian Dollar"], 90.00],
-  ["JPY",["जापानी येन","Japanese Yen"],            0.92],
-  ["KRW",["कोरियन वन","Korean Won"],               0.10],
-  ["CNY",["चिनियाँ युआन","Chinese Yuan"],         19.00],
-  ["SGD",["सिंगापुर डलर","Singapore Dollar"],    103.00]
+  ["USD",["अमेरिकी डलर","US Dollar"],            154.56],
+  ["AED",["यूएई दिरहम","UAE Dirham"],             42.08],
+  ["QAR",["कतारी रियाल","Qatari Riyal"],          42.40],
+  ["SAR",["साउदी रियाल","Saudi Riyal"],           41.17],
+  ["MYR",["मलेसियन रिंगिट","Malaysian Ringgit"],  37.78],
+  ["KWD",["कुवेती दिनार","Kuwaiti Dinar"],       501.57],
+  ["OMR",["ओमानी रियाल","Omani Rial"],           401.98],   /* USD peg × 2.6008 */
+  ["BHD",["बहराइनी दिनार","Bahraini Dinar"],     411.07],   /* USD peg × 2.6596 */
+  ["EUR",["युरो","Euro"],                        172.83],
+  ["GBP",["बेलायती पाउन्ड","British Pound"],     203.87],
+  ["AUD",["अस्ट्रेलियन डलर","Australian Dollar"],107.44],
+  ["JPY",["जापानी येन","Japanese Yen"],            0.977],
+  ["KRW",["कोरियन वन","Korean Won"],               0.115],
+  ["CNY",["चिनियाँ युआन","Chinese Yuan"],         23.06],
+  ["SGD",["सिंगापुर डलर","Singapore Dollar"],    120.55]
 ];
 var FX_OPTS = FX.map(function(x){ return [ x[0], [ x[0]+" — "+x[1][0], x[0]+" — "+x[1][1] ] ]; });
 function fxRate(code){
@@ -864,13 +864,17 @@ function npWords(num){
   if(num > 0) parts.push(NPW[num]);
   return parts.join(" ");
 }
-function npTaxCalc(inc, fy, st){
+function npTaxCalc(inc, fy, st, ssf){
   var slabs = (fy==="82")
     ? ((st==="m") ? [[600000,1],[200000,10],[300000,20],[900000,30],[3000000,36],[Infinity,39]]
                   : [[500000,1],[200000,10],[300000,20],[1000000,30],[3000000,36],[Infinity,39]])
     : [[1000000,1],[500000,10],[1000000,20],[1500000,27],[Infinity,29]];
   var left = inc, tax = 0;
-  for(var i=0;i<slabs.length && left>0;i++){ var amt = Math.min(left, slabs[i][0]); tax += amt*slabs[i][1]/100; left -= amt; }
+  for(var i=0;i<slabs.length && left>0;i++){
+    var amt = Math.min(left, slabs[i][0]);
+    tax += amt*((i===0 && ssf) ? 0 : slabs[i][1])/100;      /* SSF contributors pay no 1% social security tax */
+    left -= amt;
+  }
   return tax;
 }
 var U2P_MAP = null;
@@ -1701,11 +1705,12 @@ var TOOLS = [
     if(sal<=0) return {err:["मासिक तलब हाल्नुहोस्।","Enter the monthly salary."]};
     var annual = sal*12, ssfM = (v.ssf==="y") ? sal*0.11 : 0;
     var taxable = annual - ssfM*12;
-    var tax = npTaxCalc(taxable, v.fy, "s"), taxM = tax/12;
+    var tax = npTaxCalc(taxable, v.fy, "s", ssfM>0), taxM = tax/12;
     var net = sal - ssfM - taxM;
     var rows = [ row(["वार्षिक तलब","Annual salary"], rs(annual), "") ];
     if(ssfM>0) rows.push(row(["SSF कट्टा (११%)","SSF deduction (11%)"], "− "+rs(ssfM)+L(" /महिना"," /month"), "", "sub"));
     rows.push(row(["करयोग्य आय (वार्षिक)","Taxable income (annual)"], rs(taxable), "", "sub"));
+    if(ssfM>0) rows.push(row(["SSF भएकाले पहिलो तहको १% कर छुट","SSF: no 1% tax on the first slab"], "✓", "", "sub"));
     rows.push(row(["TDS (मासिक औसत)","TDS (monthly average)"], "− "+rs(taxM), ""));
     rows.push(row(["हातमा आउने (मासिक)","Take-home (monthly)"], rs(net), "", "big"));
     return { rows:rows,
@@ -1825,8 +1830,8 @@ var TOOLS = [
     rows.push(row(["महिनाको (औसत)","Per month (average)"], rs(tax/12), "", "sub"));
     rows.push(row(["प्रभावकारी दर","Effective rate"], fmt(tax/inc*100,2)+"%", "", "sub"));
     return { rows:rows,
-      note:["⚠️ यो अनुमान मात्र हो, exact filing को लागि accountant वा ird.gov.np हेर्नुहोस्। SSF/insurance जस्ता deduction यसमा समावेश छैन।"+(v.fy==="84"?" FY 2083/84 मा single/married भिन्नता छैन।":""),
-            "⚠️ Estimate only — see an accountant or ird.gov.np for exact filing. SSF/insurance deductions are not included."+(v.fy==="84"?" FY 2083/84 has no single/married distinction.":"")] };
+      note:["⚠️ यो अनुमान मात्र हो, exact filing को लागि accountant वा ird.gov.np हेर्नुहोस्। SSF/insurance जस्ता deduction यसमा समावेश छैन। SSF मा योगदान गर्नेलाई पहिलो तहको १% लाग्दैन — तलब TDS tool मा हेर्नुहोस्।"+(v.fy==="84"?" FY 2083/84 मा single/married भिन्नता छैन।":""),
+            "⚠️ Estimate only — see an accountant or ird.gov.np for exact filing. SSF/insurance deductions are not included. SSF contributors pay no 1% on the first slab — see the Salary TDS tool."+(v.fy==="84"?" FY 2083/84 has no single/married distinction.":"")] };
   }},
 
 /* ---------------- रकम शब्दमा ---------------- */
@@ -2002,7 +2007,10 @@ var TOOLS = [
         bound = true;
         document.addEventListener("keydown", function(e){
           if(!cur || cur.id !== "calc") return;
-          if(e.target && e.target.id === "vrate") return;
+          /* typing in any field (VAT rate, Settings drawer: profile, rates, reminders) is not a calculator key */
+          var tg = e.target, tn = tg && tg.tagName;
+          if(tn === "INPUT" || tn === "TEXTAREA" || tn === "SELECT" || (tg && tg.isContentEditable)) return;
+          if(e.ctrlKey || e.metaKey || e.altKey) return;
           var k = e.key;
           if(k >= "0" && k <= "9"){ press("d", k); }
           else if(k === "."){ press("dot"); }
@@ -2049,18 +2057,19 @@ var TOOLS = [
       {k:"jt",l:["जर्ती (wastage)","Jarti (wastage)"],u:U.pct,d:0,w:1},
       {k:"vt",l:["१३% VAT","13% VAT"],t:"s",d:"n",o:[["n",["नथप्ने","Don't add"]],["y",["थप्ने","Add"]]],w:1} ],
   calc:function(v){
-    var AANA = TOLA_G/16, LAAL = TOLA_G/64, g;
+    var AANA = TOLA_G/16, LAAL = TOLA_G/100, g;              /* 1 तोला = 16 आना = 100 लाल */
     if(v.m === "g2t") g = n(v.g);
     else g = n(v.t)*TOLA_G + n(v.a)*AANA + n(v.l)*LAAL;
     if(g<=0) return {err:["तौल हाल्नुहोस्।","Enter the weight."]};
-    var tot = g/TOLA_G, tl = Math.round(g/LAAL*100)/100;      /* लाल first, so 3.999 carries */
-    var t = Math.floor(tl/64 + 1e-9); tl -= t*64;
-    var a = Math.floor(tl/4 + 1e-9), l = Math.max(0, Math.round((tl - a*4)*100)/100);
+    var tot = g/TOLA_G, tl = Math.round(g/LAAL*100)/100;      /* लाल first, so 99.999 carries */
+    var t = Math.floor(tl/100 + 1e-9), rl = Math.max(0, Math.round((tl - t*100)*100)/100);
+    var a = Math.floor(rl/6.25 + 1e-9), l = Math.max(0, Math.round((rl - a*6.25)*100)/100);
     var rows = [
       row(["ग्राम","Gram"], fmt(g,4), "g"),
       row(["तोला (दशमलवमा)","Tola (decimal)"], fmt(tot,4), ["तोला","tola"]),
-      row(["तोला–आना–लाल","Tola–aana–laal"], fmt(t,0)+" – "+fmt(a,0)+" – "+fmt(l,2), ""),
-      row(["१ तोला","1 tola"], fmt(TOLA_G,4)+" g · "+L("१ आना ","1 aana ")+fmt(AANA,4), "g", "sub") ];
+      row(["तोला–लाल","Tola–laal"], fmt(t,0)+" – "+fmt(rl,2), ""),
+      row(["तोला–आना–लाल","Tola–aana–laal"], fmt(t,0)+" – "+fmt(a,0)+" – "+fmt(l,2), "", "sub"),
+      row(["१ तोला","1 tola"], fmt(TOLA_G,4)+" g · "+L("१ आना ","1 aana ")+fmt(AANA,4)+" g · "+L("१ लाल ","1 laal ")+fmt(LAAL,4), "g", "sub") ];
     var r = n(v.rate);
     if(r > 0){
       var metal = tot*r, jarti = metal*n(v.jt)/100, jy = n(v.jy);
@@ -2072,8 +2081,8 @@ var TOOLS = [
       rows.push(row(["जम्मा मूल्य","Total value"], rs(sub+vat), "", "big"));
     }
     return { rows:rows,
-      note:["१ तोला = ११.६६४ ग्राम · १ तोला = १६ आना · १ आना = ४ लाल। जवाहरातको जरजाति/ज्याला अलग।",
-            "1 tola = 11.664 g · 1 tola = 16 aana · 1 aana = 4 laal. Making charges are separate."] };
+      note:["१ तोला = ११.६६४ ग्राम = १६ आना = १०० लाल · १ आना = ६.२५ लाल · १ लाल ≈ ०.११७ ग्राम। जवाहरातको जरजाति/ज्याला अलग।",
+            "1 tola = 11.664 g = 16 aana = 100 laal · 1 aana = 6.25 laal · 1 laal ≈ 0.117 g. Making charges are separate."] };
   }},
 
 /* ---------------- 13. EMI ---------------- */
@@ -2292,6 +2301,8 @@ var TOOLS = [
       {k:"a",l:["रकम","Amount"],d:100,w:1},
       {k:"rate",l:["दर (१ एकाइ = NPR)","Rate (1 unit = NPR)"],d:fxRate("USD"),w:1} ],
   sync:function(v,k){ if(k === "c") v.rate = fxRate(v.c); },
+  /* saved inputs keep an old rate forever — refresh it once whenever FX_DATE is updated */
+  prep:function(v){ if(v._fx !== FX_DATE[1]){ v.rate = fxRate(v.c); v._fx = FX_DATE[1]; } },
   calc:function(v){
     var a = n(v.a), r = n(v.rate), code = v.c;
     if(a<=0) return {err:["रकम हाल्नुहोस्।","Enter an amount."]};
@@ -2409,7 +2420,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.4 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -2712,6 +2723,7 @@ function openTool(id){
       if(!bad && f.t === "s") bad = !f.o.some(function(o){ return String(o[0]) === String(v[f.k]); });
       if(bad) v[f.k] = (f.d === undefined ? "" : f.d);
     });
+    if(t.prep) t.prep(v);
   }
   toolEl.innerHTML =
     '<button class="tback" id="tback">← '+L("गृहपृष्ठ (Dashboard)","Dashboard")+'</button>'
@@ -3209,6 +3221,7 @@ function ntStart(){
   if(NT_T) clearInterval(NT_T);
   NT_T=setInterval(function(){
     var el=document.getElementById("hnotice");
+    if(document.hidden || homeEl.style.display==="none") return;
     if(!el||el.hidden){ NT_I++; ntFill(); return; }
     el.classList.add("fade");
     setTimeout(function(){ NT_I++; ntFill(); var e2=document.getElementById("hnotice"); if(e2) e2.classList.remove("fade"); },300);
@@ -3227,6 +3240,7 @@ function hsFill(){
 }
 function hsNext(){
   var el=document.getElementById("hslide"); if(!el){ clearInterval(HS_T); HS_T=null; return; }
+  if(document.hidden || homeEl.style.display==="none") return;   /* off-screen: save battery */
   el.classList.add("fade");
   setTimeout(function(){ HS_I++; hsFill(); var e2=document.getElementById("hslide"); if(e2) e2.classList.remove("fade"); },360);
 }
@@ -3281,7 +3295,15 @@ setInterval(function(){ notiCheck(); }, 180000);
     if(document.body.classList.contains("sideopen")){ closeSide(); history.pushState({g:1},""); return; }
     var pv=document.getElementById("pdfview");
     if(pv){ pv.remove(); document.body.classList.remove("pdfmode"); history.pushState({g:1},""); return; }
-    if(location.hash){ return; } /* hash back = tool close, handled by hashchange */
+    if(location.hash){
+      /* opened straight on a tool (shared link / restored app): the entry behind ours has the
+         same #tool, so no hashchange will come — close the tool here and keep the exit guard */
+      if(cur && location.hash.slice(1) === cur.id){
+        try{ history.replaceState({g:0},"",location.pathname+location.search); }catch(e){}
+        closeTool(); history.pushState({g:1},"");
+      }
+      return; /* otherwise hash back = tool change, handled by hashchange */
+    }
     if(!cur){ showExit(); } else { closeTool(); history.pushState({g:1},""); }
   });
 })();
