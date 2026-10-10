@@ -6,6 +6,14 @@
 <title>Ganak — नेपाली हिसाब Tools | PRERAK MULTIPURPOSE</title>
 <meta name="description" content="Ganak — निर्माण, जग्गा, मिति र पैसाको हिसाब गर्ने नेपाली free app। Powered by PRERAK MULTIPURPOSE, Hetauda.">
 <meta name="theme-color" content="#2E3A5C">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ganak">
+<meta property="og:title" content="Ganak — नेपाली हिसाब: निर्माण, जग्गा, सुन, EMI, पात्रो">
+<meta property="og:description" content="५२ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
+<meta property="og:url" content="https://asrayacreate.github.io/ganak/">
+<meta property="og:image" content="https://asrayacreate.github.io/ganak/icon-512.png">
+<meta property="og:image:width" content="512"><meta property="og:image:height" content="512">
+<meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.json">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0Y7NMT31NK"></script>
 <script>
@@ -710,6 +718,8 @@ body[data-theme="dark"] .tw tr.gr td{background:#2A2414;color:#F0D58C;border-bot
 .hitem .hn{font-weight:700;font-size:13px}.hitem .hd{font-size:11px;color:var(--mute);text-align:right;white-space:nowrap}
 .hitem .hv{grid-column:1/-1;font-size:12.5px;color:var(--ink2);overflow-wrap:anywhere}.hitem .hv b{font-family:var(--fm)}
 .hclear{display:block;width:100%;border:0;border-top:1px solid var(--ol);background:none;padding:10px;color:var(--mute);font-family:var(--fs);font-size:12px;cursor:pointer}
+.exrate.old{background:#EAF2FF;border-color:#8FB3E8;color:#1D4C8C}
+body[data-theme="dark"] .exrate.old{background:rgba(100,170,255,.14);border-color:rgba(100,170,255,.3);color:#BCD8FF}
 .fhint{display:block;min-height:16px;margin-top:4px;font-family:var(--fm);font-size:11px;line-height:16px;color:var(--mute);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ---- buttons ---- */
@@ -3274,7 +3284,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.3 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.4 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3566,6 +3576,11 @@ function negErr(t, v){
 }
 function fieldHtml(f, val){
   var warn = (f.exrate && !(typeof RATES_OK!=="undefined" && (f.rk ? rateOk(f.rk) : RATES_OK))) ? '<span class="exrate">'+L("⚠️ नमुना दर","⚠️ example rate")+'</span>' : '';
+  /* saved rate still in the box but old → say how old (not when the user typed their own today) */
+  if(!warn && f.rk && typeof RATES!=="undefined" && String(val)===String(RATES[f.rk])){
+    var age=rateStale(f.rk);
+    if(age) warn='<span class="exrate old">⏱ '+L(npd(age)+" दिन पुरानो दर", age+" days old")+'</span>';
+  }
   var lab = '<span class="fl">'+esc(S(f.l))+(f.u ? ' <em>'+esc(S(f.u))+'</em>' : '')+warn+'</span>', inp;
   if(f.t === "s"){
     inp = '<select data-k="'+f.k+'">' + f.o.map(function(o){
@@ -3818,6 +3833,17 @@ toolEl.addEventListener("input", function(e){
   var h = el.nextElementSibling;
   if(h && h.className === "fhint") h.textContent = moneyHint(el.value);
   compute();
+});
+/* number boxes refuse "२०,००,०००" or "Rs 1,50,000" — clean a pasted amount instead of losing it */
+document.addEventListener("paste", function(e){
+  var el = e.target;
+  if(!el || el.tagName !== "INPUT" || el.type !== "number") return;
+  var t = (e.clipboardData || window.clipboardData); t = t ? t.getData("text") : "";
+  var c = String(t).trim().replace(/[०-९]/g, function(d){ return "०१२३४५६७८९".indexOf(d); })
+            .replace(/^(रु\.?|Rs\.?|NPR|रू\.?)\s*/i, "").replace(/[,\s]/g, "");
+  if(!c || c === t || !/^-?\d*\.?\d+$/.test(c)) return;
+  e.preventDefault(); el.value = c;
+  el.dispatchEvent(new Event("input", {bubbles:true})); el.dispatchEvent(new Event("change", {bubbles:true}));
 });
 /* phone keyboard "Next"/Enter moves to the next box; on the last one it closes the keyboard */
 toolEl.addEventListener("keydown", function(e){
@@ -4149,7 +4175,7 @@ function renderDrawer(){
     +'<div class="dr-sec">'+L("सामग्रीको दर","Material rates")+'</div><div class="rgrid">'
     +RATEDEF.map(function(rd){ return '<label class="rlab">'+esc(S(rd[1]))+'<input class="pfin" data-rk="'+rd[0]+'" type="number" inputmode="decimal" step="any" value="'+RATES[rd[0]]+'"></label>'; }).join('')
     +'</div>'+RATEGRP.map(function(g){ return '<div class="dr-sec">'+esc(S(g[0]))+'</div><div class="rgrid">'
-      +g[1].map(function(rd){ return '<label class="rlab">'+esc(S(rd[1]))+(rateOk(rd[0])?'':' ⚠️')+'<input class="pfin" data-rk="'+rd[0]+'" type="number" inputmode="decimal" step="any" value="'+RATES[rd[0]]+'"></label>'; }).join('')+'</div>'; }).join('')
+      +g[1].map(function(rd){ return '<label class="rlab">'+esc(S(rd[1]))+(rateOk(rd[0])?'':' ⚠️')+(rateStale(rd[0])?' ⏱'+npd(rateStale(rd[0]))+L("दि","d"):'')+'<input class="pfin" data-rk="'+rd[0]+'" type="number" inputmode="decimal" step="any" value="'+RATES[rd[0]]+'"></label>'; }).join('')+'</div>'; }).join('')
     +'<div class="drnote">'+(allRatesOk()
       ? L("दर तपाईंले मिलाइसक्नुभयो ✓ — बजार बदलिए फेरि यहीँ अपडेट गर्नुहोस्।","You've set your rates ✓ — update here whenever the market changes.")
       : L("⚠️ यी नमुना (example) दर हुन् — आफ्नै बजार दर हालेर तल Save थिच्नुहोस्।","⚠️ These are example rates — enter your own and press Save below."))+'</div>'
@@ -4264,7 +4290,7 @@ document.getElementById("drawer").addEventListener("click",function(e){
   if(del){ REM.splice(+del.dataset.del,1); saveRem(); renderDrawer(); renderSide(); return; }
   if(e.target.id==="rtSave"){
     document.querySelectorAll("[data-rk]").forEach(function(el){ var rv=parseFloat(el.value); if(rv>0) RATES[el.dataset.rk]=rv; });
-    saveRates(); confirmAllRates(); applyRateDefaults(true);
+    saveRates(); confirmAllRates(); for(var _sk in RATES) RATE_TS[_sk]=Date.now(); saveTs(); applyRateDefaults(true);
     if(cur && !cur.custom){ renderFields(); compute(); }
     renderDrawer(); renderHomeHero();
     toast(L("दर save भयो ✓","Rates saved ✓")); return; }
@@ -4303,6 +4329,7 @@ document.getElementById("drawer").addEventListener("input",function(e){
   if(e.target.id==="pfPh"){ PROF.ph=e.target.value; saveProf(); }
   if(e.target.dataset.rk){ var rv=parseFloat(e.target.value); if(rv>0){ RATES[e.target.dataset.rk]=rv; saveRates();
     if(rv!==RATES_FACTORY[e.target.dataset.rk]) confirmKey(e.target.dataset.rk);
+    stampRate(e.target.dataset.rk);
     applyRateDefaults(true);
     if(cur && !cur.custom){ renderFields(); compute(); } } }
 });
@@ -4705,6 +4732,18 @@ function confirmKey(k){ if(isV1Rate(k)) confirmRates(); else { RATE_OKK[k]=1; sa
 function confirmAllRates(){ confirmRates(); for(var k in RATES) if(!isV1Rate(k)) RATE_OKK[k]=1; saveOkk(); }
 function allRatesOk(keys){ if(typeof RATES==="undefined") return false; keys = keys || Object.keys(RATES); return keys.every(rateOk); }
 for(var _nk in RATES){ if(!isV1Rate(_nk) && RATES[_nk]!==RATES_FACTORY[_nk]) RATE_OKK[_nk]=1; }
+/* when each rate was last saved — gold/silver move daily, so an old saved rate gets a "⏱ N दिन पुरानो" badge.
+   Rates confirmed before v8.4 have no date yet: they start counting from today. */
+var RATE_TS={}; try{ RATE_TS=JSON.parse(localStorage.getItem("ganak_rates_ts")||"{}")||{}; }catch(e){}
+function saveTs(){ try{localStorage.setItem("ganak_rates_ts",JSON.stringify(RATE_TS));}catch(e){} }
+function stampRate(k){ RATE_TS[k]=Date.now(); saveTs(); }
+(function(){ var ch=false; for(var k in RATES){ if(rateOk(k) && !RATE_TS[k]){ RATE_TS[k]=Date.now(); ch=true; } } if(ch) saveTs(); })();
+var RATE_STALE={gold:2,tejabi:2,silver:2,loan:180,epf:180};   /* days; NEA tariff (e…) 365; materials 120 */
+function rateStale(k){
+  if(typeof RATE_TS==="undefined" || !RATE_TS[k] || !rateOk(k)) return 0;
+  var age=Math.floor((Date.now()-RATE_TS[k])/864e5), lim=RATE_STALE[k] || (/^e\d/.test(k) ? 365 : 120);
+  return age>=lim ? age : 0;
+}
 var RATE_MAP={glass:["r","glass"],rod:["r","steel"],brick:["r","brick"],tile:["r","tile"]};
 function applyRateDefaults(sync){
   TOOLS.forEach(function(t){ var m=RATE_MAP[t.id]; if(!t.f) return;
