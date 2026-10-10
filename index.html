@@ -561,6 +561,12 @@ body[data-theme="dark"] .vbtn{background:#2A2310;border-color:#4A3C14;color:#E8D
 body[data-theme="dark"] .vbtn:active{background:#4A3C14}
 body[data-theme="dark"] .rembtn{background:var(--tape);color:#15202A}
 body[data-theme="dark"] .row.big .rv{background:linear-gradient(transparent 66%,rgba(245,179,1,.22) 66%)}
+/* the category / blueprint / sand papers are light-only and outrank the dark theme — keep the page dark (subtle tint per category) */
+body[data-theme="dark"][data-bg]{--paper:#101820;--grid:rgba(255,255,255,.045);--line:#2E3B48;--line2:#243140}
+body[data-theme="dark"][data-bg="auto"][data-cat="con"]{--paper:#17130F}
+body[data-theme="dark"][data-bg="auto"][data-cat="np"]{--paper:#0F1712}
+body[data-theme="dark"][data-bg="auto"][data-cat="fin"]{--paper:#0F1620}
+body[data-theme="dark"][data-bg="auto"][data-cat="util"]{--paper:#13171B}
 /* ---------- material rates grid ---------- */
 .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .rlab{font-size:11px;font-weight:600;color:var(--ink2)}
@@ -966,14 +972,18 @@ var GRADE_SC = { neb:[[90,"A+",4.0],[80,"A",3.6],[70,"B+",3.2],[60,"B",2.8],[50,
                  tu:[[90,"A",4.0],[80,"A-",3.7],[70,"B+",3.3],[60,"B",3.0],[50,"B-",2.7],[0,"F",0]] };
 /* NEPSE broker commission by transaction amount (broker rate cards); SEBON fee 0.015%; DP Rs 25 per buy */
 var NEPSE_COMM = [[50000,0.36],[500000,0.33],[2000000,0.31],[10000000,0.27],[Infinity,0.24]];
-/* सार्वजनिक बिदा / चाडपर्व 2083 — Nepal Gazette list as reported (edusanjal, collegenp, NRB, Hamro Patro); h = holiday, v = Kathmandu valley, f = festival */
-var HOLI = { 2083:[[1,1,"h","नयाँ वर्ष २०८३","New Year 2083"],[1,18,"h","बुद्ध जयन्ती · उभौली · श्रमिक दिवस","Buddha Jayanti · Ubhauli · Labour Day"],[2,15,"h","गणतन्त्र दिवस","Republic Day"],
+/* सार्वजनिक बिदा / चाडपर्व — 2083: Nepal Gazette list as reported (edusanjal, collegenp, NRB, Hamro Patro, MoHA notices);
+   2082: Shivaratri, Ram Navami, Eid and Lhosar only (HOLI_PART). h = holiday, v = Kathmandu valley, f = festival */
+var HOLI = { 2082:[[9,15,"h","तमु ल्होसार","Tamu Lhosar"],[10,5,"h","सोनाम ल्होसार","Sonam Lhosar"],[11,3,"h","महाशिवरात्रि","Maha Shivaratri"],[11,6,"h","ग्याल्पो ल्होसार","Gyalpo Lhosar"],
+  [12,7,"h","इद-उल-फित्र (रमजान इद)","Eid ul-Fitr"],[12,13,"h","रामनवमी","Ram Navami"]],
+  2083:[[1,1,"h","नयाँ वर्ष २०८३","New Year 2083"],[1,18,"h","बुद्ध जयन्ती · उभौली · श्रमिक दिवस","Buddha Jayanti · Ubhauli · Labour Day"],[2,14,"h","बकर इद (इद-उल-अज्हा)","Bakar Eid (Eid ul-Adha)"],[2,15,"h","गणतन्त्र दिवस","Republic Day"],
   [5,12,"h","जनै पूर्णिमा · रक्षाबन्धन","Janai Purnima · Raksha Bandhan"],[5,13,"v","गाईजात्रा (उपत्यका)","Gai Jatra (valley)"],[5,19,"h","कृष्ण जन्माष्टमी","Krishna Janmashtami"],[5,23,"h","जेनजी शहीद दिवस","Gen-Z Martyrs' Day"],[5,29,"f","हरितालिका तीज","Haritalika Teej"],
   [6,3,"h","संविधान दिवस","Constitution Day"],[6,9,"v","इन्द्रजात्रा (उपत्यका)","Indra Jatra (valley)"],[6,25,"h","घटस्थापना","Ghatasthapana"],[6,31,"h","दशैं बिदा","Dashain holiday"],
   [7,1,"h","दशैं बिदा","Dashain holiday"],[7,2,"h","दशैं बिदा","Dashain holiday"],[7,3,"h","दशैं बिदा","Dashain holiday"],[7,4,"h","दशैं बिदा","Dashain holiday"],[7,5,"h","दशैं बिदा","Dashain holiday"],[7,6,"h","दशैं बिदा","Dashain holiday"],
   [7,22,"h","लक्ष्मी पूजा (तिहार)","Laxmi Puja (Tihar)"],[7,23,"h","तिहार बिदा","Tihar holiday"],[7,24,"h","तिहार बिदा","Tihar holiday"],[7,25,"h","भाइटीका","Bhai Tika"],[7,26,"h","तिहार बिदा","Tihar holiday"],[7,29,"h","छठ पर्व","Chhath"],
-  [9,9,"h","उधौली पर्व · योमरी पुन्ही","Udhauli · Yomari Punhi"],[9,10,"h","क्रिसमस","Christmas"],[9,15,"h","तमु ल्होसार","Tamu Lhosar"],[10,1,"h","माघे संक्रान्ति","Maghe Sankranti"],[10,16,"h","शहीद दिवस","Martyrs' Day"],
-  [10,28,"f","सरस्वती पूजा (शैक्षिक संस्था)","Saraswati Puja (schools)"],[12,8,"h","फागु पूर्णिमा (तराई)","Fagu Purnima (Terai)"],[12,23,"v","घोडेजात्रा (उपत्यका)","Ghode Jatra (valley)"]] };
+  [9,9,"h","उधौली पर्व · योमरी पुन्ही","Udhauli · Yomari Punhi"],[9,10,"h","क्रिसमस","Christmas"],[9,15,"h","तमु ल्होसार","Tamu Lhosar"],[10,1,"h","माघे संक्रान्ति","Maghe Sankranti"],[10,16,"h","शहीद दिवस","Martyrs' Day"],[10,24,"h","सोनाम ल्होसार","Sonam Lhosar"],
+  [10,28,"f","सरस्वती पूजा (शैक्षिक संस्था)","Saraswati Puja (schools)"],[11,22,"h","महाशिवरात्रि","Maha Shivaratri"],[11,25,"h","ग्याल्पो ल्होसार","Gyalpo Lhosar"],[12,8,"h","फागु पूर्णिमा (तराई)","Fagu Purnima (Terai)"],[12,23,"v","घोडेजात्रा (उपत्यका)","Ghode Jatra (valley)"]] };
+var HOLI_PART = { 2082:1 };
 function tithiName(ti){ return (ti===14) ? ["पूर्णिमा","Purnima"] : (ti===29) ? ["औंसी","Aunsi"] : [(ti<15?"शुक्ल ":"कृष्ण ")+TITHI[ti%15], (ti<15?"Shukla ":"Krishna ")+TITHI[ti%15]]; }
 function rupeeWords(x){                                 /* "… रुपैयाँ … पैसा मात्र" for बिजक */
   var rup = Math.floor(Math.abs(x)), ps = Math.round((Math.abs(x)-rup)*100); if(ps===100){ rup++; ps=0; }
@@ -2815,11 +2825,11 @@ var TOOLS = [
       wk.push(npd(d)+" ("+a.d+")"); if(wk.length===7){ grid.push(wk); wk = []; }
     }
     if(wk.length){ while(wk.length<7) wk.push(""); grid.push(wk); }
-    if(hl.length) rows.push(row(["यो महिनाका सार्वजनिक बिदा (सूचीमा)","Listed public holidays this month"], npd(nh), L("दिन","days"), "sub"));
+    if(hl.length && !HOLI_PART[y]) rows.push(row(["यो महिनाका सार्वजनिक बिदा (सूचीमा)","Listed public holidays this month"], npd(nh), L("दिन","days"), "sub"));
     return { rows:rows,
       table:{ title:L("🗓️ महिनाको पात्रो","🗓️ Month grid"), sub:npd(y)+" "+bsM(m-1), head:LANG ? WDE : WD, rows:grid },
-      note:["मिति: Bikram Sambat तालिका (२०००–"+npd(BS_MAX_YEAR)+")। तिथि: सूर्योदय (बिहान ६ बजे) को चन्द्र–सूर्य कोणबाट (हरेक १२° = एक तिथि) अनुमान — तिथि फेरिने दिन पात्रोसँग फरक पर्न सक्छ। चाडपर्व/बिदा: २०८३ को सरकारी सूची (समाचारमा प्रकाशित) — महाशिवरात्रि, रामनवमी, इद, ल्होसार आदिको मिति पुष्टि नभएकाले राखिएको छैन। 🔴 सार्वजनिक बिदा · 🟡 उपत्यका/विशेष।",
-            "Dates: Bikram Sambat table (2000–"+BS_MAX_YEAR+"). Tithi: estimated from the moon–sun angle at sunrise (6 am; every 12° is one tithi) — may differ from a printed patro on days the tithi changes. Festivals/holidays: the 2083 government list as reported — Maha Shivaratri, Ram Navami, Eid, Lhosar etc. are left out until their dates are confirmed. 🔴 public holiday · 🟡 valley/special."] };
+      note:["मिति: Bikram Sambat तालिका (२०००–"+npd(BS_MAX_YEAR)+")। तिथि: सूर्योदय (बिहान ६ बजे) को चन्द्र–सूर्य कोणबाट (हरेक १२° = एक तिथि) अनुमान — तिथि फेरिने दिन पात्रोसँग फरक पर्न सक्छ। चाडपर्व/बिदा: २०८३ — सरकारी सूची (राजपत्र र गृह मन्त्रालयको सूचना, समाचारअनुसार); २०८२ — महाशिवरात्रि, रामनवमी, इद र ल्होसार मात्र। इदको मिति चन्द्रदर्शनअनुसार तोकिन्छ — २०८२ को बकर इद र २०८३ को इद-उल-फित्र पुष्टि नभएकाले राखिएको छैन। २०८३ मा रामनवमी पर्दैन (२०८४ बैशाख २)। 🔴 सार्वजनिक बिदा · 🟡 उपत्यका/विशेष।",
+            "Dates: Bikram Sambat table (2000–"+BS_MAX_YEAR+"). Tithi: estimated from the moon–sun angle at sunrise (6 am; every 12° is one tithi) — may differ from a printed patro on days the tithi changes. Festivals/holidays: 2083 — the government list (Gazette and Home Ministry notices, as reported); 2082 — Maha Shivaratri, Ram Navami, Eid and Lhosar only. Eid follows the moon sighting — 2082 Bakar Eid and 2083 Eid ul-Fitr are left out until confirmed. No Ram Navami falls in 2083 (it is Baisakh 2, 2084). 🔴 public holiday · 🟡 valley/special."] };
   }},
 
 /* ---------------- एकाइ मूल्य तुलना (v6.8) ---------------- */
@@ -3087,7 +3097,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.9 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
