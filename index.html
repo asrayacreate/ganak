@@ -1395,13 +1395,15 @@ var TOOLS = [
     else if(v.m === "sqft") sq = n(v.sf);
     else sq = n(v.sm)/SQFT_M2;
     if(sq<=0) return {err:["जग्गाको नाप हाल्नुहोस्।","Enter the land area."]};
-    var x = sq, ro = Math.floor(x/LAND.ropani); x -= ro*LAND.ropani;
-    var aa = Math.floor(x/LAND.aana); x -= aa*LAND.aana;
-    var pa = Math.floor(x/LAND.paisa); x -= pa*LAND.paisa;
-    var da = Math.round(x/LAND.daam*100)/100;
-    var y = sq, bi = Math.floor(y/LAND.bigha); y -= bi*LAND.bigha;
-    var ka = Math.floor(y/LAND.kattha); y -= ka*LAND.kattha;
-    var dh = Math.round(y/LAND.dhur*100)/100;
+    /* round the smallest unit first, then split — so 3.996 दाम carries to the next पैसा
+       instead of showing "…–4" (1 रोपनी = 256 दाम, 1 बिघा = 400 धुर) */
+    var x = Math.round(sq/LAND.daam*100)/100, ro = Math.floor(x/256 + 1e-9); x -= ro*256;
+    var aa = Math.floor(x/16 + 1e-9); x -= aa*16;
+    var pa = Math.floor(x/4 + 1e-9); x -= pa*4;
+    var da = Math.max(0, Math.round(x*100)/100);
+    var y = Math.round(sq/LAND.dhur*100)/100, bi = Math.floor(y/400 + 1e-9); y -= bi*400;
+    var ka = Math.floor(y/20 + 1e-9); y -= ka*20;
+    var dh = Math.max(0, Math.round(y*100)/100);
     var rows = [
       row(["वर्ग फिट","Square feet"], fmt(sq,2), U.sqft),
       row(["वर्ग मिटर","Square metre"], fmt(sq*SQFT_M2,2), U.sqm),
@@ -1496,14 +1498,15 @@ var TOOLS = [
     var y=ty-by, m=tm-bm, d=td-bd;
     if(d<0){ m--; d += new Date(ty,tm-1,0).getDate(); }
     if(m<0){ y--; m += 12; }
-    var days = Math.floor((now - birth)/86400000);
-    var nb = new Date(ty,bm-1,bd); if(nb <= now) nb = new Date(ty+1,bm-1,bd);
-    var toGo = Math.ceil((nb - now)/86400000);
+    var today0 = new Date(ty,tm-1,td);                       /* midnight, so the birthday itself counts as 0 */
+    var days = Math.round((today0 - birth)/86400000);
+    var nb = new Date(ty,bm-1,bd); if(nb < today0) nb = new Date(ty+1,bm-1,bd);
+    var toGo = Math.round((nb - today0)/86400000);
     var rows = [
       row(["उमेर","Age"], fmt(y,0)+L(" वर्ष "," y ")+fmt(m,0)+L(" महिना "," m ")+fmt(d,0)+L(" दिन"," d"), ""),
       row(["जम्मा दिन","Total days"], fmt(days,0), L("दिन","days"), "sub"),
       row(["जम्मा महिना","Total months"], fmt(y*12+m,0), L("महिना","months"), "sub"),
-      row(["आगामी जन्मदिन","Next birthday"], fmt(toGo,0)+L(" दिनपछि"," days away"), "") ];
+      row(["आगामी जन्मदिन","Next birthday"], toGo === 0 ? L("आज! 🎂","Today! 🎂") : fmt(toGo,0)+L(" दिनपछि"," days away"), "") ];
     rows.push(row(["जन्ममिति (AD)","Birth date (AD)"], AD_MONTHS[bm-1]+" "+bd+", "+by, "", "sub"));
     try{ var b = adToBs(by,bm,bd);
       if(b) rows.push(row(["जन्ममिति (BS)","Birth date (BS)"], npd(b.y)+" "+bsM(b.m-1)+" "+npd(b.d), ["गते","gate"], "sub")); }catch(e){}
@@ -1701,7 +1704,7 @@ var TOOLS = [
     var tax = npTaxCalc(taxable, v.fy, "s"), taxM = tax/12;
     var net = sal - ssfM - taxM;
     var rows = [ row(["वार्षिक तलब","Annual salary"], rs(annual), "") ];
-    if(ssfM>0) rows.push(row(["SSF कट्टा (११%)","SSF deduction (11%)"], "− "+rs(ssfM)+" /महिना", "", "sub"));
+    if(ssfM>0) rows.push(row(["SSF कट्टा (११%)","SSF deduction (11%)"], "− "+rs(ssfM)+L(" /महिना"," /month"), "", "sub"));
     rows.push(row(["करयोग्य आय (वार्षिक)","Taxable income (annual)"], rs(taxable), "", "sub"));
     rows.push(row(["TDS (मासिक औसत)","TDS (monthly average)"], "− "+rs(taxM), ""));
     rows.push(row(["हातमा आउने (मासिक)","Take-home (monthly)"], rs(net), "", "big"));
@@ -1785,8 +1788,8 @@ var TOOLS = [
   share:function(){
     var D = []; try{ D = JSON.parse(localStorage.getItem("ganak_udharo")||"[]"); }catch(e){}
     var tot = 0, A = [];
-    D.forEach(function(e){ var amt=(e.t==="g"?1:-1)*e.a; tot+=amt; A.push("• "+e.n+" ("+e.d+"): "+(e.t==="g"?"+":"−")+" रु "+fmt(e.a,0)); });
-    A.push("─────────────", (tot>=0?"जम्मा पाउनु पर्ने: ":"जम्मा तिर्नु पर्ने: ")+"रु "+fmt(Math.abs(tot),0));
+    D.forEach(function(e){ var amt=(e.t==="g"?1:-1)*e.a; tot+=amt; A.push("• "+e.n+" ("+e.d+"): "+(e.t==="g"?"+":"−")+" "+L("रु ","Rs ")+fmt(e.a,0)); });
+    A.push("─────────────", L(tot>=0?"जम्मा पाउनु पर्ने: ":"जम्मा तिर्नु पर्ने: ", tot>=0?"Net to receive: ":"Net to pay: ")+L("रु ","Rs ")+fmt(Math.abs(tot),0));
     return A.join("\n");
   }},
 
@@ -2050,8 +2053,9 @@ var TOOLS = [
     if(v.m === "g2t") g = n(v.g);
     else g = n(v.t)*TOLA_G + n(v.a)*AANA + n(v.l)*LAAL;
     if(g<=0) return {err:["तौल हाल्नुहोस्।","Enter the weight."]};
-    var tot = g/TOLA_G, t = Math.floor(tot), rem = (tot - t)*16;
-    var a = Math.floor(rem), l = Math.round((rem - a)*4*100)/100;
+    var tot = g/TOLA_G, tl = Math.round(g/LAAL*100)/100;      /* लाल first, so 3.999 carries */
+    var t = Math.floor(tl/64 + 1e-9); tl -= t*64;
+    var a = Math.floor(tl/4 + 1e-9), l = Math.max(0, Math.round((tl - a*4)*100)/100);
     var rows = [
       row(["ग्राम","Gram"], fmt(g,4), "g"),
       row(["तोला (दशमलवमा)","Tola (decimal)"], fmt(tot,4), ["तोला","tola"]),
@@ -2147,6 +2151,7 @@ var TOOLS = [
     }
     var toM = { ft:FT_M, m:1, in:IN_M, cm:0.01, mm:0.001, yd:0.9144, km:1000 };
     var mm2 = val*(toM[v.u] || 1);
+    var tin = Math.round(Math.abs(mm2)/IN_M*100)/100, fti = Math.floor(tin/12 + 1e-9);   /* 11.999" → 1' 0" */
     return { rows:[
       row(["मिटर","Metre"], fmt(mm2,4), "m"),
       row(["फिट","Feet"], fmt(mm2/FT_M,4), "ft"),
@@ -2154,7 +2159,7 @@ var TOOLS = [
       row(["सेन्टिमिटर","Centimetre"], fmt(mm2*100,2), "cm"),
       row(["मिलिमिटर","Millimetre"], fmt(mm2*1000,1), "mm", "sub"),
       row(["गज (yard)","Yard"], fmt(mm2/0.9144,4), "yd", "sub"),
-      row(["फिट–इन्चमा","Feet & inches"], Math.floor(mm2/FT_M)+"' "+fmt(((mm2/FT_M)%1)*12,2)+'"', "", "big") ],
+      row(["फिट–इन्चमा","Feet & inches"], (mm2<0?"-":"")+fti+"' "+fmt(Math.max(0, tin - fti*12),2)+'"', "", "big") ],
       note:["१ फिट = ०.३०४८ मिटर · १ इन्च = २.५४ सेमी।","1 ft = 0.3048 m · 1 inch = 2.54 cm."] };
   }},
 
@@ -2404,7 +2409,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.3 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.4 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -2500,7 +2505,7 @@ function printHead(){
 function slipMeta(){
   var s="";
   try{ var d=new Date(), b=adToBs(d.getFullYear(),d.getMonth()+1,d.getDate());
-    if(b) s=npd(b.y)+" "+BS_MONTHS[b.m-1]+" "+npd(b.d); }catch(e){}
+    if(b) s=npd(b.y)+" "+bsM(b.m-1)+" "+npd(b.d); }catch(e){}
   if(typeof PROF!=="undefined"&&PROF.name) s+=(s?" · ":"")+PROF.name;
   return s;
 }
@@ -2698,10 +2703,15 @@ function openTool(id){
   TOOLS.forEach(function(x){ if(x.id === id) t = x; });
   if(!t){ closeTool(); return; }
   cur = t;
-  if(!t.custom && !state[t.id]){
-    var v = {};
-    t.f.forEach(function(f){ v[f.k] = (f.d === undefined ? "" : f.d); });
-    state[t.id] = v;
+  if(!t.custom){
+    /* saved inputs may come from an older version: fill new fields with their default
+       and reset a select whose stored value is no longer one of its options */
+    var v = state[t.id] || (state[t.id] = {});
+    t.f.forEach(function(f){
+      var bad = (v[f.k] === undefined || v[f.k] === null);
+      if(!bad && f.t === "s") bad = !f.o.some(function(o){ return String(o[0]) === String(v[f.k]); });
+      if(bad) v[f.k] = (f.d === undefined ? "" : f.d);
+    });
   }
   toolEl.innerHTML =
     '<button class="tback" id="tback">← '+L("गृहपृष्ठ (Dashboard)","Dashboard")+'</button>'
@@ -2835,7 +2845,7 @@ function pdfRows(){
   if(lastOut && lastOut.rows && !lastOut.err){
     var rh='';
     lastOut.rows.forEach(function(r){
-      var c=r.c==="big"||r.c==="hero"?"pbig":(r.c==="sub"?"psub2":"");
+      var c=/\b(big|hero)\b/.test(r.c)?"pbig":(/\bsub\b/.test(r.c)?"psub2":"");   /* "big hero", "txt big" too */
       rh+='<div class="prow '+c+'"><span class="pl">'+esc(S(r.l))+'</span><span class="pdots"></span>'
         +'<span class="pv">'+esc(r.v)+'</span>'+(r.u?'<span class="pu">'+esc(S(r.u))+'</span>':'')+'</div>';
     });
@@ -2887,7 +2897,8 @@ function route(){
   if(id) openTool(id); else closeTool();
 }
 window.addEventListener("hashchange", route);
-route();
+/* first route() runs at the very end of this script — RATES, saved state, the
+   openTool wrappers and voice support must all exist before a deep-linked tool opens */
 
 /*==V2: sidebar, settings, profile, reminders, backgrounds ==*/
 var PROF = {name:"",biz:"",ph:""};
@@ -3401,9 +3412,13 @@ if(!RATES_OK){ for(var _fk in RATES_FACTORY){ if(RATES[_fk]!==RATES_FACTORY[_fk]
 function confirmRates(){ RATES_OK=true; try{localStorage.setItem("ganak_rates_ok","1");}catch(e){} }
 var RATE_MAP={glass:["r","glass"],rod:["r","steel"],brick:["r","brick"],tile:["r","tile"]};
 function applyRateDefaults(sync){
-  TOOLS.forEach(function(t){ var m=RATE_MAP[t.id]; if(!m||!t.f) return;
-    t.f.forEach(function(f){ if(f.k===m[0]) f.d=RATES[m[1]]; });
-    if(sync && state[t.id]) state[t.id][m[0]]=RATES[m[1]];
+  TOOLS.forEach(function(t){ var m=RATE_MAP[t.id]; if(!t.f) return;
+    t.f.forEach(function(f){
+      var rk = f.rk || (m && f.k===m[0] ? m[1] : null);   /* field-level rk: e.g. ढलान cement/rod */
+      if(!rk || !(rk in RATES)) return;
+      f.d=RATES[rk];
+      if(sync && state[t.id]) state[t.id][f.k]=RATES[rk];
+    });
   });
   if(sync && typeof saveState==="function") saveState();
 }
@@ -3434,6 +3449,7 @@ document.body.dataset.theme=THEME;
 document.body.dataset.bg=BG;
 document.body.dataset.cat=(cur?cur.cat:"");
 renderSide();
+route();
 </script>
 </body>
 </html>
