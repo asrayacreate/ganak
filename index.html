@@ -705,7 +705,36 @@ body[data-theme="dark"] .tw tr.gr td{background:#2A2414;color:#F0D58C;border-bot
 .updbar #updX{background:transparent;color:#C9D3DD;padding:8px 10px}
 .pdfbar{background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);border-radius:16px}
 .pdfbar button{border-radius:12px;flex:1 1 auto;white-space:nowrap;padding:10px 8px}
-@media(max-width:400px){.pdfbar{gap:6px;padding:8px}.pdfbar #pvCopy .sbt{display:none}.pdfbar button.px{flex-basis:34px}}.pdfbar button:not(.pp):not(.pw):not(.pi):not(.px){background:rgba(255,255,255,.1)}
+@media(max-width:400px){.pdfbar{gap:6px;padding:8px}.pdfbar #pvPrint .sbt{display:none}.pdfbar button.px{flex-basis:34px}}
+/* invoice download row */
+.ivact{display:flex;gap:8px;margin:16px 0 4px}.ivact .rembtn{flex:1;padding:12px 14px;font-size:14px}.ivact .mini{flex:0 0 auto;padding:10px 14px}
+.sched-act .azgo{background:var(--g-amb);color:#1A1405;border-color:transparent}
+/* EMI full schedule overlay */
+.azsheet{max-width:640px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:20px;padding:18px 14px 22px;box-shadow:var(--m2)}
+.azh{font-size:19px;font-weight:800;margin:0 2px 12px}
+.azt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.azt div{border-radius:12px;background:rgba(21,32,42,.05);padding:9px 10px;min-width:0}
+body[data-theme="dark"] .azt div{background:rgba(255,255,255,.05)}
+.azt div.on{background:rgba(255,179,0,.2)}
+.azt span{display:block;font-size:11px;color:var(--mute);font-weight:600}
+.azt b{display:block;font-family:var(--fm);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.azsplit{height:12px;border-radius:999px;background:#E07A2E;overflow:hidden;margin:16px 0 6px}
+.azsplit i,.azb i{display:block;height:100%;background:#1C5FA8}
+.azleg{display:flex;justify-content:space-between;font-size:12px;font-weight:700}
+.azleg .p{color:#1C5FA8}.azleg .i{color:#C4621C}
+body[data-theme="dark"] .azleg .p{color:#86BCFF}body[data-theme="dark"] .azleg .i{color:#FFB27A}
+.azs{font-size:14px;font-weight:800;margin:20px 2px 8px}.azs em{font-style:normal;font-weight:600;font-size:11px;color:var(--mute)}
+.aztw{overflow-x:auto;border:1px solid var(--ol);border-radius:12px}
+.aztw table{width:100%;border-collapse:collapse;font-family:var(--fm);font-size:12px}
+.aztw th{position:sticky;top:0;background:#15202A;color:#fff;font-family:var(--fs);font-size:11px;padding:8px;text-align:right;white-space:nowrap}
+.aztw th:first-child,.aztw td:first-child{text-align:left}
+.aztw td{padding:6px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--ol)}
+.aztw td:first-child span{font-family:var(--fs);color:var(--mute);font-size:11px}
+.aztw tr.gr td{background:rgba(255,179,0,.16);font-family:var(--fs);font-weight:700;font-size:11.5px}
+.azb{width:56px}.azb i{height:8px;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+.azb{background:linear-gradient(#E07A2E,#E07A2E) center/100% 8px no-repeat}
+/* phones: 2 tiles per row; the monthly table drops the EMI column (same every month, shown above) */
+@media(max-width:480px){.azt{grid-template-columns:1fr 1fr}.aztw.m th:nth-child(2),.aztw.m td:nth-child(2){display:none}.aztw td,.aztw th{padding:6px 6px}.azb{width:40px}}.pdfbar button:not(.pp):not(.pw):not(.pi):not(.px){background:rgba(255,255,255,.1)}
 .pdfbar button.pp{background:var(--g-amb);color:#1A1405}.pdfbar button.pw{background:linear-gradient(135deg,#25D366,#12A383 55%,#0B7F70)}
 .hist{margin:12px 0 14px;border:1px solid var(--ol);border-radius:16px;background:var(--card);box-shadow:var(--m1);overflow:hidden}
 .hist summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
@@ -2370,7 +2399,8 @@ var TOOLS = [
       table:{ title:L("📊 महिना-महिनाको तालिका","📊 Month-by-month schedule"),
               sub:fmt(N,0)+L(" किस्ता"," instalments"),
               head:[ "#", L("किस्ता","EMI"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी साँवा","Balance") ],
-              rows:trows },
+              rows:trows, amz:true },
+      amort:{ P:P, rate:n(v.r), N:N, emi:emi, ti:ti, items:items },
       note:["Reducing balance विधि — EMI = [P × R × (1+R)^N] ÷ [(1+R)^N − 1]। सुरुमा ब्याज बढी र साँवा कम कट्छ। अन्तिम किस्ता पैसा मिलाउन थोरै फरक पर्न सक्छ। बैंकको service charge/बिमा अलग।",
             "Reducing-balance method — EMI = [P × R × (1+R)^N] ÷ [(1+R)^N − 1]. Early instalments are interest-heavy. The last instalment adjusts slightly to close the balance. Bank service charges and insurance are separate."] };
   }},
@@ -2870,7 +2900,9 @@ var TOOLS = [
       + '</div><div class="eyebrow" style="margin-top:6px">'+L("सामानको सूची","Items")+'</div><div id="ivItems"></div>'
       + '<button class="rembtn" id="ivAdd" style="width:100%;margin:4px 0 10px">＋ '+L("सामान थप्नुहोस्","Add item")+'</button>'
       + '<div class="fields">'+f("ivDisc", L("छुट","Discount")+' <em>%</em>', "half", 'type="number" inputmode="decimal" step="any"')+'</div>'
-      + '<div class="note" style="margin:0 0 10px">ℹ️ '+L("विक्रेताको नाम/फोन/logo: Settings → Profile बाट आउँछ।","Seller name/phone/logo come from Settings → Profile.")+'</div><div id="out"></div>';
+      + '<div class="note" style="margin:0 0 10px">ℹ️ '+L("विक्रेताको नाम/फोन/logo: Settings → Profile बाट आउँछ।","Seller name/phone/logo come from Settings → Profile.")+'</div><div id="out"></div>'
+      + '<div class="ivact"><button class="rembtn" id="ivPdf">⬇️ '+L("PDF Download","Download PDF")+'</button>'
+      + '<button class="mini" id="ivImg">🖼 '+L("फोटो","Image")+'</button></div>';
   },
   init:function(){
     var KEY = "ganak_invoice", ids = ["ivType","ivNo","ivSPan","ivSAddr","ivBName","ivBAddr","ivBPan","ivDisc"], D;
@@ -2903,10 +2935,13 @@ var TOOLS = [
       rows.push(row(["जम्मा","Subtotal"], rs(sub), ""));
       if(disc>0) rows.push(row(["छुट ("+fmt(dp,2)+"%)","Discount ("+fmt(dp,2)+"%)"], "− "+rs(disc), ""));
       if(tax){ rows.push(row(["करयोग्य रकम","Taxable amount"], rs(base), "", "sub")); rows.push(row(["VAT १३%","VAT 13%"], rs(vat), "")); }
+      var inv = { tax:tax, no:D.ivNo, sPan:D.ivSPan, sAddr:D.ivSAddr, bName:D.ivBName, bAddr:D.ivBAddr, bPan:D.ivBPan,
+                  bs:(bs ? npd(bs.y+"/"+pad2(bs.m)+"/"+pad2(bs.d)) : ""), items:[], sub:sub, dp:dp, disc:disc, base:base, vat:vat, tot:tot, words:w };
+      D.items.forEach(function(x){ var q = n(x.q), r = n(x.r); if(!(q*r>0) && !x.d) return; inv.items.push({d:x.d, q:q, r:r, a:q*r}); });
       rows.push(row(["कुल रकम","Grand total"], rs(tot), "", "big nw"));
       rows.push(row(["अक्षरमा","In words"], L(w[0],w[1]), "", "txt sub"));
       if(tax && !/^\d{9}$/.test(D.ivSPan||"")) rows.push(row(["⚠️ कर बीजकमा विक्रेताको ९ अङ्कको VAT नं. चाहिन्छ","⚠️ A tax invoice needs the seller's 9-digit VAT no."], "!", "", "sub"));
-      return { title:[tax ? "कर बीजक · TAX INVOICE" : "बिजक · INVOICE", tax ? "TAX INVOICE · कर बीजक" : "INVOICE · बिजक"], rows:rows,
+      return { title:[tax ? "कर बीजक · TAX INVOICE" : "बिजक · INVOICE", tax ? "TAX INVOICE · कर बीजक" : "INVOICE · बिजक"], rows:rows, inv:inv,
         note:["कर बीजकमा 'कर बीजक' शीर्षक, विक्रेताको नाम/ठेगाना/VAT नं., बीजक नं., मिति, सामानको विवरण, परिमाण, दर, करयोग्य मूल्य, १३% VAT र जम्मा हुनुपर्छ; रु १०,००० भन्दा बढीको बिक्रीमा संक्षिप्त बीजक दिइँदैन (VAT नियमावली २०५३ नियम १७)। कम्प्युटरबाट जारी बीजक मान्य हुन IRD को स्वीकृति चाहिन्छ — यो app स्वीकृत billing software होइन; यसलाई quotation/proforma वा बिल पडमा सार्न प्रयोग गर्नुहोस्।",
               "A tax invoice must show the 'Tax Invoice' heading, seller name/address/VAT no., invoice no., date, item description, quantity, rate, taxable value, 13% VAT and total; abbreviated invoices are not allowed above Rs 10,000 (VAT Rules 2053, rule 17). Computer-issued invoices need IRD approval to be valid — this app is not approved billing software; use it for quotations/proformas or to copy onto your bill pad."] };
     }
@@ -2919,6 +2954,8 @@ var TOOLS = [
     });
     $("#cust").addEventListener("change", function(e){ if(e.target.tagName === "SELECT") render(); });
     $("#cust").addEventListener("click", function(e){
+      if(e.target.closest("#ivPdf")){ if(lastOut && lastOut.inv) downloadPdf(); else toast(L("पहिले सामान र दर हाल्नुहोस्","Add items and rates first")); return; }
+      if(e.target.closest("#ivImg")){ if(lastOut && lastOut.inv) shareImage(); return; }
       if(e.target.id === "ivAdd"){ D.items.push({d:"",q:"1",r:""}); items(); render(); return; }
       var del = e.target.closest("[data-del]");
       if(del){ D.items.splice(+del.dataset.del, 1); items(); render(); }
@@ -3284,7 +3321,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.4 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3609,7 +3646,9 @@ function renderFields(){
 }
 function tableHtml(t){
   var h = '<details class="sched" open><summary><span>'+esc(t.title)+'</span><span class="sc">'+esc(t.sub||"")+'</span></summary>'
-        + '<div class="sched-act"><button class="mini" id="tblCopy">'+esc(S(UI.tblcopy))+'</button></div>'
+        + '<div class="sched-act"><button class="mini" id="tblCopy">'+esc(S(UI.tblcopy))+'</button>'
+        + (t.amz ? '<button class="mini azgo" id="amzOpen">⤢ '+esc(L("पूरा तालिका","Full schedule"))+'</button><button class="mini" id="amzCsv">⬇️ Excel</button>' : '')
+        + '</div>'
         + '<div class="tw"><table><thead><tr>'
         + t.head.map(function(x){ return '<th>'+esc(x)+'</th>'; }).join("") + '</tr></thead><tbody>';
   t.rows.forEach(function(r){
@@ -3859,6 +3898,9 @@ toolEl.addEventListener("keydown", function(e){
 toolEl.addEventListener("change", function(e){
   var el = e.target; if(!el.dataset || !el.dataset.k || !cur || cur.custom) return;
   var v = state[cur.id];
+  /* a typed box was already computed on "input"; recomputing on its blur-"change" would redraw the result
+     under the finger and swallow the tap that caused the blur (e.g. "पूरा तालिका", "तालिका copy") */
+  if(el.tagName !== "SELECT" && v[el.dataset.k] === el.value) return;
   v[el.dataset.k] = el.value;
   if(el.tagName === "SELECT"){
     if(cur.sync) cur.sync(v, el.dataset.k);
@@ -3869,6 +3911,8 @@ toolEl.addEventListener("change", function(e){
 toolEl.addEventListener("click", function(e){
   if(!cur) return;
   if(e.target.id === "tblCopy" && lastTable){ copyText(tableText(lastTable), S(UI.tcopied)); return; }
+  if(e.target.closest("#amzOpen")){ openAmort(); return; }
+  if(e.target.closest("#amzCsv")){ amortCsv(); return; }
   if(e.target.id !== "exBtn") return;
   if(cur.custom){ if(cur.reset) cur.reset(); toast(S(UI.exfilled)); return; }
   var v = {}; cur.f.forEach(function(f){ v[f.k] = (f.d === undefined ? "" : f.d); });
@@ -3934,8 +3978,8 @@ function openPdfView(){
   var d=document.createElement("div");
   d.className="pdfview"; d.id="pdfview";
   d.innerHTML='<div class="pdfbar">'
-    +'<button class="pp" id="pvPrint" aria-label="Print / PDF">🖨 PDF</button>'
-    +'<button id="pvCopy" aria-label="Copy">📋<span class="sbt"> Copy</span></button>'
+    +'<button class="pp" id="pvDl" aria-label="Download PDF">⬇️ PDF</button>'
+    +'<button id="pvPrint" aria-label="Print">🖨<span class="sbt"> Print</span></button>'
     +'<button class="pw" id="pvShare">💬 Share</button>'
     +'<button class="pi" id="pvImg">🖼 '+L("फोटो","Image")+'</button>'
     +'<button class="px" id="pvClose" aria-label="close">✕</button></div>'
@@ -3960,126 +4004,401 @@ function openPdfView(){
       toast(L("Copy भयो ✓","Copied ✓")); return; }
     if(e.target.closest("#pvShare")){ shareOut(shareText()); return; }
     if(e.target.closest("#pvImg")){ shareImage(); return; }
+    if(e.target.closest("#pvDl")){ downloadPdf(); return; }
   });
   document.addEventListener("keydown",function esc2(e){ if(e.key==="Escape"){ closePv(); document.removeEventListener("keydown",esc2); } });
 }
 $("#btnPrint").addEventListener("click", openPdfView);
 
-/* ---- result as a picture (WhatsApp / Viber): the PDF sheet drawn on a 1080px canvas ----
-   Two passes over the same layout code: first measures the height, then draws. */
-function slipCanvas(done){
-  var W = 1080, P = 64, CW = W - 2*P;
-  var rs_ = getComputedStyle(document.documentElement);
-  var FS = rs_.getPropertyValue("--fs") || "sans-serif", FM = rs_.getPropertyValue("--fm") || "monospace";
-  var INK = "#15202A", INK2 = "#36424E", MUTE = "#5B6672", LINE = "#E2DCC9", PAPER = "#FFFEF8", AMB = "#F5B301";
-  var biz = (PROF.biz||PROF.name) ? (PROF.biz||PROF.name) : "PRERAK MULTIPURPOSE PVT LTD";
-  var sub = [PROF.biz?PROF.name:"", PROF.ph?"📞 "+PROF.ph:"", !PROF.biz&&!PROF.name?L("हेटौंडा","Hetauda"):""].filter(Boolean).join(" · ");
-  var cv = document.createElement("canvas"), ctx = cv.getContext("2d");
-  function font(px, w, mono){ ctx.font = (w||"")+" "+px+"px "+(mono?FM:FS); }
-  function wrap(t, maxW){
-    var out = [], line = "";
+/* ---- documents: result photo, invoice, EMI schedule → canvas → PNG / PDF (no library) ----
+   cvKit = shared drawing helpers. A renderer (lay) is a plain function of k: the first pass (draw=false)
+   only measures the height and collects k.brk(y) safe page breaks (between table rows); then it paints —
+   onto one canvas for a photo, or one A4-sized canvas per PDF page (k.y0 = page top), so even a 60-year
+   EMI schedule never needs a giant canvas on a small phone. */
+var DOC = {INK:"#15202A", INK2:"#36424E", MUTE:"#5B6672", LINE:"#E2DCC9", PAPER:"#FFFEF8", AMB:"#F5B301"};
+function cvKit(W){
+  var cs = getComputedStyle(document.documentElement), k = {W:W, draw:false, breaks:[], y0:0};
+  k.cv = document.createElement("canvas"); k.ctx = k.cv.getContext("2d");
+  k.FS = cs.getPropertyValue("--fs") || "sans-serif"; k.FM = cs.getPropertyValue("--fm") || "monospace";
+  k.font = function(px, w, mono){ k.ctx.font = (w||"")+" "+px+"px "+(mono?k.FM:k.FS); };
+  k.tw = function(t){ return k.ctx.measureText(String(t)).width; };
+  k.wrap = function(t, maxW){
+    var out = [];
     String(t).split(/\n/).forEach(function(par){
-      line = "";
+      var line = "";
       par.split(/(\s+)/).forEach(function(w){
-        var tryL = line + w;
-        if(ctx.measureText(tryL).width <= maxW || !line.trim()){ line = tryL; return; }
+        if(k.tw(line + w) <= maxW || !line.trim()){ line += w; return; }
         out.push(line.trim()); line = w.trim();
       });
       out.push(line.trim());
     });
     return out;
-  }
-  function lay(draw, logo){
-    var y = 0;
-    function txt(t, x, yy, al, col){ if(draw){ ctx.fillStyle = col||INK; ctx.textAlign = al||"left"; ctx.fillText(t, x, yy); } }
-    function rule(yy, dbl){ if(!draw) return; ctx.fillStyle = INK; ctx.fillRect(P, yy, CW, 3); if(dbl) ctx.fillRect(P, yy+7, CW, 3); }
-    function tape(yy){ if(!draw) return; ctx.fillStyle = AMB; ctx.fillRect(0, yy, W, 18);
-      ctx.fillStyle = "rgba(21,32,42,.8)"; for(var x = 0; x < W; x += 27) ctx.fillRect(x, yy + (x % 135 ? 10 : 4), 2, 18); }
-    if(draw){ ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, cv.height);
-      ctx.fillStyle = "rgba(70,58,20,.035)"; for(var gy = 0; gy < cv.height; gy += 6) ctx.fillRect(0, gy, W, 2); }
-    tape(0); y = 18 + 48;
-    /* header: logo / monogram + business */
-    if(draw){
-      if(logo){ ctx.save(); ctx.beginPath(); ctx.moveTo(P+16,y); ctx.arcTo(P+96,y,P+96,y+96,16); ctx.arcTo(P+96,y+96,P,y+96,16);
-        ctx.arcTo(P,y+96,P,y,16); ctx.arcTo(P,y,P+96,y,16); ctx.clip(); ctx.drawImage(logo, P, y, 96, 96); ctx.restore(); }
-      else { ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(P+48, y+48, 48, 0, 7); ctx.fill();
-        font(46, "800"); ctx.fillStyle = AMB; ctx.textAlign = "center"; ctx.fillText(biz.trim().charAt(0).toUpperCase(), P+48, y+64); }
+  };
+  k.txt = function(t, x, y, al, col){ if(!k.draw) return; k.ctx.fillStyle = col||DOC.INK; k.ctx.textAlign = al||"left"; k.ctx.fillText(t, x, y); };
+  k.rect = function(x, y, w, h, col){ if(!k.draw) return; k.ctx.fillStyle = col; k.ctx.fillRect(x, y, w, h); };
+  k.rule = function(x, y, w, dbl){ k.rect(x, y, w, 3, DOC.INK); if(dbl) k.rect(x, y+7, w, 3, DOC.INK); };
+  k.tape = function(y){ if(!k.draw) return; k.rect(0, y, W, 18, DOC.AMB);
+    for(var x = 0; x < W; x += 27) k.rect(x, y + (x % 135 ? 10 : 4), 2, 18 - (x % 135 ? 10 : 4), "rgba(21,32,42,.8)"); };
+  k.paper = function(){ if(!k.draw) return; var h = k.cv.height; k.rect(0, k.y0, W, h, DOC.PAPER);
+    for(var gy = k.y0 - k.y0 % 6; gy < k.y0 + h; gy += 6) k.rect(0, gy, W, 2, "rgba(70,58,20,.035)"); };
+  k.brk = function(y){ k.breaks.push(y); };
+  /* business header used by every document: logo / monogram + name + one sub line */
+  k.head = function(x, y, logo, maxW){
+    var biz = (PROF.biz||PROF.name) ? (PROF.biz||PROF.name) : "PRERAK MULTIPURPOSE PVT LTD";
+    var sub = [PROF.biz?PROF.name:"", PROF.ph?"📞 "+PROF.ph:"", !PROF.biz&&!PROF.name?L("हेटौंडा","Hetauda"):""].filter(Boolean).join(" · ");
+    if(k.draw){
+      var c = k.ctx;
+      if(logo){ c.save(); c.beginPath(); c.moveTo(x+16,y); c.arcTo(x+96,y,x+96,y+96,16); c.arcTo(x+96,y+96,x,y+96,16);
+        c.arcTo(x,y+96,x,y,16); c.arcTo(x,y,x+96,y,16); c.clip(); c.drawImage(logo, x, y, 96, 96); c.restore(); }
+      else { c.fillStyle = DOC.INK; c.beginPath(); c.arc(x+48, y+48, 48, 0, 7); c.fill();
+        k.font(46, "800"); c.fillStyle = DOC.AMB; c.textAlign = "center"; c.fillText(biz.trim().charAt(0).toUpperCase(), x+48, y+64); }
     }
-    font(40, "800"); var bl = wrap(biz, CW - 124);
-    bl.forEach(function(l, i){ txt(l, P+124, y + 44 + i*48); });
+    k.font(40, "800"); var bl = k.wrap(biz, maxW - 124);
+    bl.forEach(function(l, i){ k.txt(l, x+124, y + 44 + i*48); });
     var hy = y + 44 + (bl.length-1)*48;
-    if(sub){ font(26); txt(sub, P+124, hy + 40, "left", MUTE); hy += 40; }
-    y = Math.max(y + 96, hy + 12) + 28;
-    rule(y); y += 3 + 40;
-    font(26, "600"); txt(L("अनुमानित हिसाब (Estimate)","Estimate"), P, y, "left", MUTE); txt(slipMeta(), W-P, y, "right", MUTE);
-    y += 56; font(38, "800"); wrap(S(cur.nm), CW).forEach(function(l){ txt(l, P, y); y += 48; });
-    y += 6; rule(y, true); y += 10 + 34;
-    var o = lastOut;
-    if(o && o.rows && !o.err){
-      o.rows.forEach(function(r, ri){
-        var big = /\b(big|hero)\b/.test(r.c), small = /\bsub\b/.test(r.c), l = S(r.l), v = String(r.v), u = S(r.u);
-        if(/\btxt\b/.test(r.c)){
-          font(24, "600"); txt(l, P, y, "left", MUTE); y += 40;
-          font(30, "600"); wrap(v, CW).forEach(function(t){ txt(t, P, y); y += 42; }); y += 14; return;
-        }
-        if(big && ri){ y += 8; rule(y - 30, true); y += 30; }
-        var lf = big ? 30 : (small ? 24 : 28), vf = big ? 52 : (small ? 26 : 30);
-        font(vf, "800", true); var vw = ctx.measureText(v).width;
-        font(22, "", true); var uw = u ? ctx.measureText(u).width + 10 : 0;
-        font(lf, big ? "800" : "500");
-        var lmax = Math.max(CW*0.45, CW - vw - uw - 40), ll = wrap(l, lmax), lw = 0;
-        ll.forEach(function(t){ lw = Math.max(lw, ctx.measureText(t).width); });
-        var own = (vw + uw > CW - Math.min(lw, lmax) - 40);   /* value too long → its own line */
-        var lh = lf + 14;
-        ll.forEach(function(t, i){ txt(t, P, y + i*lh, "left", small ? MUTE : INK2); });
-        var vy = own ? y + ll.length*lh + (vf - lf) : y + (ll.length-1)*lh + (big ? 10 : 0);
-        if(draw){
-          if(!own){ ctx.save(); ctx.strokeStyle = "#BDB59D"; ctx.lineWidth = 2; ctx.setLineDash([2,7]); ctx.beginPath();
-            var lx = P + (ll.length > 1 ? ctx.measureText(ll[ll.length-1]).width : lw) + 14;
-            ctx.moveTo(lx, vy - 8); ctx.lineTo(W - P - vw - uw - 14, vy - 8); ctx.stroke(); ctx.restore(); }
-          if(big){ ctx.fillStyle = "rgba(245,179,1,.45)"; ctx.fillRect(W - P - vw - uw - 8, vy - vf*0.34, vw + uw + 8, vf*0.42); }
-          font(vf, "800", true); ctx.fillStyle = small ? MUTE : INK; ctx.textAlign = "right"; ctx.fillText(v, W - P - uw, vy);
-          if(u){ font(22, "", true); ctx.fillStyle = MUTE; ctx.fillText(u, W - P, vy); }
-        }
-        y = vy + (small ? 24 : 30);
-        if(big && !/\bnw\b/.test(r.c)){ var mw = moneyWords(r.v); if(mw){ font(24, "600"); wrap(mw, CW).forEach(function(t){ txt(t, W-P, y + 4, "right", MUTE); y += 34; }); } }
-        y += big ? 18 : 12;
-      });
-      if(o.table){ font(23, "600"); txt(o.table.title+" — "+L("पूरा तालिका PDF मा","full table in the PDF"), P, y + 10, "left", MUTE); y += 46; }
-      if(o.note){ y += 6; if(draw){ ctx.fillStyle = LINE; ctx.fillRect(P, y, CW, 2); } y += 40;
-        font(23); wrap("ℹ️ " + S(o.note), CW).forEach(function(t){ txt(t, P, y, "left", MUTE); y += 34; }); }
-    } else {
-      font(28, "", true); wrap(cur.share ? cur.share() : outLines(o).join("\n"), CW).forEach(function(t){ txt(t, P, y, "left", INK2); y += 40; });
-    }
-    y += 50; font(26, "700"); txt(L("धन्यवाद!","Thank you!"), P, y, "left", INK2);
-    if(draw){ ctx.fillStyle = INK2; ctx.fillRect(W - P - 300, y - 8, 300, 2); }
-    font(22); txt(L("हस्ताक्षर","Signature"), W - P - 150, y + 30, "center", MUTE);
-    y += 84; font(21, "600"); txt("Ganak · asrayacreate.github.io/ganak · PRERAK MULTIPURPOSE PVT LTD", W/2, y, "center", MUTE);
-    y += 34; tape(y); return y + 18;
+    if(sub){ k.font(26); k.txt(sub, x+124, hy + 40, "left", DOC.MUTE); hy += 40; }
+    return Math.max(y + 96, hy + 12);
+  };
+  k.logo = function(cb){
+    if(PROF.logo){ var im = new Image(); im.onload = function(){ cb(im); }; im.onerror = function(){ cb(null); }; im.src = PROF.logo; }
+    else cb(null);
+  };
+  k.measure = function(lay, logo){ k.cv.width = W; k.cv.height = 10; k.draw = false; k.y0 = 0; k.breaks = []; return Math.ceil(lay(k, logo)); };
+  /* whole document on one canvas (photo) */
+  k.run = function(lay, done){
+    k.logo(function(logo){ var h = k.measure(lay, logo); k.cv.height = h; k.draw = true; lay(k, logo); done(k.cv); });
+  };
+  return k;
+}
+
+/* the result sheet (every tool) — 1080px */
+function slipLay(k, logo){
+  var W = k.W, P = 64, CW = W - 2*P, y, o = lastOut;
+  k.paper(); k.tape(0); y = 18 + 48;
+  y = k.head(P, y, logo, CW) + 28;
+  k.rule(P, y, CW); y += 3 + 40;
+  k.font(26, "600"); k.txt(L("अनुमानित हिसाब (Estimate)","Estimate"), P, y, "left", DOC.MUTE); k.txt(slipMeta(), W-P, y, "right", DOC.MUTE);
+  y += 56; k.font(38, "800"); k.wrap(S(cur.nm), CW).forEach(function(l){ k.txt(l, P, y); y += 48; });
+  y += 6; k.rule(P, y, CW, true); y += 10 + 34;
+  if(o && o.rows && !o.err){
+    o.rows.forEach(function(r, ri){
+      var big = /\b(big|hero)\b/.test(r.c), small = /\bsub\b/.test(r.c), l = S(r.l), v = String(r.v), u = S(r.u);
+      k.brk(y - 34);
+      if(/\btxt\b/.test(r.c)){
+        k.font(24, "600"); k.txt(l, P, y, "left", DOC.MUTE); y += 40;
+        k.font(30, "600"); k.wrap(v, CW).forEach(function(t){ k.txt(t, P, y); y += 42; }); y += 14; return;
+      }
+      if(big && ri){ y += 8; k.rule(P, y - 30, CW, true); y += 30; }
+      var lf = big ? 30 : (small ? 24 : 28), vf = big ? 52 : (small ? 26 : 30);
+      k.font(vf, "800", true); var vw = k.tw(v);
+      k.font(22, "", true); var uw = u ? k.tw(u) + 10 : 0;
+      k.font(lf, big ? "800" : "500");
+      var lmax = Math.max(CW*0.45, CW - vw - uw - 40), ll = k.wrap(l, lmax), lw = 0;
+      ll.forEach(function(t){ lw = Math.max(lw, k.tw(t)); });
+      var own = (vw + uw > CW - Math.min(lw, lmax) - 40), lh = lf + 14;
+      ll.forEach(function(t, i){ k.txt(t, P, y + i*lh, "left", small ? DOC.MUTE : DOC.INK2); });
+      var vy = own ? y + ll.length*lh + (vf - lf) : y + (ll.length-1)*lh + (big ? 10 : 0);
+      if(k.draw){
+        var c = k.ctx;
+        if(!own){ c.save(); c.strokeStyle = "#BDB59D"; c.lineWidth = 2; c.setLineDash([2,7]); c.beginPath();
+          var lx = P + (ll.length > 1 ? k.tw(ll[ll.length-1]) : lw) + 14;
+          c.moveTo(lx, vy - 8); c.lineTo(W - P - vw - uw - 14, vy - 8); c.stroke(); c.restore(); }
+        if(big) k.rect(W - P - vw - uw - 8, vy - vf*0.34, vw + uw + 8, vf*0.42, "rgba(245,179,1,.45)");
+        k.font(vf, "800", true); k.txt(v, W - P - uw, vy, "right", small ? DOC.MUTE : DOC.INK);
+        if(u){ k.font(22, "", true); k.txt(u, W - P, vy, "right", DOC.MUTE); }
+      }
+      y = vy + (small ? 24 : 30);
+      if(big && !/\bnw\b/.test(r.c)){ var mw = moneyWords(r.v); if(mw){ k.font(24, "600"); k.wrap(mw, CW).forEach(function(t){ k.txt(t, W-P, y + 4, "right", DOC.MUTE); y += 34; }); } }
+      y += big ? 18 : 12;
+    });
+    if(o.table){ k.font(23, "600"); k.txt(o.table.title+" — "+L("पूरा तालिका PDF मा","full table in the PDF"), P, y + 10, "left", DOC.MUTE); y += 46; }
+    if(o.note){ y += 6; k.rect(P, y, CW, 2, DOC.LINE); y += 40;
+      k.font(23); k.wrap("ℹ️ " + S(o.note), CW).forEach(function(t){ k.txt(t, P, y, "left", DOC.MUTE); y += 34; }); }
+  } else {
+    k.font(28, "", true); k.wrap(cur.share ? cur.share() : outLines(o).join("\n"), CW).forEach(function(t){ k.txt(t, P, y, "left", DOC.INK2); y += 40; });
   }
-  function go(logo){ cv.width = W; cv.height = 10; cv.height = Math.ceil(lay(false, logo)); lay(true, logo); done(cv); }
-  if(PROF.logo){ var im = new Image(); im.onload = function(){ go(im); }; im.onerror = function(){ go(null); }; im.src = PROF.logo; }
-  else go(null);
+  k.brk(y);
+  y += 50; k.font(26, "700"); k.txt(L("धन्यवाद!","Thank you!"), P, y, "left", DOC.INK2);
+  k.rect(W - P - 300, y - 8, 300, 2, DOC.INK2);
+  k.font(22); k.txt(L("हस्ताक्षर","Signature"), W - P - 150, y + 30, "center", DOC.MUTE);
+  y += 84; k.font(21, "600"); k.txt("Ganak · asrayacreate.github.io/ganak · PRERAK MULTIPURPOSE PVT LTD", W/2, y, "center", DOC.MUTE);
+  y += 34; k.tape(y); return y + 18;
+}
+
+/* बिजक: a real bill layout — seller, title, buyer, items table, totals, words, signature — 1240px ≈ A4 */
+function invoiceLay(k, logo){
+  var W = k.W, P = 70, CW = W - 2*P, y, iv = lastOut.inv, tax = iv.tax;
+  k.paper(); k.tape(0); y = 18 + 50;
+  /* seller (left) */
+  var hy = k.head(P, y, logo, CW*0.6);
+  k.font(24); var sl = [];
+  if(iv.sAddr) sl.push(iv.sAddr);
+  sl.push((tax ? L("VAT नं.: ","VAT no.: ") : L("PAN नं.: ","PAN no.: ")) + (iv.sPan || "—"));
+  sl.forEach(function(t){ k.wrap(t, CW*0.6 - 124).forEach(function(w){ k.txt(w, P+124, hy + 22, "left", DOC.INK2); hy += 34; }); });
+  /* title + number/date (right) */
+  k.font(44, "800"); k.txt(tax ? "कर बीजक" : "बीजक", W-P, y + 40, "right");
+  k.font(24, "700"); k.txt(tax ? "TAX INVOICE" : "INVOICE", W-P, y + 74, "right", DOC.MUTE);
+  k.font(24); k.txt(L("बीजक नं.: ","Invoice no.: ") + (iv.no || "—"), W-P, y + 118, "right", DOC.INK2);
+  k.txt(L("मिति: ","Date: ") + iv.bs + " BS", W-P, y + 152, "right", DOC.INK2);
+  k.txt(TODAY_ISO + " AD", W-P, y + 186, "right", DOC.MUTE);
+  y = Math.max(hy + 24, y + 210);
+  k.rule(P, y, CW); y += 3 + 36;
+  /* buyer */
+  k.font(22, "700"); k.txt(L("ग्राहक / Buyer","Buyer / ग्राहक"), P, y, "left", DOC.MUTE); y += 40;
+  k.font(30, "800"); k.txt(iv.bName || "—", P, y); y += 38;
+  k.font(24);
+  if(iv.bAddr){ k.txt(iv.bAddr, P, y, "left", DOC.INK2); y += 34; }
+  if(iv.bPan){ k.txt(L("PAN नं.: ","PAN no.: ") + iv.bPan, P, y, "left", DOC.INK2); y += 34; }
+  y += 18;
+  /* items table */
+  var C = [ {w:80, t:"क्र.सं.\nS.N.", al:"center"}, {w:0, t:"विवरण\nDescription", al:"left"}, {w:150, t:"परिमाण\nQty", al:"right"},
+            {w:190, t:"दर\nRate", al:"right"}, {w:220, t:"रकम\nAmount", al:"right"} ];
+  C[1].w = CW - 80 - 150 - 190 - 220;
+  var xs = [], xx = P; C.forEach(function(c){ xs.push(xx); xx += c.w; });
+  function cellX(i){ var c = C[i]; return c.al === "right" ? xs[i] + c.w - 14 : (c.al === "center" ? xs[i] + c.w/2 : xs[i] + 14); }
+  k.rect(P, y, CW, 76, DOC.INK);
+  k.font(20, "700");
+  C.forEach(function(c, i){ c.t.split("\n").forEach(function(t, j){ k.txt(t, cellX(i), y + 32 + j*26, c.al, j ? "#B9C4CE" : "#FFFFFF"); }); });
+  y += 76;
+  iv.items.forEach(function(it, i){
+    k.brk(y);
+    k.font(26); var dl = k.wrap(it.d || "—", C[1].w - 28), rh = Math.max(56, dl.length*34 + 22);
+    if(i % 2) k.rect(P, y, CW, rh, "rgba(21,32,42,.035)");
+    k.font(24, "", true); k.txt(String(i+1), cellX(0), y + 36, "center", DOC.MUTE);
+    k.font(26); dl.forEach(function(t, j){ k.txt(t, cellX(1), y + 36 + j*34, "left"); });
+    k.font(24, "", true); k.txt(fmt(it.q,3), cellX(2), y + 36, "right"); k.txt(fmt(it.r,2), cellX(3), y + 36, "right");
+    k.font(26, "700", true); k.txt(fmt(it.a,2), cellX(4), y + 36, "right");
+    y += rh; k.rect(P, y - 1, CW, 1, DOC.LINE);
+  });
+  k.rect(P, y, CW, 3, DOC.INK); y += 3; k.brk(y);
+  /* totals (right column) */
+  var TX = W - P - 560;
+  function tot(l, v, opt){
+    opt = opt || {};
+    if(opt.big){ y += 10; k.rect(TX, y, 560, 64, "rgba(245,179,1,.30)"); k.font(30, "800"); k.txt(l, TX + 16, y + 43, "left");
+      k.font(36, "800", true); k.txt(v, W - P - 14, y + 44, "right"); y += 74; return; }
+    k.font(25, opt.b ? "700" : ""); k.txt(l, TX + 16, y + 40, "left", opt.m ? DOC.MUTE : DOC.INK2);
+    k.font(26, opt.b ? "800" : "600", true); k.txt(v, W - P - 14, y + 40, "right", opt.m ? DOC.MUTE : DOC.INK);
+    y += 50;
+  }
+  tot(L("जम्मा","Subtotal"), rs(iv.sub), {b:1});
+  if(iv.disc > 0) tot(L("छुट (","Discount (") + fmt(iv.dp,2) + "%)", "− " + rs(iv.disc));
+  if(tax){ tot(L("करयोग्य रकम","Taxable amount"), rs(iv.base), {m:1}); tot(L("मूल्य अभिवृद्धि कर (VAT) १३%","VAT 13%"), rs(iv.vat)); }
+  tot(L("कुल रकम","Grand total"), rs(iv.tot), {big:1});
+  y += 10; k.font(22, "700"); k.txt(L("अक्षरमा","In words"), P, y + 10, "left", DOC.MUTE); y += 44;
+  k.font(27, "700"); k.wrap(L(iv.words[0], iv.words[1]), CW).forEach(function(t){ k.txt(t, P, y); y += 38; });
+  k.brk(y);
+  /* signatures */
+  y += 90;
+  k.rect(P, y, 300, 2, DOC.INK2); k.rect(W - P - 340, y, 340, 2, DOC.INK2);
+  k.font(22); k.txt(L("ग्राहकको हस्ताक्षर","Buyer's signature"), P + 150, y + 32, "center", DOC.MUTE);
+  k.txt(L("आधिकारिक हस्ताक्षर","Authorized signature"), W - P - 170, y + 32, "center", DOC.MUTE);
+  y += 90; k.font(26, "700"); k.txt(L("धन्यवाद!","Thank you!"), W/2, y, "center", DOC.INK2);
+  y += 44; k.font(19, "600");
+  k.txt(L("Ganak (asrayacreate.github.io/ganak) बाट तयार · IRD स्वीकृत billing software होइन",
+          "Prepared with Ganak (asrayacreate.github.io/ganak) · not IRD-approved billing software"), W/2, y, "center", DOC.MUTE);
+  y += 30; k.tape(y); return y + 18;
+}
+
+/* EMI: full month-by-month amortization — 1240px, page breaks between rows */
+function emiStartBs(){ var d = new Date(); return adToBs(d.getFullYear(), d.getMonth()+1, d.getDate()); }
+function emiMonth(b, i){   /* instalment i (1…N) falls in the BS month after today's */
+  if(!b) return ""; var z = b.m - 1 + i;
+  return bsM(z % 12) + " " + npd(b.y + Math.floor(z / 12));
+}
+function amortLay(k, logo){
+  var a = lastOut.amort, W = k.W, P = 70, CW = W - 2*P, y, b = emiStartBs(), tot = a.P + a.ti;
+  k.paper(); k.tape(0); y = 18 + 50;
+  y = k.head(P, y, logo, CW) + 26;
+  k.rule(P, y, CW); y += 3 + 50;
+  k.font(40, "800"); k.txt(L("ऋण भुक्तानी तालिका (EMI)","Loan amortization schedule (EMI)"), P, y); y += 40;
+  k.font(23); k.txt(slipMeta(), P, y, "left", DOC.MUTE); y += 30;
+  /* summary 3 × 2 */
+  var S6 = [[L("ऋण रकम","Loan amount"), rs(a.P)], [L("ब्याज दर (वार्षिक)","Interest (yearly)"), fmt(a.rate,2)+"%"],
+            [L("अवधि","Term"), fmt(a.N,0)+L(" महिना"," months")], [L("मासिक किस्ता","Monthly EMI"), rs(a.emi)],
+            [L("जम्मा ब्याज","Total interest"), rs(a.ti)], [L("जम्मा भुक्तानी","Total payment"), rs(tot)]];
+  var bw = (CW - 2*20) / 3;
+  S6.forEach(function(s, i){
+    var bx = P + (i % 3)*(bw + 20), by = y + 20 + Math.floor(i / 3)*110;
+    k.rect(bx, by, bw, 94, i === 3 ? "rgba(245,179,1,.28)" : "rgba(21,32,42,.05)");
+    k.font(21, "600"); k.txt(s[0], bx + 16, by + 34, "left", DOC.MUTE);
+    k.font(30, "800", true); k.txt(s[1], bx + 16, by + 74, "left");
+  });
+  y += 20 + 2*110 + 10;
+  /* principal vs interest share */
+  var pp = a.P / tot;
+  k.rect(P, y, CW*pp, 26, "#1C5FA8"); k.rect(P + CW*pp, y, CW*(1-pp), 26, "#E07A2E");
+  y += 54; k.font(22, "700");
+  k.txt("■ " + L("साँवा ","Principal ") + fmt(pp*100,1) + "%", P, y, "left", "#1C5FA8");
+  k.txt("■ " + L("ब्याज ","Interest ") + fmt((1-pp)*100,1) + "%", W - P, y, "right", "#C4621C");
+  y += 30;
+  function table(head, ws, rows, sub){
+    var xs = [], xx = P; ws.forEach(function(w){ xs.push(xx); xx += w; });
+    k.brk(y); k.rect(P, y, CW, 50, DOC.INK); k.font(21, "700");
+    head.forEach(function(h, i){ k.txt(h, i ? xs[i] + ws[i] - 12 : xs[i] + 12, y + 33, i ? "right" : "left", "#FFFFFF"); });
+    y += 50;
+    rows.forEach(function(r, ri){
+      k.brk(y);
+      if(r.g){ k.rect(P, y, CW, 40, "rgba(245,179,1,.22)"); k.font(20, "700"); k.txt(r.g, P + 12, y + 28, "left", "#5D4B18"); y += 40; return; }
+      if(ri % 2) k.rect(P, y, CW, 38, "rgba(21,32,42,.035)");
+      k.font(21, "", true);
+      r.forEach(function(c, i){ k.txt(c, i ? xs[i] + ws[i] - 12 : xs[i] + 12, y + 27, i ? "right" : "left", i ? DOC.INK : DOC.MUTE); });
+      y += 38;
+    });
+    k.rect(P, y, CW, 2, DOC.INK); y += 2; k.brk(y);
+  }
+  /* yearly totals */
+  y += 40; k.font(28, "800"); k.txt(L("वर्षअनुसार","Year by year"), P, y); y += 22;
+  var yr = [], yy, seg, gp, gi;
+  for(yy = 0; yy*12 < a.N; yy++){
+    seg = a.items.slice(yy*12, yy*12+12); gp = 0; gi = 0;
+    seg.forEach(function(x){ gp += x.pr; gi += x.ip; });
+    yr.push([L("वर्ष ","Year ") + npd(yy+1), fmt(gp,0), fmt(gi,0), fmt(seg[seg.length-1].bal,0)]);
+  }
+  table([L("वर्ष","Year"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी साँवा","Balance")], [CW*0.25, CW*0.25, CW*0.25, CW*0.25], yr);
+  /* every month */
+  y += 44; k.font(28, "800"); k.txt(L("महिनाअनुसार","Month by month"), P, y); y += 22;
+  var mr = [];
+  a.items.forEach(function(x){
+    if((x.m - 1) % 12 === 0) mr.push({g: L("वर्ष ","Year ") + npd(Math.floor((x.m-1)/12) + 1)});
+    mr.push([npd(x.m) + "  " + emiMonth(b, x.m), fmt(x.pay,0), fmt(x.pr,0), fmt(x.ip,0), fmt(x.bal,0)]);
+  });
+  table([L("किस्ता · महिना","No. · month"), L("किस्ता","EMI"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी","Balance")],
+        [CW*0.32, CW*0.17, CW*0.17, CW*0.17, CW*0.17], mr);
+  y += 40; k.font(21);
+  k.wrap(L("Reducing balance विधि। पहिलो किस्ता अर्को महिना मानिएको; बैंकको service charge/बिमा अलग। अन्तिम किस्ता बाँकी मिलाउन थोरै फरक पर्न सक्छ।",
+           "Reducing-balance method. First instalment assumed next month; bank service charges/insurance are separate. The last instalment adjusts slightly to close the balance."), CW)
+    .forEach(function(t){ k.txt(t, P, y, "left", DOC.MUTE); y += 30; });
+  y += 30; k.font(19, "600"); k.txt("Ganak · asrayacreate.github.io/ganak · PRERAK MULTIPURPOSE PVT LTD", W/2, y, "center", DOC.MUTE);
+  y += 30; k.tape(y); return y + 18;
+}
+
+/* which document for the tool on screen: [width, layout] */
+function docLay(){ return (cur && cur.id === "invoice" && lastOut && lastOut.inv) ? [1240, invoiceLay] : [1080, slipLay]; }
+function docCanvas(done){ var d = docLay(); cvKit(d[0]).run(d[1], done); }
+function slipCanvas(done){ docCanvas(done); }
+
+/* minimal PDF 1.4, no library: each A4 page is its own canvas (layout drawn with the page top shifted up),
+   cut at the nearest safe break above the page end — never through a table row — and stored as a JPEG.
+   Text is exactly what was drawn, Devanagari included. */
+function layToPdf(W, lay, done){
+  var k = cvKit(W), PW = 595.28, PH = 841.89, M = 24, sc = (PW - 2*M) / W, sliceH = Math.floor((PH - 2*M) / sc), pages = [], y = 0;
+  k.logo(function(logo){
+    var H = k.measure(lay, logo), br = k.breaks.slice().sort(function(a, b){ return a - b; });
+    (function next(){
+      if(y >= H - 1){ build(); return; }
+      var end = Math.min(H, y + sliceH);
+      if(end < H){ var ok = br.filter(function(b){ return b > y + sliceH*0.4 && b <= end; }); if(ok.length) end = ok[ok.length-1]; }
+      var c = document.createElement("canvas"); c.width = W; c.height = end - y;
+      k.cv = c; k.ctx = c.getContext("2d"); k.ctx.translate(0, -y); k.y0 = y; k.draw = true; k.breaks = [];
+      lay(k, logo);
+      c.toBlob(function(bl){
+        bl.arrayBuffer().then(function(ab){ pages.push({w:W, h:c.height, d:new Uint8Array(ab)}); y = end; next(); });
+      }, "image/jpeg", 0.9);
+    })();
+  });
+  function build(){
+    var enc = new TextEncoder(), parts = [], off = 0, xr = [], np = pages.length, kids = [], i;
+    function put(s){ var u = (typeof s === "string") ? enc.encode(s) : s; parts.push(u); off += u.length; }
+    function obj(n, s){ xr[n] = off; put(n + " 0 obj\n" + s); }
+    put("%PDF-1.4\n%âãÏÓ\n");
+    for(i = 0; i < np; i++) kids.push((3 + i*3) + " 0 R");
+    obj(1, "<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+    obj(2, "<< /Type /Pages /Kids [" + kids.join(" ") + "] /Count " + np + " >>\nendobj\n");
+    pages.forEach(function(pg, i){
+      var pn = 3 + i*3, w = (pg.w*sc).toFixed(2), h = (pg.h*sc).toFixed(2), cs = "q " + w + " 0 0 " + h + " " + M + " " + (PH - M - pg.h*sc).toFixed(2) + " cm /Im0 Do Q";
+      obj(pn, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + PW + " " + PH + "] /Resources << /XObject << /Im0 " + (pn+1) + " 0 R >> >> /Contents " + (pn+2) + " 0 R >>\nendobj\n");
+      obj(pn+1, "<< /Type /XObject /Subtype /Image /Width " + pg.w + " /Height " + pg.h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + pg.d.length + " >>\nstream\n");
+      put(pg.d); put("\nendstream\nendobj\n");
+      obj(pn+2, "<< /Length " + cs.length + " >>\nstream\n" + cs + "\nendstream\nendobj\n");
+    });
+    var n = 3 + np*3, xo = off, x = "xref\n0 " + n + "\n0000000000 65535 f \n";
+    for(i = 1; i < n; i++) x += ("000000000" + xr[i]).slice(-10) + " 00000 n \n";
+    put(x + "trailer\n<< /Size " + n + " /Root 1 0 R >>\nstartxref\n" + xo + "\n%%EOF\n");
+    done(new Blob(parts, {type:"application/pdf"}));
+  }
+}
+function saveBlob(b, name, msg){
+  var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  toast(msg || L("Download भयो ✓","Downloaded ✓"));
+}
+function docName(ext){
+  var base = (cur && cur.id === "invoice" && lastOut && lastOut.inv) ? "bijak-" + String(lastOut.inv.no || "").replace(/[^\w-]+/g, "") : "ganak-" + (cur ? cur.id : "");
+  return base + "-" + todayISO() + "." + ext;
+}
+function downloadPdf(lay, W, name){
+  if(!cur) return;
+  if(typeof histAdd === "function") histAdd();
+  toast(L("PDF बन्दैछ…","Making the PDF…"));
+  var d = lay ? [W, lay] : docLay();
+  layToPdf(d[0], d[1], function(b){ saveBlob(b, name || docName("pdf"), L("PDF Download भयो ✓ (Downloads)","PDF downloaded ✓ (Downloads)")); });
 }
 function shareImage(){
   if(!cur) return;
-  if(typeof histAdd==="function") histAdd();
-  var name = "ganak-" + cur.id + "-" + todayISO() + ".png", title = S(cur.nm);
-  function save(b){
-    var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
-    toast(L("फोटो save भयो ✓","Image saved ✓"));
-  }
-  slipCanvas(function(cv){
+  if(typeof histAdd === "function") histAdd();
+  var name = docName("png"), title = S(cur.nm);
+  docCanvas(function(cv){
     cv.toBlob(function(b){
       if(!b){ toast(L("फोटो बनेन — PDF प्रयोग गर्नुहोस्","Couldn't make the image — use PDF")); return; }
       var f = null; try{ f = new File([b], name, {type:"image/png"}); }catch(e){}
       try{ gtag('event','image_share'); }catch(e){}
       if(f && navigator.canShare && navigator.canShare({files:[f]})){
-        navigator.share({files:[f], title:title}).catch(function(err){ if(!(err && err.name === "AbortError")) save(b); });
-      } else save(b);
+        navigator.share({files:[f], title:title}).catch(function(err){ if(!(err && err.name === "AbortError")) saveBlob(b, name, L("फोटो save भयो ✓","Image saved ✓")); });
+      } else saveBlob(b, name, L("फोटो save भयो ✓","Image saved ✓"));
     }, "image/png");
+  });
+}
+
+/* EMI: full-screen schedule with downloads */
+function amortCsv(){
+  var a = lastOut && lastOut.amort; if(!a) return;
+  var b = emiStartBs(), L1 = ["#", L("महिना","Month"), "EMI", L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी साँवा","Balance")].join(",");
+  var lines = [L1].concat(a.items.map(function(x){ return [x.m, emiMonth(b, x.m), x.pay.toFixed(2), x.pr.toFixed(2), x.ip.toFixed(2), x.bal.toFixed(2)].join(","); }));
+  if(typeof histAdd === "function") histAdd();
+  saveBlob(new Blob(["﻿" + lines.join("\r\n")], {type:"text/csv"}), "emi-schedule-" + todayISO() + ".csv", L("Excel (CSV) Download भयो ✓","Excel (CSV) downloaded ✓"));
+}
+function openAmort(){
+  var a = lastOut && lastOut.amort; if(!a) return;
+  var b = emiStartBs(), tot = a.P + a.ti, pp = a.P / tot * 100, mx = 0, h = "", yy, seg, gp, gi;
+  a.items.forEach(function(x){ mx = Math.max(mx, x.pay); });
+  var tiles = [[L("ऋण रकम","Loan"), rs(a.P)], [L("ब्याज दर","Rate"), fmt(a.rate,2)+"%"], [L("अवधि","Term"), fmt(a.N,0)+L(" महिना"," months")],
+               [L("मासिक किस्ता","Monthly EMI"), rs(a.emi), 1], [L("जम्मा ब्याज","Total interest"), rs(a.ti)], [L("जम्मा भुक्तानी","Total payment"), rs(tot)]];
+  var yrs = "";
+  for(yy = 0; yy*12 < a.N; yy++){
+    seg = a.items.slice(yy*12, yy*12+12); gp = 0; gi = 0;
+    seg.forEach(function(x){ gp += x.pr; gi += x.ip; });
+    yrs += '<tr><td>'+esc(L("वर्ष ","Year ")+npd(yy+1))+'</td><td>'+fmt(gp,0)+'</td><td>'+fmt(gi,0)+'</td><td>'+fmt(seg[seg.length-1].bal,0)+'</td>'
+      + '<td class="azb"><i style="width:'+(gp/(gp+gi)*100).toFixed(1)+'%"></i></td></tr>';
+  }
+  a.items.forEach(function(x){
+    if((x.m - 1) % 12 === 0) h += '<tr class="gr"><td colspan="6">'+esc(L("वर्ष ","Year ")+npd(Math.floor((x.m-1)/12)+1))+'</td></tr>';
+    h += '<tr><td><b>'+npd(x.m)+'</b> <span>'+esc(emiMonth(b, x.m))+'</span></td><td>'+fmt(x.pay,0)+'</td><td>'+fmt(x.pr,0)+'</td><td>'+fmt(x.ip,0)+'</td><td>'+fmt(x.bal,0)+'</td>'
+      + '<td class="azb"><i style="width:'+(x.pr/x.pay*100).toFixed(1)+'%"></i></td></tr>';
+  });
+  var d = document.createElement("div");
+  d.className = "pdfview azv"; d.id = "pdfview";
+  d.innerHTML = '<div class="pdfbar">'
+    + '<button class="pp" id="azPdf">⬇️ PDF</button><button id="azCsv">⬇️ Excel</button>'
+    + '<button class="px" id="azX" aria-label="Close">✕</button></div>'
+    + '<div class="azsheet"><div class="azh">📊 '+esc(L("ऋण भुक्तानी तालिका","Amortization schedule"))+'</div>'
+    + '<div class="azt">'+tiles.map(function(t){ return '<div'+(t[2]?' class="on"':'')+'><span>'+esc(t[0])+'</span><b>'+esc(t[1])+'</b></div>'; }).join("")+'</div>'
+    + '<div class="azsplit"><i style="width:'+pp.toFixed(1)+'%"></i></div>'
+    + '<div class="azleg"><span class="p">■ '+esc(L("साँवा ","Principal "))+fmt(pp,1)+'%</span><span class="i">■ '+esc(L("ब्याज ","Interest "))+fmt(100-pp,1)+'%</span></div>'
+    + '<div class="azs">'+esc(L("वर्षअनुसार","Year by year"))+'</div>'
+    + '<div class="aztw"><table><thead><tr><th>'+esc(L("वर्ष","Year"))+'</th><th>'+esc(L("साँवा","Principal"))+'</th><th>'+esc(L("ब्याज","Interest"))+'</th><th>'+esc(L("बाँकी","Balance"))+'</th><th></th></tr></thead><tbody>'+yrs+'</tbody></table></div>'
+    + '<div class="azs">'+esc(L("महिनाअनुसार","Month by month"))+' <em>'+esc(L("(पहिलो किस्ता अर्को महिना मानिएको)","(first instalment assumed next month)"))+'</em></div>'
+    + '<div class="aztw m"><table><thead><tr><th>'+esc(L("किस्ता · महिना","No. · month"))+'</th><th>EMI</th><th>'+esc(L("साँवा","Principal"))+'</th><th>'+esc(L("ब्याज","Interest"))+'</th><th>'+esc(L("बाँकी","Balance"))+'</th><th></th></tr></thead><tbody>'+h+'</tbody></table></div>'
+    + '</div>';
+  document.body.appendChild(d);
+  function close(){ d.remove(); document.removeEventListener("keydown", esc3); }
+  function esc3(e){ if(e.key === "Escape") close(); }
+  document.addEventListener("keydown", esc3);
+  d.addEventListener("click", function(e){
+    if(e.target === d || e.target.closest("#azX")){ close(); return; }
+    if(e.target.closest("#azPdf")){ downloadPdf(amortLay, 1240, "emi-schedule-" + todayISO() + ".pdf"); return; }
+    if(e.target.closest("#azCsv")){ amortCsv(); return; }
   });
 }
 
