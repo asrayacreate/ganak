@@ -1,4 +1,4 @@
-GANAK v6.8 — LIVE गर्ने अन्तिम निर्देशन
+GANAK v6.9 — LIVE गर्ने अन्तिम निर्देशन
 =========================================
 यो folder हुबहु host गर्नुहोस् (HTTPS अनिवार्य)।
 
@@ -20,7 +20,7 @@ GANAK v6.8 — LIVE गर्ने अन्तिम निर्देशन
     → सबै ⚠️ नमुना-दर warning हट्छ
   - Settings → Profile मा नाम/व्यवसाय/logo save गर्नुहोस्
 
-भर्सन: v6.8 · cache ganak-v6-8 · 52 tools · पूर्ण offline
+भर्सन: v6.9 · cache ganak-v6-9 · 52 tools · पूर्ण offline
 (index.html बदलेपछि app खोल्दा नयाँ version आफैं आउँछ — दोस्रो पटक खोल्दा देखिन्छ।)
 
 
