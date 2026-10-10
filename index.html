@@ -935,6 +935,19 @@ var U = {
 };
 function rsPer(x){ return [ "रु/"+x, "Rs/"+x ]; }
 
+/* ---- v6.6 tool data (sources in each tool's note) ---- */
+/* litres per unit — NIST SP 811 App. B (SI/US/UK, from 1 in = 2.54 cm); पाथी 4.546 L = 8 माना, मुरी = 20 पाथी (Documenta Nepalica) */
+var VOL_L = [ ["m3",["घन मिटर","Cubic metre"],"cu.m",1000], ["l",["लिटर","Litre"],"L",1], ["ml",["मिलिलिटर","Millilitre"],"ml",0.001],
+  ["cft",["घन फिट","Cubic foot"],"cu.ft",28.316846592], ["cin",["घन इन्च","Cubic inch"],"cu.in",0.016387064], ["cyd",["घन गज","Cubic yard"],"cu.yd",764.554857984],
+  ["gus",["US gallon","US gallon"],"gal (US)",3.785411784], ["guk",["UK gallon","UK gallon"],"gal (UK)",4.54609],
+  ["mana",["माना","Mana"],["माना","mana"],4.546/8], ["pathi",["पाथी","Pathi"],["पाथी","pathi"],4.546], ["muri",["मुरी","Muri"],["मुरी","muri"],4.546*20] ];
+/* nominal mix parts + water litres per 50 kg bag: IS 456 Table 9 (M10 34, M15 32, M20 30 L); M25 at w/c 0.50 (Table 5) */
+var MIX = { M10:[1,3,6,34], M15:[1,2,4,32], M20:[1,1.5,3,30], M25:[1,1,2,25] };
+/* NEA domestic single phase: slab size, label, Settings rate key (0–20 key depends on meter); service charge by meter × slab */
+var NEA_SL = [ [20,"०–२०","0–20",""], [10,"२१–३०","21–30","e21"], [20,"३१–५०","31–50","e31"], [100,"५१–१५०","51–150","e51"], [100,"१५१–२५०","151–250","e51"], [Infinity,"२५१+","251+","e251"] ];
+var NEA_SC = { "5":[30,50,50,75,100,150], "15":[50,75,75,100,125,175], "30":[75,100,100,125,150,200], "60":[125,125,125,150,200,250] };
+function sigFmt(x){ var a = Math.abs(x); return fmt(x, a>=1000 ? 2 : a>=1 ? 4 : a>=0.001 ? 6 : 9); }
+
 var TOOLS = [
 
 /* ---------------- 1. सिसा / झ्याल ---------------- */
@@ -2333,6 +2346,174 @@ var TOOLS = [
               rows:trows },
       note:["दर "+S(FX_DATE)+" को अनुमानित हो। माथिको “दर” बक्समा आजको दर हालेर ठ्याक्कै हिसाब गर्न सकिन्छ। भारतीय रुपैयाँ नेपाल राष्ट्र बैंकको स्थिर दर १ INR = १.६० NPR मा चल्छ।",
             "Rates are approximate as of "+S(FX_DATE)+". Type today's rate in the “Rate” box for an exact figure. The Indian rupee is pegged by Nepal Rastra Bank at 1 INR = 1.60 NPR."] };
+  }},
+
+/* ---------------- आयतन Converter (v6.6) ---------------- */
+{ id:"vol", cat:"util", ic:"🧊", neu:true,
+  nm:["आयतन Converter","Volume Converter"],
+  sb:["लिटर ↔ घन फिट ↔ gallon ↔ पाथी","Litre ↔ cu.ft ↔ gallon ↔ pathi"],
+  kw:"volume aayatan litre liter cubic feet cft cum cubic metre gallon pathi mana muri tank ghan",
+  ex:["१०० घन फिट → लिटर, घन मिटर, gallon, पाथी","100 cu.ft → litres, cu.m, gallons, pathi"],
+  f:[ {k:"v",l:["आयतन","Volume"],d:100,w:1},
+      {k:"u",l:["एकाइ","Unit"],t:"s",d:"cft",o:VOL_L.map(function(x){ return [x[0],x[1]]; }),w:1} ],
+  calc:function(v){
+    var val = n(v.v), unit = VOL_L.filter(function(x){ return x[0]===v.u; })[0] || VOL_L[1];
+    if(val<=0) return {err:["आयतन हाल्नुहोस्।","Enter a volume."]};
+    var lit = val*unit[3], rows = VOL_L.map(function(x){
+      return row(x[1], sigFmt(lit/x[3]), x[2], /^(ml|cin|cyd|guk|mana|muri)$/.test(x[0]) ? "sub" : "");
+    });
+    rows.push(row(["लिटरमा","In litres"], sigFmt(lit), U.lit, "big"));
+    return { rows:rows,
+      note:["१ घन फिट = २८.३१७ लिटर · १ घन मिटर = १,००० लिटर · US gallon = ३.७८५ L · UK gallon = ४.५४६ L (NIST SP 811)। १ पाथी ≈ ४.५४६ L = ८ माना, १ मुरी = २० पाथी — परम्परागत नाप, ठाउँअनुसार केही फरक हुन सक्छ।",
+            "1 cu.ft = 28.317 L · 1 cu.m = 1,000 L · US gallon = 3.785 L · UK gallon = 4.546 L (NIST SP 811). 1 pathi ≈ 4.546 L = 8 mana, 1 muri = 20 pathi — traditional units that vary a little by place."] };
+  }},
+
+/* ---------------- तापक्रम Converter (v6.6) ---------------- */
+{ id:"temp", cat:"util", ic:"🌡️", neu:true,
+  nm:["तापक्रम Converter","Temperature Converter"],
+  sb:["°C ↔ °F ↔ K","°C ↔ °F ↔ K"],
+  kw:"temperature tapkram celsius fahrenheit kelvin degree jwaro fever thermometer garmi jado",
+  ex:["ज्वरो 101 °F → °C कति?","Fever of 101 °F → how many °C?"],
+  f:[ {k:"v",l:["तापक्रम","Temperature"],d:101,w:1},
+      {k:"u",l:["एकाइ","Unit"],t:"s",d:"F",o:[["C",["सेल्सियस (°C)","Celsius (°C)"]],["F",["फरेनहाइट (°F)","Fahrenheit (°F)"]],["K",["केल्भिन (K)","Kelvin (K)"]]],w:1} ],
+  calc:function(v){
+    if(String(v.v).trim()==="" || !isFinite(parseFloat(v.v))) return {err:["तापक्रम हाल्नुहोस्।","Enter a temperature."]};
+    var x = n(v.v), c = (v.u==="F") ? (x-32)/1.8 : (v.u==="K") ? x-273.15 : x;
+    if(c < -273.15 - 1e-9) return {err:["परम शून्य (० K = −२७३.१५ °C) भन्दा चिसो हुँदैन।","Nothing is colder than absolute zero (0 K = −273.15 °C)."]};
+    var f = c*1.8 + 32, k = c + 273.15, big = (v.u==="C") ? row(["फरेनहाइटमा","In Fahrenheit"], fmt(f,2), "°F", "big") : row(["सेल्सियसमा","In Celsius"], fmt(c,2), "°C", "big");
+    return { rows:[
+      row(["सेल्सियस","Celsius"], fmt(c,2), "°C"),
+      row(["फरेनहाइट","Fahrenheit"], fmt(f,2), "°F"),
+      row(["केल्भिन","Kelvin"], fmt(k,2), "K", "sub"), big ],
+      note:["°F = °C × १.८ + ३२ · °C = (°F − ३२) ÷ १.८ · K = °C + २७३.१५ (NIST SP 811)।",
+            "°F = °C × 1.8 + 32 · °C = (°F − 32) ÷ 1.8 · K = °C + 273.15 (NIST SP 811)."] };
+  }},
+
+/* ---------------- कंक्रिट मिक्स अनुपात (v6.6) ---------------- */
+{ id:"mix", cat:"con", ic:"🧪", neu:true,
+  nm:["कंक्रिट मिक्स अनुपात","Concrete Mix Ratio"],
+  sb:["M10–M25 → बोरा, बालुवा, गिट्टी, पानी","M10–M25 → bags, sand, aggregate, water"],
+  kw:"concrete mix ratio grade m10 m15 m20 m25 nominal cement bag sand aggregate gitti balauwa pani water pcc rcc dhalan",
+  ex:["२ घन मिटर M20 (1:1.5:3) → सिमेन्ट, बालुवा, गिट्टी, पानी र लागत","2 cu.m of M20 (1:1.5:3) → cement, sand, aggregate, water and cost"],
+  f:[ {k:"g",l:["ग्रेड (grade)","Grade"],t:"s",d:"M20",o:[["M10",["M10 — 1:3:6 (PCC, जगको सोलिङ)","M10 — 1:3:6 (PCC, footing base)"]],["M15",["M15 — 1:2:4","M15 — 1:2:4"]],["M20",["M20 — 1:1.5:3 (slab, beam, column)","M20 — 1:1.5:3 (slab, beam, column)"]],["M25",["M25 — 1:1:2","M25 — 1:1:2"]]]},
+      {k:"vu",l:["आयतनको एकाइ","Volume unit"],t:"s",d:"m3",o:[["m3",["घन मिटर (cu.m)","Cubic metre"]],["cft",["घन फिट (cu.ft)","Cubic feet"]]],w:1},
+      {k:"v",l:["कंक्रिटको आयतन (wet)","Concrete volume (wet)"],d:2,w:1},
+      {k:"cr",l:["सिमेन्ट दर","Cement rate"],u:["रु/बोरा","Rs/bag"],d:750,w:1,exrate:true,rk:"cement"},
+      {k:"sr",l:["बालुवा दर","Sand rate"],u:["रु/cu.ft","Rs/cu.ft"],d:65,w:1,exrate:true,rk:"sand"},
+      {k:"ar",l:["गिट्टी दर","Aggregate rate"],u:["रु/cu.ft","Rs/cu.ft"],d:70,w:1,exrate:true,rk:"agg"} ],
+  calc:function(v){
+    var M = MIX[v.g] || MIX.M20, wet = n(v.v)*((v.vu==="cft") ? CFT_M3 : 1);
+    if(wet<=0) return {err:["कंक्रिटको आयतन हाल्नुहोस्।","Enter the concrete volume."]};
+    var sum = M[0]+M[1]+M[2], dry = wet*1.54, bags = dry*M[0]/sum/0.0347, nb = ceil(bags);
+    var sand = dry*M[1]/sum, agg = dry*M[2]/sum, water = bags*M[3];
+    var cost = nb*n(v.cr) + sand/CFT_M3*n(v.sr) + agg/CFT_M3*n(v.ar);
+    return { rows:[
+      row(["ग्रेड / अनुपात","Grade / ratio"], v.g+" — "+M[0]+" : "+M[1]+" : "+M[2], ""),
+      row(["कंक्रिट (wet)","Concrete (wet)"], fmt(wet,3)+" cu.m = "+fmt(wet/CFT_M3,2), U.cuft),
+      row(["सुख्खा आयतन (× १.५४)","Dry volume (× 1.54)"], fmt(dry,3), U.cum, "sub"),
+      row(["सिमेन्ट","Cement"], fmt(nb,0)+L(" बोरा ("," bags (")+fmt(bags,2)+")", "50kg"),
+      row(["प्रति घन मिटर सिमेन्ट","Cement per cu.m"], fmt(bags/wet,2)+L(" बोरा"," bags"), "", "sub"),
+      row(["बालुवा","Sand"], fmt(sand/CFT_M3,2)+" cu.ft = "+fmt(sand,3), U.cum),
+      row(["गिट्टी","Aggregate"], fmt(agg/CFT_M3,2)+" cu.ft = "+fmt(agg,3), U.cum),
+      row(["पानी (w/c "+fmt(M[3]/50,2)+")","Water (w/c "+fmt(M[3]/50,2)+")"], fmt(water,0), U.lit),
+      row(["सामग्रीको अनुमानित लागत","Est. material cost"], rs(cost), "", "big") ],
+      note:["IS 456 नमुना (nominal) मिक्स: M10 1:3:6, M15 1:2:4, M20 1:1.5:3; M25 1:1:2 साइटको चलन (M25 माथि design mix — IS 10262)। Dry factor १.५४; १ बोरा = ५० kg = ०.०३४७ cu.m। पानी: IS 456 Table 9 — प्रति बोरा M10 ३४, M15 ३२, M20 ३० लिटर; M25 w/c ०.५० (Table 5)। Engineer को drawing नै अन्तिम हो।",
+            "IS 456 nominal mixes: M10 1:3:6, M15 1:2:4, M20 1:1.5:3; M25 1:1:2 is site practice (use a design mix — IS 10262 — above M25). Dry factor 1.54; 1 bag = 50 kg = 0.0347 cu.m. Water: IS 456 Table 9 — per bag M10 34, M15 32, M20 30 L; M25 at w/c 0.50 (Table 5). The engineer's drawing is final."] };
+  }},
+
+/* ---------------- बिजुली बिल — NEA (v6.6) ---------------- */
+{ id:"elec", cat:"util", ic:"⚡", neu:true,
+  nm:["बिजुली बिल (NEA)","Electricity Bill (NEA)"],
+  sb:["युनिट → slab अनुसार बिल — १ र ३ फेज","Units → slab-wise bill — 1 & 3 phase"],
+  kw:"electricity bijuli bill nea unit meter ampere 5a 15a 30a 60a three phase tariff mahasul batti",
+  ex:["१५A मिटर, महिनाको १२० युनिट → बिल कति?","15A meter, 120 units a month → how much?"],
+  f:[ {k:"ph",l:["फेज","Phase"],t:"s",d:"1",o:[["1",["सिंगल फेज (घरायसी)","Single phase (domestic)"]],["3",["थ्री फेज (घरायसी, 400 V)","Three phase (domestic, 400 V)"]]],w:1},
+      {k:"amp",l:["मिटर","Meter"],t:"s",d:"15",o:[["5",["५ एम्पियर","5 ampere"]],["15",["१५ एम्पियर","15 ampere"]],["30",["३० एम्पियर","30 ampere"]],["60",["६० एम्पियर","60 ampere"]]],w:1,sif:function(v){return v.ph!=="3";}},
+      {k:"kv",l:["क्षमता","Capacity"],t:"s",d:"lo",o:[["lo",["१० kVA सम्म","Up to 10 kVA"]],["hi",["१० kVA भन्दा माथि","Above 10 kVA"]]],w:1,sif:function(v){return v.ph==="3";}},
+      {k:"se",l:["महिना","Season"],t:"s",d:"w",o:[["w",["असार–कात्तिक","Asar–Kartik"]],["d",["मंसिर–जेठ","Mangsir–Jestha"]]],w:1,sif:function(v){return v.ph==="3";}},
+      {k:"m",l:["खपत कसरी?","Consumption from"],t:"s",d:"u",o:[["u",["युनिट सिधै","Units directly"]],["r",["मिटर reading (अघिल्लो → अहिले)","Meter readings (previous → now)"]]]},
+      {k:"u",l:["महिनाको खपत","Units this month"],u:U.unit,d:120,sif:function(v){return v.m!=="r";}},
+      {k:"r1",l:["अघिल्लो reading","Previous reading"],d:4520,w:1,sif:function(v){return v.m==="r";}},
+      {k:"r2",l:["अहिलेको reading","Current reading"],d:4640,w:1,sif:function(v){return v.m==="r";}},
+      {k:"vt",l:["VAT","VAT"],t:"s",d:"5",o:[["5",["५% — ५० युनिटमाथिको महसुलमा","5% — on charges above 50 units"]],["0",["छैन","None"]]]} ],
+  calc:function(v){
+    var u = (v.m==="r") ? n(v.r2)-n(v.r1) : n(v.u);
+    if(v.m==="r" && n(v.r2) < n(v.r1)) return {err:["अहिलेको reading अघिल्लो भन्दा कम छ।","The current reading is below the previous one."]};
+    if(u<=0) return {err:["खपत (युनिट) हाल्नुहोस्।","Enter the units consumed."]};
+    var rows = [ row(["महिनाको खपत","Units consumed"], fmt(u,2), U.unit) ], energy = 0, vatBase = 0, sc, keys;
+    if(v.ph==="3"){
+      var rk3 = (v.se==="d") ? "e3d" : "e3w", r3 = RATES[rk3];
+      keys = [rk3]; energy = u*r3; vatBase = Math.max(0, u-50)*r3; sc = (v.kv==="hi") ? 1800 : 1100;
+      rows.push(row([fmt(u,2)+" युनिट × रु "+fmt(r3,2), fmt(u,2)+" units × Rs "+fmt(r3,2)], rs(energy), "", "sub"));
+    } else {
+      var amp = NEA_SC[v.amp] ? v.amp : "15", left = u, from = 0;
+      keys = ["e"+amp,"e21","e31","e51","e251"];
+      NEA_SL.forEach(function(sl, i){
+        if(left <= 0) return;
+        var q = Math.min(left, sl[0]), rt = RATES[sl[3] || ("e"+amp)];
+        if(i===0 && amp==="5" && u<=20) rt = 0;                 /* 5A: up to 20 units — no energy charge */
+        var amt = q*rt; energy += amt;
+        if(from+q > 50) vatBase += (from+q - Math.max(from,50))*rt;
+        rows.push(row([sl[1]+" युनिट: "+fmt(q,2)+" × रु "+fmt(rt,2), sl[2]+" units: "+fmt(q,2)+" × Rs "+fmt(rt,2)], rs(amt), "", "sub"));
+        left -= q; from += q;
+      });
+      sc = NEA_SC[amp][u<=20 ? 0 : u<=30 ? 1 : u<=50 ? 2 : u<=150 ? 3 : u<=250 ? 4 : 5];
+    }
+    var vat = (v.vt==="5") ? vatBase*0.05 : 0, tot = energy + sc + vat;
+    rows.push(row(["ऊर्जा शुल्क","Energy charge"], rs(energy), ""));
+    rows.push(row(["सेवा शुल्क","Service charge"], rs(sc), ""));
+    if(vat > 0) rows.push(row(["VAT ५% (५० युनिटमाथि)","VAT 5% (above 50 units)"], rs(vat), "", "sub"));
+    if(!allRatesOk(keys)) rows.push(row(["⚠️ नमुना दर — Settings मा NEA दर Save गर्नुहोस्","⚠️ Example rates — save NEA rates in Settings"], "⚙", "", "sub"));
+    rows.push(row(["जम्मा बिल","Total bill"], rs(tot), "", "big"));
+    rows.push(row(["औसत प्रति युनिट","Average per unit"], rs(tot/u), "", "sub"));
+    return { rows:rows,
+      note:["NEA घरायसी महसुल: ऊर्जा शुल्क slab-slab जोडिन्छ; सेवा शुल्क मिटर र जम्मा खपतको slab अनुसार एउटा। ५A मा २० युनिटसम्म ऊर्जा शुल्क लाग्दैन, २० नाघे पहिलो २० युनिट रु ३ मा। ३ फेज (400 V): सेवा शुल्क रु १,१०० (१० kVA सम्म) / १,८०० (माथि)। VAT ५% (२०८३/८४ बजेट, ५० युनिटमाथि) — असोज २०८३ मा हटाउने सहमति भएको छ, हटेपछि 'छैन' रोज्नुहोस्। दर Settings मा मिलाउनुहोस्; ठ्याक्कै बिलका लागि NEA को बिल हेर्नुहोस्।",
+            "NEA domestic tariff: energy is charged slab by slab; one service charge by meter size and total-consumption slab. 5A: no energy charge up to 20 units; above 20, the first 20 units are Rs 3. Three phase (400 V): service charge Rs 1,100 (up to 10 kVA) / 1,800 (above). 5% VAT (budget 2083/84, above 50 units) — removal was agreed in Asoj 2083; pick 'None' once it is gone. Set rates in Settings; your NEA bill is final."] };
+  }},
+
+/* ---------------- सुन / गहना मूल्य (v6.6) ---------------- */
+{ id:"gold", cat:"np", ic:"💍", neu:true,
+  nm:["सुन / गहना मूल्य","Gold / Jewellery Price"],
+  sb:["तोला–आना–लाल, karat, ज्याला, जर्ती, VAT","Tola–aana–laal, karat, making, wastage, VAT"],
+  kw:"gold jewellery jewelry gahana sun chandi silver tola lal laal aana karat 24k 22k 18k tejabi chhapawal jyala jarti making wastage vat price mulya",
+  ex:["१ तोला ४ आना 22K गहना, ज्याला १०%","1 tola 4 aana of 22K jewellery, 10% making"],
+  f:[ {k:"wm",l:["तौल कसरी?","Weight in"],t:"s",d:"tl",o:[["tl",["तोला–आना–लाल","Tola–aana–laal"]],["g",["ग्राम","Grams"]]],w:1},
+      {k:"pu",l:["धातु / शुद्धता","Metal / purity"],t:"s",d:"22",o:[["24",["छापावाल सुन (24K, 99.9%)","Fine gold (24K, 99.9%)"]],["tj",["तेजाबी सुन","Tejabi gold"]],["22",["22K गहना (91.67%)","22K jewellery (91.67%)"]],["18",["18K गहना (75%)","18K jewellery (75%)"]],["ag",["चाँदी","Silver"]]],w:1},
+      {k:"t",l:["तोला","Tola"],d:1,w:1,sif:function(v){return v.wm!=="g";}},
+      {k:"a",l:["आना","Aana"],d:4,w:1,sif:function(v){return v.wm!=="g";}},
+      {k:"l",l:["लाल","Laal"],d:0,w:1,sif:function(v){return v.wm!=="g";}},
+      {k:"g",l:["तौल","Weight"],u:"g",d:10,w:1,sif:function(v){return v.wm==="g";}},
+      {k:"gr",l:["छापावाल सुन दर (प्रति तोला)","Fine gold rate (per tola)"],u:["रु","Rs"],d:295700,exrate:true,rk:"gold",sif:function(v){return /^(24|22|18)$/.test(v.pu);}},
+      {k:"tr",l:["तेजाबी सुन दर (प्रति तोला)","Tejabi gold rate (per tola)"],u:["रु","Rs"],d:291200,exrate:true,rk:"tejabi",sif:function(v){return v.pu==="tj";}},
+      {k:"sr",l:["चाँदी दर (प्रति तोला)","Silver rate (per tola)"],u:["रु","Rs"],d:4400,exrate:true,rk:"silver",sif:function(v){return v.pu==="ag";}},
+      {k:"mm",l:["ज्याला कसरी?","Making charge as"],t:"s",d:"pc",o:[["pc",["धातु मूल्यको %","% of metal value"]],["pt",["प्रति तोला रु","Rs per tola"]],["fx",["एकमुष्ट रु","Fixed Rs"]]],w:1},
+      {k:"mv",l:["ज्याला (making)","Making charge"],d:10,w:1},
+      {k:"jt",l:["जर्ती (wastage)","Jarti (wastage)"],u:U.pct,d:0,w:1},
+      {k:"vt",l:["VAT","VAT"],t:"s",d:"n",o:[["n",["सादा गहना — VAT छैन","Plain jewellery — no VAT"]],["mk",["ज्याला + जर्तीमा १३%","13% on making + jarti"]],["all",["पत्थरजडित — पूरै बिलमा १३%","Stone-studded — 13% on the whole bill"]]],w:1} ],
+  calc:function(v){
+    var g = (v.wm==="g") ? n(v.g) : n(v.t)*TOLA_G + n(v.a)*TOLA_G/16 + n(v.l)*TOLA_G/100;
+    if(g<=0) return {err:["तौल हाल्नुहोस्।","Enter the weight."]};
+    var pu = v.pu, rate = (pu==="ag") ? n(v.sr) : (pu==="tj") ? n(v.tr) : n(v.gr), fac = /^(22|18)$/.test(pu) ? n(pu)/24 : 1;
+    if(rate<=0) return {err:["दर (प्रति तोला) हाल्नुहोस्।","Enter the rate per tola."]};
+    var tola = g/TOLA_G, tl = Math.round(g/(TOLA_G/100)*100)/100, t = Math.floor(tl/100 + 1e-9), rl = Math.max(0, Math.round((tl - t*100)*100)/100);
+    var a = Math.floor(rl/6.25 + 1e-9), l = Math.max(0, Math.round((rl - a*6.25)*100)/100);
+    var eff = rate*fac, metal = tola*eff, jarti = metal*n(v.jt)/100;
+    var mk = (v.mm==="pt") ? tola*n(v.mv) : (v.mm==="fx") ? n(v.mv) : metal*n(v.mv)/100;
+    var sub = metal + jarti + mk, vat = (v.vt==="all") ? sub*0.13 : (v.vt==="mk") ? (mk + jarti)*0.13 : 0, tot = sub + vat;
+    var pl = { "24":["छापावाल 24K","Fine 24K"], tj:["तेजाबी","Tejabi"], "22":["22K = छापावाल × २२/२४","22K = fine × 22/24"], "18":["18K = छापावाल × १८/२४","18K = fine × 18/24"], ag:["चाँदी","Silver"] }[pu] || ["",""];
+    var rows = [
+      row(["तौल","Weight"], fmt(g,3)+" g = "+fmt(tola,4), ["तोला","tola"]),
+      row(["तोला–आना–लाल","Tola–aana–laal"], fmt(t,0)+" – "+fmt(a,0)+" – "+fmt(l,2)+"  ("+fmt(t,0)+L(" तोला "," tola ")+fmt(rl,2)+L(" लाल)"," laal)"), "", "sub"),
+      row([pl[0]+" — दर प्रति तोला", pl[1]+" — rate per tola"], rs(eff), "", "sub"),
+      row(["धातुको मूल्य","Metal value"], rs(metal), "") ];
+    if(jarti > 0) rows.push(row(["जर्ती ("+fmt(n(v.jt),2)+"%)","Jarti ("+fmt(n(v.jt),2)+"%)"], rs(jarti), ""));
+    if(mk > 0) rows.push(row(["ज्याला (making)","Making charge"], rs(mk), ""));
+    if(vat > 0) rows.push(row([(v.vt==="all") ? "VAT १३% (पूरै बिल)" : "VAT १३% (ज्याला + जर्ती)", (v.vt==="all") ? "VAT 13% (whole bill)" : "VAT 13% (making + jarti)"], rs(vat), "", "sub"));
+    rows.push(row(["जम्मा मूल्य","Total price"], rs(tot), "", "big"));
+    rows.push(row(["प्रति ग्राम","Per gram"], rs(tot/g), "", "sub"));
+    return { rows:rows,
+      note:["१ तोला = ११.६६३८ ग्राम = १६ आना = १०० लाल। Karat = २४ भागमा सुनको भाग: 22K = ९१.६७%, 18K = ७५%। बजेट २०८२/८३ ले पत्थरजडित गहनामा १३% VAT लगायो; सादा सुनको गहनामा लागेको २% विलासिता शुल्क २०८३ मा हटाइएको छ। ज्याला/जर्ती पसलअनुसार फरक — बिलमा छुट्टाछुट्टै माग्नुहोस्। दर FENEGOSIDA को दैनिक दर हेरेर Settings मा राख्नुहोस्।",
+            "1 tola = 11.6638 g = 16 aana = 100 laal. Karat = parts of gold in 24: 22K = 91.67%, 18K = 75%. Budget 2082/83 put 13% VAT on stone-studded jewellery; the 2% luxury fee on plain gold jewellery was removed in 2083. Making and jarti vary by shop — ask for them itemised on the bill. Keep the rate in Settings from FENEGOSIDA's daily rate."] };
   }}
 
 ];
@@ -2420,7 +2601,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.6 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -2466,7 +2647,12 @@ calc:["दैनिक हिसाबको calculator — १३% VAT एक �
 tola:["सुन–चाँदीको तोला ↔ ग्राम र आजको दरमा मूल्य।","Gold and silver tola ↔ gram, valued at your rate."],
 emi:["ऋणको मासिक किस्ता (EMI) र पूरा महिना-महिनाको तालिका।","Monthly loan instalment with the full month-by-month schedule."],
 conv:["फिट, मिटर, इन्च र वर्ग एकाइहरू बीचको छिटो रूपान्तरण।","Quick conversion between feet, metres, inches and square units."],
-fx:["NPR र विदेशी मुद्रा — आफ्नै दर हालेर दुवैतिर बदल्नुहोस्।","NPR ↔ foreign currency, both ways at your own rate."]
+fx:["NPR र विदेशी मुद्रा — आफ्नै दर हालेर दुवैतिर बदल्नुहोस्।","NPR ↔ foreign currency, both ways at your own rate."],
+vol:["लिटर, घन मिटर, घन फिट, gallon र पाथी–माना–मुरीबीच आयतन बदल्ने।","Volume between litres, cubic metres, cubic feet, gallons and pathi–mana–muri."],
+temp:["सेल्सियस, फरेनहाइट र केल्भिनबीच तापक्रम — ज्वरो नाप्दा पनि।","Temperature between Celsius, Fahrenheit and Kelvin — handy for fever readings too."],
+mix:["M10–M25 ग्रेडको कंक्रिटमा सिमेन्ट बोरा, बालुवा, गिट्टी, पानी र लागत — घन मिटर वा घन फिटबाट।","Cement bags, sand, aggregate, water and cost for M10–M25 concrete, from cu.m or cu.ft."],
+elec:["NEA को slab अनुसार बिजुलीको बिल — ५/१५/३०/६० एम्पियर र थ्री फेज, सेवा शुल्क र VAT सहित।","NEA slab-wise electricity bill — 5/15/30/60 A and three phase, with service charge and VAT."],
+gold:["सुन/चाँदीको गहनाको मूल्य — तोला–आना–लाल, karat, ज्याला, जर्ती र VAT सहित।","Gold/silver jewellery price — tola–aana–laal, karat, making, jarti and VAT."]
 };
 var ROMAN = {
 dhalan:"dhalan slab concrete rcc chhat casting",
@@ -2504,7 +2690,12 @@ calc:"calculator hisab vat karobar",
 tola:"tola gram sun chandi gold silver gahana",
 emi:"emi kista loan rin byaj bank finance",
 conv:"feet meter inch lambai converter unit metre",
-fx:"currency dollar mudra videshi rate exchange"
+fx:"currency dollar mudra videshi rate exchange",
+vol:"aayatan volume litre liter ghan feet cft gallon pathi mana muri",
+temp:"tapkram temperature celsius fahrenheit kelvin jwaro degree",
+mix:"concrete mix ratio grade m20 m25 cement bora balua gitti pani dhalan",
+elec:"bijuli bill nea batti unit meter ampere mahasul electricity",
+gold:"sun gahana gold jewellery tola lal aana karat jyala jarti chandi"
 };
 function printHead(){
   var biz=(typeof PROF!=="undefined"&&PROF.biz)?PROF.biz:"PRERAK MULTIPURPOSE";
@@ -2575,6 +2766,11 @@ timber:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circl
   emi:'<path d="M3.5 8.5L12 4l8.5 4.5"/><line x1="5.5" y1="11" x2="5.5" y2="17"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/><line x1="18.5" y1="11" x2="18.5" y2="17"/><line x1="3.5" y1="20" x2="20.5" y2="20"/><circle cx="12" cy="7" r="1.3" fill="#F5B301" stroke="none"/>',
   conv:'<rect x="2.5" y="9" width="3" height="7" fill="#F5B301" stroke="none"/><rect x="2.5" y="9" width="19" height="7"/><line x1="5.5" y1="9" x2="5.5" y2="16"/><line x1="9" y1="9" x2="9" y2="12"/><line x1="12.5" y1="9" x2="12.5" y2="13.5"/><line x1="16" y1="9" x2="16" y2="12"/><line x1="19" y1="9" x2="19" y2="12"/>',
   fx:'<path d="M4 8.5h12.5l-3-3"/><path d="M20 15.5H7.5l3 3"/><circle cx="12" cy="12" r="1.8" fill="#F5B301" stroke="none"/>',
+  vol:'<path d="M12 3.5l8 4.5-8 4.5-8-4.5z" fill="#F5B301" stroke="none"/><path d="M12 3.5l8 4.5v8l-8 4.5-8-4.5V8z"/><path d="M4 8l8 4.5L20 8M12 12.5v8"/>',
+  temp:'<path d="M10 4.5a2 2 0 0 1 4 0v9.3a4 4 0 1 1-4 0z"/><circle cx="12" cy="17" r="2" fill="#F5B301" stroke="none"/><path d="M12 9v6" stroke="#F5B301" stroke-width="2"/><path d="M16.5 6.5h2.5M16.5 9.5h2"/>',
+  mix:'<path d="M5 8.5h14l-1.6 11H6.6z"/><path d="M8.5 5.5h7"/><circle cx="9.3" cy="13" r="1.4" fill="#F5B301" stroke="none"/><circle cx="12.6" cy="15.6" r="1.4"/><circle cx="15" cy="12.2" r="1.4"/>',
+  elec:'<path d="M13.5 2.5L5.5 13.5h5.5l-1 8 8-11h-5.5z" fill="#F5B301" stroke="none"/><path d="M13.5 2.5L5.5 13.5h5.5l-1 8 8-11h-5.5z"/>',
+  gold:'<circle cx="12" cy="15" r="5.5"/><path d="M9.3 6.6l1.3-2.6h2.8l1.3 2.6-2.7 3.2z" fill="#F5B301" stroke="none"/><path d="M9.3 6.6l1.3-2.6h2.8l1.3 2.6-2.7 3.2z"/>',
 };
 function icHtml(t){
   var inner = ICONS[t.id];
@@ -2612,7 +2808,7 @@ function renderHome(){
 /* ---------- tool ---------- */
 function visFields(t, v){ return t.f.filter(function(f){ return !f.sif || f.sif(v); }); }
 function fieldHtml(f, val){
-  var warn = (f.exrate && !(typeof RATES_OK!=="undefined" && RATES_OK)) ? '<span class="exrate">'+L("⚠️ नमुना दर","⚠️ example rate")+'</span>' : '';
+  var warn = (f.exrate && !(typeof RATES_OK!=="undefined" && (f.rk ? rateOk(f.rk) : RATES_OK))) ? '<span class="exrate">'+L("⚠️ नमुना दर","⚠️ example rate")+'</span>' : '';
   var lab = '<span class="fl">'+esc(S(f.l))+(f.u ? ' <em>'+esc(S(f.u))+'</em>' : '')+warn+'</span>', inp;
   if(f.t === "s"){
     inp = '<select data-k="'+f.k+'">' + f.o.map(function(o){
@@ -2994,7 +3190,9 @@ function renderDrawer(){
     +'<button class="rembtn" id="pfSave" style="margin-top:8px;width:100%">'+L("प्रोफाइल Save गर्नुहोस् ✓","Save profile ✓")+'</button>'
     +'<div class="dr-sec">'+L("सामग्रीको दर","Material rates")+'</div><div class="rgrid">'
     +RATEDEF.map(function(rd){ return '<label class="rlab">'+esc(S(rd[1]))+'<input class="pfin" data-rk="'+rd[0]+'" type="number" inputmode="decimal" step="any" value="'+RATES[rd[0]]+'"></label>'; }).join('')
-    +'</div><div class="drnote">'+(RATES_OK
+    +'</div>'+RATEGRP.map(function(g){ return '<div class="dr-sec">'+esc(S(g[0]))+'</div><div class="rgrid">'
+      +g[1].map(function(rd){ return '<label class="rlab">'+esc(S(rd[1]))+(rateOk(rd[0])?'':' ⚠️')+'<input class="pfin" data-rk="'+rd[0]+'" type="number" inputmode="decimal" step="any" value="'+RATES[rd[0]]+'"></label>'; }).join('')+'</div>'; }).join('')
+    +'<div class="drnote">'+(allRatesOk()
       ? L("दर तपाईंले मिलाइसक्नुभयो ✓ — बजार बदलिए फेरि यहीँ अपडेट गर्नुहोस्।","You've set your rates ✓ — update here whenever the market changes.")
       : L("⚠️ यी नमुना (example) दर हुन् — आफ्नै बजार दर हालेर तल Save थिच्नुहोस्।","⚠️ These are example rates — enter your own and press Save below."))+'</div>'
     +'<button class="rembtn" id="rtSave" style="margin-top:8px;width:100%">'+L("दर Save गर्नुहोस् ✓","Save rates ✓")+'</button>'
@@ -3086,7 +3284,7 @@ document.getElementById("drawer").addEventListener("click",function(e){
   if(del){ REM.splice(+del.dataset.del,1); saveRem(); renderDrawer(); renderSide(); return; }
   if(e.target.id==="rtSave"){
     document.querySelectorAll("[data-rk]").forEach(function(el){ var rv=parseFloat(el.value); if(rv>0) RATES[el.dataset.rk]=rv; });
-    saveRates(); confirmRates(); applyRateDefaults(true);
+    saveRates(); confirmAllRates(); applyRateDefaults(true);
     if(cur && !cur.custom){ renderFields(); compute(); }
     renderDrawer(); renderHomeHero();
     toast(L("दर save भयो ✓","Rates saved ✓")); return; }
@@ -3124,7 +3322,7 @@ document.getElementById("drawer").addEventListener("input",function(e){
   if(e.target.id==="pfBiz"){ PROF.biz=e.target.value; saveProf(); }
   if(e.target.id==="pfPh"){ PROF.ph=e.target.value; saveProf(); }
   if(e.target.dataset.rk){ var rv=parseFloat(e.target.value); if(rv>0){ RATES[e.target.dataset.rk]=rv; saveRates();
-    if(rv!==RATES_FACTORY[e.target.dataset.rk]) confirmRates();
+    if(rv!==RATES_FACTORY[e.target.dataset.rk]) confirmKey(e.target.dataset.rk);
     applyRateDefaults(true);
     if(cur && !cur.custom){ renderFields(); compute(); } } }
 });
@@ -3141,9 +3339,9 @@ function bizCardHtml(){
     +'</div><button class="bce" id="bizEdit">'+L("सम्पादन","Edit")+'</button></div>';
 }
 function rateNudge(){
-  if(RATES_OK) return "";
+  if(allRatesOk()) return "";
   return '<button class="ratenudge" id="rateNudge">⚠️ '
-    +L("सामग्रीको दर अझै नमुना (example) छ — आफ्नै बजार दर हाल्नुहोस्","Material rates are still examples — set your own market rates")
+    +L("केही दर (सामग्री, सुन, बिजुली) अझै नमुना (example) छन् — आफ्नै बजार दर हाल्नुहोस्","Some rates (materials, gold, electricity) are still examples — set your own market rates")
     +' <b>'+L("मिलाउनुहोस् →","Set now →")+'</b></button>';
 }
 function renderHomeHero(){
@@ -3426,12 +3624,29 @@ var RATES_FACTORY={cement:750,sand:65,agg:70,brick:18,steel:115,glass:950,tile:1
 var RATEDEF=[["cement",["सिमेन्ट (रु/बोरा)","Cement (Rs/bag)"]],["sand",["बालुवा (रु/cu.ft)","Sand (Rs/cu.ft)"]],
   ["agg",["गिट्टी (रु/cu.ft)","Aggregate (Rs/cu.ft)"]],["brick",["इँटा (रु/गोटा)","Brick (Rs/pc)"]],
   ["steel",["रड (रु/kg)","Steel (Rs/kg)"]],["glass",["सिसा (रु/sq.ft)","Glass (Rs/sq.ft)"]],["tile",["Tile (रु/sq.ft)","Tile (Rs/sq.ft)"]]];
+/* v6.6+ market rates, grouped in Settings. Samples: FENEGOSIDA 2026-10-09 (gold/silver), NEA domestic tariff (electricity) */
+var RATEGRP=[
+  [["सुन / चाँदी (रु/तोला)","Gold / silver (Rs/tola)"],[["gold",["छापावाल सुन (24K)","Fine gold (24K)"],295700],["tejabi",["तेजाबी सुन","Tejabi gold"],291200],["silver",["चाँदी","Silver"],4400]]],
+  [["बिजुली — NEA (रु/युनिट)","Electricity — NEA (Rs/unit)"],[["e5",["५A ०–२० (२० नाघेमा)","5A 0–20 (if over 20)"],3],["e15",["१५A ०–२०","15A 0–20"],4],["e30",["३०A ०–२०","30A 0–20"],5],["e60",["६०A ०–२०","60A 0–20"],6],
+    ["e21",["२१–३० युनिट","21–30 units"],6.5],["e31",["३१–५० युनिट","31–50 units"],8],["e51",["५१–२५० युनिट","51–250 units"],9.5],["e251",["२५१+ युनिट","251+ units"],11],
+    ["e3w",["३ फेज असार–कात्तिक","3-phase Asar–Kartik"],10.5],["e3d",["३ फेज मंसिर–जेठ","3-phase Mangsir–Jestha"],11.5]]]
+];
+RATEGRP.forEach(function(g){ g[1].forEach(function(r){ RATES[r[0]]=r[2]; RATES_FACTORY[r[0]]=r[2]; }); });
 try{ var _rr=JSON.parse(localStorage.getItem("ganak_rates")||"{}"); for(var _rk in RATES) if(_rr[_rk]>0) RATES[_rk]=_rr[_rk]; }catch(e){}
 function saveRates(){ try{localStorage.setItem("ganak_rates",JSON.stringify(RATES));}catch(e){} }
 var RATES_OK=false; try{ RATES_OK = localStorage.getItem("ganak_rates_ok")==="1"; }catch(e){}
 /* saved rate differs from factory default => user's own rate; auto-confirm even if flag was lost */
 if(!RATES_OK){ for(var _fk in RATES_FACTORY){ if(RATES[_fk]!==RATES_FACTORY[_fk]){ RATES_OK=true; try{localStorage.setItem("ganak_rates_ok","1");}catch(e){} break; } } }
 function confirmRates(){ RATES_OK=true; try{localStorage.setItem("ganak_rates_ok","1");}catch(e){} }
+/* the original 7 material rates share RATES_OK; every newer rate keeps its own ⚠️ until saved */
+var RATE_OKK={}; try{ RATE_OKK=JSON.parse(localStorage.getItem("ganak_rates_okk")||"{}")||{}; }catch(e){}
+function isV1Rate(k){ return RATEDEF.some(function(r){ return r[0]===k; }); }
+function rateOk(k){ return isV1Rate(k) ? !!RATES_OK : !!RATE_OKK[k]; }
+function saveOkk(){ try{localStorage.setItem("ganak_rates_okk",JSON.stringify(RATE_OKK));}catch(e){} }
+function confirmKey(k){ if(isV1Rate(k)) confirmRates(); else { RATE_OKK[k]=1; saveOkk(); } }
+function confirmAllRates(){ confirmRates(); for(var k in RATES) if(!isV1Rate(k)) RATE_OKK[k]=1; saveOkk(); }
+function allRatesOk(keys){ if(typeof RATES==="undefined") return false; keys = keys || Object.keys(RATES); return keys.every(rateOk); }
+for(var _nk in RATES){ if(!isV1Rate(_nk) && RATES[_nk]!==RATES_FACTORY[_nk]) RATE_OKK[_nk]=1; }
 var RATE_MAP={glass:["r","glass"],rod:["r","steel"],brick:["r","brick"],tile:["r","tile"]};
 function applyRateDefaults(sync){
   TOOLS.forEach(function(t){ var m=RATE_MAP[t.id]; if(!t.f) return;
@@ -3471,6 +3686,8 @@ document.body.dataset.theme=THEME;
 document.body.dataset.bg=BG;
 document.body.dataset.cat=(cur?cur.cat:"");
 renderSide();
+/* the home hero was first drawn before saved rates loaded — redraw so the ⚠️ nudge reflects them */
+renderHomeHero(); htFill(); hsFill(); ntFill();
 route();
 </script>
 </body>
