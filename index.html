@@ -706,6 +706,13 @@ body[data-theme="dark"] .tw tr.gr td{background:#2A2414;color:#F0D58C;border-bot
 .pdfbar{background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);border-radius:16px}
 .pdfbar button{border-radius:12px;flex:1 1 auto;white-space:nowrap;padding:10px 8px}
 @media(max-width:400px){.pdfbar{gap:6px;padding:8px}.pdfbar #pvPrint .sbt{display:none}.pdfbar button.px{flex-basis:34px}}
+.udback{display:inline-flex;margin:12px 0 0}
+.udppl{border:1px solid var(--ol);border-radius:16px;background:var(--card);box-shadow:var(--m1);overflow:hidden}
+.udppl .hitem:first-child{border-top:0}
+.hitem .udb{font-family:var(--fm);font-weight:800;font-size:13px}.hitem .udb.r{color:#1F7A50}.hitem .udb.p{color:#B54708}.hitem .udb.z{color:var(--mute)}
+body[data-theme="dark"] .hitem .udb.r{color:#6FDCA6}body[data-theme="dark"] .hitem .udb.p{color:#FFB27A}
+.udact{display:flex;gap:8px;margin:14px 0 4px}.udact .rembtn{flex:1;padding:12px}.udact .mini{flex:0 0 auto;padding:10px 14px}
+.bkrow{display:flex;gap:8px;margin:6px 0}.bkrow .rembtn{flex:1}.bkrow .bkin{display:inline-flex;align-items:center;padding:8px 14px;cursor:pointer}
 .ivnew{display:block;width:100%;margin:8px 0 2px;padding:10px;font-size:13px}
 .ivrow{display:flex;border-top:1px solid var(--ol)}.ivrow .hitem{border-top:0;flex:1}
 .ivdel{flex:0 0 44px;border:0;background:none;color:var(--mute);font-size:15px;cursor:pointer}
@@ -2022,54 +2029,104 @@ var TOOLS = [
 /* ---------------- उधारो खाता ---------------- */
 { id:"udharo", cat:"fin", ic:"📒", neu:true, custom:true,
   nm:["उधारो खाता","Credit Ledger"],
-  sb:["दिएको–लिएको record, फोनमै save","Given–taken records, saved on this phone"],
-  kw:"udharo khata ledger baki paisa dine line record",
+  sb:["व्यक्तिअनुसार बाँकी, WhatsApp हिसाब, PDF","Balance per person, WhatsApp statement, PDF"],
+  kw:"udharo khata ledger baki paisa dine line record hisab statement",
   ex:["राम दाइ — दिएको रु २,५००; सीता — लिएको रु १,०००","Ram — gave Rs 2,500; Sita — took Rs 1,000"],
   html:function(){
     return '<div class="fields">'
-      + '<label class="f"><span class="fl">'+L("नाम","Name")+'</span><input type="text" id="udName" placeholder="'+L("जस्तै: राम दाइ","e.g. Ram")+'"></label>'
+      + '<label class="f"><span class="fl">'+L("नाम","Name")+'</span><input type="text" id="udName" list="udNames" autocomplete="off" placeholder="'+L("जस्तै: राम दाइ","e.g. Ram")+'"></label>'
       + '<label class="f half"><span class="fl">'+L("रकम","Amount")+' <em>'+L("रु","Rs")+'</em></span><input type="number" inputmode="decimal" id="udAmt"></label>'
       + '<label class="f half"><span class="fl">'+L("किसिम","Type")+'</span><select id="udType"><option value="g">'+L("दिएको (पाउनु पर्ने)","Given (they owe)")+'</option><option value="t">'+L("लिएको (तिर्नु पर्ने)","Taken (I owe)")+'</option></select></label>'
       + '<button class="rembtn" id="udAdd" style="grid-column:1/-1">＋ '+L("थप्नुहोस्","Add")+'</button>'
-      + '</div><div id="udOut"></div>';
+      + '</div><datalist id="udNames"></datalist><div id="udOut"></div>';
   },
   init:function(){
     var KEY = "ganak_udharo";
-    function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||"[]"); }catch(e){ return []; } }
+    UD_VIEW = "";
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||"[]")||[]; }catch(e){ return []; } }
     function save(x){ try{ localStorage.setItem(KEY, JSON.stringify(x)); }catch(e){} }
+    function money(x){ return L("रु ","Rs ")+fmt(Math.abs(x),0); }
+    function balWord(b){ return b > 0 ? L("पाउनु पर्ने","to receive") : (b < 0 ? L("तिर्नु पर्ने","to pay") : L("चुक्ता ✓","settled ✓")); }
     function render(){
-      var D = load(), out = $("#udOut"), tot = 0, html = "";
-      if(!D.length){ out.innerHTML = '<div class="note" style="margin-top:10px">ℹ️ '+L("अहिलेसम्म कुनै उधारो छैन। माथि नाम र रकम हालेर थप्नुहोस् — यही फोनमा save हुन्छ।","No entries yet. Add a name and amount above — saved on this phone.")+'</div>'; setSticky("",""); stickyEl.style.display="none"; return; }
-      html = '<div class="slip"><div class="slip-h"><span>'+L("उधारो खाता","Ledger")+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>';
-      D.forEach(function(e,i){
-        var amt = (e.t==="g"?1:-1)*e.a; tot += amt;
-        html += '<div class="row sub"><span class="rl">'+esc(e.n)+' <em style="font-style:normal;color:var(--mute);font-size:11px">'+esc(e.d)+'</em></span>'
-             + '<span class="rv" style="color:'+(e.t==="g"?"var(--ink)":"#B54708")+'">'+(e.t==="g"?"":"− ")+L("रु ","Rs ")+fmt(e.a,0)+'</span>'
-             + ' <button class="mini" data-udd="'+i+'" style="margin-left:6px">✕</button></div>';
-      });
-      html += '<div class="row big"><span class="rl">'+L(tot>=0?"जम्मा पाउनु पर्ने":"जम्मा तिर्नु पर्ने", tot>=0?"Net to receive":"Net to pay")+'</span><span class="rv">'+L("रु ","Rs ")+fmt(Math.abs(tot),0)+'</span></div>'
-           + '<div class="note">ℹ️ '+L("यो फोनको browser मा मात्र save हुन्छ — फोन/browser फेरे data जाँदैन साथमा।","Saved only in this phone's browser.")+'</div></div>';
+      var D = load(), P = udPeople(D), out = $("#udOut"), html = "";
+      $("#udNames").innerHTML = P.map(function(p){ return '<option value="'+esc(p.n)+'">'; }).join("");
+      if(!D.length){ out.innerHTML = '<div class="note" style="margin-top:10px">ℹ️ '+L("अहिलेसम्म कुनै उधारो छैन। माथि नाम र रकम हालेर थप्नुहोस्।","No records yet. Add a name and amount above.")+'</div>'; stickyEl.style.display = "none"; return; }
+      var p = UD_VIEW ? P.filter(function(x){ return x.k === UD_VIEW; })[0] : null;
+      if(UD_VIEW && !p) UD_VIEW = "";
+      if(p){   /* one person */
+        html = '<button class="tback udback" id="udBack">← '+L("सबैको हिसाब","All people")+'</button>'
+          + '<div class="slip"><div class="slip-h"><span>'+esc(p.n)+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>';
+        p.e.forEach(function(e){
+          html += '<div class="row sub"><span class="rl">'+esc(udDate(e.d))+' · '+(e.s ? L("चुक्ता","settled") : (e.t==="g" ? L("दिएको","given") : L("लिएको","taken")))+'</span><span class="dots"></span>'
+            + '<span class="rv" style="color:'+(e.t==="g"?"var(--ink)":"#B54708")+'">'+(e.t==="g"?"+ ":"− ")+money(e.a)+'</span>'
+            + '<button class="mini" data-udd="'+e.i+'" aria-label="'+L("हटाउने","Delete")+'" style="margin-left:6px">✕</button></div>';
+        });
+        html += '<div class="row big nw"><span class="rl">'+balWord(p.bal)+'</span><span class="dots"></span><span class="rv">'+money(p.bal)+'</span></div></div>'
+          + '<div class="udact"><button class="rembtn" id="udWa">💬 '+L("WhatsApp मा हिसाब","Send statement")+'</button>'
+          + (p.bal ? '<button class="mini" id="udSettle">✓ '+L("चुक्ता","Settle")+'</button>' : '')
+          + '<button class="mini" id="udPdf">⬇️ PDF</button></div>';
+        out.innerHTML = html;
+        setSticky(esc(p.n) + " · " + balWord(p.bal), money(p.bal));
+        return;
+      }
+      /* everyone */
+      var rec = 0, pay = 0;
+      P.forEach(function(x){ if(x.bal > 0) rec += x.bal; else pay -= x.bal; });
+      html = '<div class="slip"><div class="slip-h"><span>'+L("उधारो खाता","Ledger")+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>'
+        + '<div class="row"><span class="rl">'+L("जम्मा पाउनु पर्ने","Total to receive")+'</span><span class="dots"></span><span class="rv">'+money(rec)+'</span></div>'
+        + '<div class="row"><span class="rl">'+L("जम्मा तिर्नु पर्ने","Total to pay")+'</span><span class="dots"></span><span class="rv" style="color:#B54708">'+money(pay)+'</span></div>'
+        + '<div class="row big nw"><span class="rl">'+L(rec-pay>=0?"खुद पाउनु पर्ने":"खुद तिर्नु पर्ने", rec-pay>=0?"Net to receive":"Net to pay")+'</span><span class="dots"></span><span class="rv">'+money(rec-pay)+'</span></div></div>'
+        + '<div class="eyebrow" style="margin-top:14px">'+L("व्यक्तिअनुसार — थिचेर हिसाब हेर्नुहोस्","By person — tap for details")+'</div><div class="udppl">'
+        + P.map(function(x){
+            return '<button class="hitem udp" data-udp="'+esc(x.k)+'"><span class="hn">'+esc(x.n)+'</span>'
+              + '<span class="hd udb '+(x.bal>0?"r":(x.bal<0?"p":"z"))+'">'+(x.bal ? money(x.bal) : L("चुक्ता ✓","settled ✓"))+'</span>'
+              + '<span class="hv">'+npd(x.e.length)+L(" वटा record · अन्तिम "," records · last ")+esc(udDate(x.e[0].d))+(x.bal ? " · "+balWord(x.bal) : "")+'</span></button>';
+          }).join("") + '</div>'
+        + '<div class="udact"><button class="mini" id="udPdf">⬇️ PDF '+L("(सबैको)","(everyone)")+'</button></div>'
+        + '<div class="note" style="margin-top:10px">ℹ️ '+L("यो फोनमा मात्र save हुन्छ — Settings → Backup बाट फाइलमा राख्नुहोस्।","Saved only on this phone — keep a copy via Settings → Backup.")+'</div>';
       out.innerHTML = html;
-      setSticky(L(tot>=0?"जम्मा पाउनु पर्ने":"जम्मा तिर्नु पर्ने", tot>=0?"Net to receive":"Net to pay"), L("रु ","Rs ")+fmt(Math.abs(tot),0));
+      setSticky(L(rec-pay>=0?"खुद पाउनु पर्ने":"खुद तिर्नु पर्ने", rec-pay>=0?"Net to receive":"Net to pay"), money(rec-pay));
     }
     $("#udAdd").addEventListener("click", function(){
-      var nm = $("#udName").value.trim(), a = parseFloat($("#udAmt").value);
+      var nm = $("#udName").value.trim().replace(/\s+/g, " "), a = parseFloat($("#udAmt").value);
       if(!nm || !(a>0)){ alert(L("नाम र रकम दुवै हाल्नुहोस्।","Enter both name and amount.")); return; }
       var D = load(); D.unshift({n:nm.slice(0,40), a:a, t:$("#udType").value, d:new Date().toISOString().slice(0,10)});
-      save(D); $("#udName").value=""; $("#udAmt").value=""; render();
+      save(D); $("#udAmt").value = ""; if(!UD_VIEW) $("#udName").value = ""; render();
     });
     $("#udOut").addEventListener("click", function(e){
+      var pb = e.target.closest("[data-udp]");
+      if(pb){ UD_VIEW = pb.dataset.udp; var pp = udPeople(load()).filter(function(x){ return x.k === UD_VIEW; })[0];
+        if(pp) $("#udName").value = pp.n; render(); window.scrollTo(0, 0); return; }
+      if(e.target.closest("#udBack")){ UD_VIEW = ""; $("#udName").value = ""; render(); return; }
+      if(e.target.closest("#udWa")){ shareOut(cur.share()); return; }
+      if(e.target.closest("#udPdf")){ downloadPdf(udharoLay, 1240, "udharo-" + (UD_VIEW ? "statement-" : "") + todayISO() + ".pdf"); return; }   /* ASCII name: Chrome drops non-ASCII download names */
+      if(e.target.closest("#udSettle")){
+        var q = udPeople(load()).filter(function(x){ return x.k === UD_VIEW; })[0]; if(!q || !q.bal) return;
+        if(!confirm(L(q.n+" को "+money(q.bal)+" हिसाब चुक्ता भयो?", "Mark "+money(q.bal)+" with "+q.n+" as settled?"))) return;
+        var D = load(); D.unshift({n:q.n, a:Math.abs(q.bal), t:(q.bal > 0 ? "t" : "g"), d:new Date().toISOString().slice(0,10), s:1});
+        save(D); render(); return;
+      }
       var b = e.target.closest("[data-udd]"); if(!b) return;
       if(!confirm(L("यो record हटाउने?","Delete this record?"))) return;
-      var D = load(); D.splice(parseInt(b.dataset.udd,10),1); save(D); render();
+      var D2 = load(); D2.splice(parseInt(b.dataset.udd,10),1); save(D2); render();
     });
     render();
   },
   share:function(){
-    var D = []; try{ D = JSON.parse(localStorage.getItem("ganak_udharo")||"[]"); }catch(e){}
-    var tot = 0, A = [];
-    D.forEach(function(e){ var amt=(e.t==="g"?1:-1)*e.a; tot+=amt; A.push("• "+e.n+" ("+e.d+"): "+(e.t==="g"?"+":"−")+" "+L("रु ","Rs ")+fmt(e.a,0)); });
-    A.push("─────────────", L(tot>=0?"जम्मा पाउनु पर्ने: ":"जम्मा तिर्नु पर्ने: ", tot>=0?"Net to receive: ":"Net to pay: ")+L("रु ","Rs ")+fmt(Math.abs(tot),0));
+    var D = []; try{ D = JSON.parse(localStorage.getItem("ganak_udharo")||"[]")||[]; }catch(e){}
+    var P = udPeople(D), A = [], who = [PROF.biz || PROF.name, PROF.ph ? "📞 " + PROF.ph : ""].filter(Boolean).join(" · ");
+    var p = UD_VIEW ? P.filter(function(x){ return x.k === UD_VIEW; })[0] : null;
+    if(p){
+      A.push("📒 " + L("उधारो हिसाब — ","Account — ") + p.n, "─────────────");
+      p.e.slice().reverse().forEach(function(e){ A.push("• " + udDate(e.d) + " " + (e.s ? L("चुक्ता","settled") : (e.t==="g" ? L("दिएको","given") : L("लिएको","taken"))) + ": " + (e.t==="g"?"+ ":"− ") + L("रु ","Rs ") + fmt(e.a,0)); });
+      A.push("─────────────", p.bal > 0 ? L("तपाईंले तिर्नुपर्ने बाँकी: ","Balance you owe: ") + L("रु ","Rs ") + fmt(p.bal,0)
+                         : (p.bal < 0 ? L("मैले तिर्नुपर्ने बाँकी: ","Balance I owe: ") + L("रु ","Rs ") + fmt(-p.bal,0) : L("हिसाब चुक्ता ✓","All settled ✓")));
+      if(who) A.push("— " + who);
+      return A.join("\n");
+    }
+    var tot = 0;
+    P.forEach(function(x){ tot += x.bal; if(x.bal) A.push("• " + x.n + ": " + (x.bal > 0 ? "+ " : "− ") + L("रु ","Rs ") + fmt(Math.abs(x.bal),0)); });
+    A.push("─────────────", L(tot>=0?"खुद पाउनु पर्ने: ":"खुद तिर्नु पर्ने: ", tot>=0?"Net to receive: ":"Net to pay: ") + L("रु ","Rs ") + fmt(Math.abs(tot),0));
     return A.join("\n");
   }},
 
@@ -3382,7 +3439,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.6 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.7 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4120,6 +4177,26 @@ function cvKit(W){
     if(sub){ k.font(26); k.txt(sub, x+124, hy + 40, "left", DOC.MUTE); hy += 40; }
     return Math.max(y + 96, hy + 12);
   };
+  /* table: dark header row, zebra rows, {g:"…"} group rows; registers page breaks and a repeatable header.
+     al: per-column "left"/"right" (default: first left, rest right). Returns the y below the table. */
+  k.grid = function(x, y, cw, head, ws, rows, al){
+    var xs = [], xx = x; ws.forEach(function(w){ xs.push(xx); xx += w; });
+    function A(i){ return al ? al[i] : (i ? "right" : "left"); }
+    function X(i){ return A(i) === "right" ? xs[i] + ws[i] - 12 : xs[i] + 12; }
+    function hdr(yy){ k.rect(x, yy, cw, 50, DOC.INK); k.font(21, "700"); head.forEach(function(h, i){ k.txt(h, X(i), yy + 33, A(i), "#FFFFFF"); }); }
+    k.brk(y); hdr(y); y += 50; var y0 = y;
+    rows.forEach(function(r, ri){
+      k.brk(y);
+      if(r.g){ k.rect(x, y, cw, 40, "rgba(245,179,1,.22)"); k.font(20, "700"); k.txt(r.g, x + 12, y + 28, "left", "#5D4B18"); y += 40; return; }
+      if(ri % 2) k.rect(x, y, cw, 38, "rgba(21,32,42,.035)");
+      k.font(21, "", true);
+      r.forEach(function(c, i){ k.txt(c, X(i), y + 27, A(i), (r.col && r.col[i]) || (i ? DOC.INK : DOC.MUTE)); });
+      y += 38;
+    });
+    k.rect(x, y, cw, 2, DOC.INK); y += 2; k.brk(y);
+    k.th.push({y0:y0, y1:y, h:50, draw:hdr});   /* a PDF page that starts inside this table repeats the header */
+    return y;
+  };
   k.logo = function(cb){
     if(PROF.logo){ var im = new Image(); im.onload = function(){ cb(im); }; im.onerror = function(){ cb(null); }; im.src = PROF.logo; }
     else cb(null);
@@ -4293,23 +4370,6 @@ function amortLay(k, logo){
   k.txt("■ " + L("साँवा ","Principal ") + fmt(pp*100,1) + "%", P, y, "left", "#1C5FA8");
   k.txt("■ " + L("ब्याज ","Interest ") + fmt((1-pp)*100,1) + "%", W - P, y, "right", "#C4621C");
   y += 30;
-  function table(head, ws, rows, sub){
-    var xs = [], xx = P; ws.forEach(function(w){ xs.push(xx); xx += w; });
-    function hdr(yy){ k.rect(P, yy, CW, 50, DOC.INK); k.font(21, "700");
-      head.forEach(function(h, i){ k.txt(h, i ? xs[i] + ws[i] - 12 : xs[i] + 12, yy + 33, i ? "right" : "left", "#FFFFFF"); }); }
-    k.brk(y); hdr(y);
-    y += 50; var y0 = y;
-    rows.forEach(function(r, ri){
-      k.brk(y);
-      if(r.g){ k.rect(P, y, CW, 40, "rgba(245,179,1,.22)"); k.font(20, "700"); k.txt(r.g, P + 12, y + 28, "left", "#5D4B18"); y += 40; return; }
-      if(ri % 2) k.rect(P, y, CW, 38, "rgba(21,32,42,.035)");
-      k.font(21, "", true);
-      r.forEach(function(c, i){ k.txt(c, i ? xs[i] + ws[i] - 12 : xs[i] + 12, y + 27, i ? "right" : "left", i ? DOC.INK : DOC.MUTE); });
-      y += 38;
-    });
-    k.rect(P, y, CW, 2, DOC.INK); y += 2; k.brk(y);
-    k.th.push({y0:y0, y1:y, h:50, draw:hdr});   /* a PDF page that starts inside this table repeats the header */
-  }
   /* yearly totals */
   y += 40; k.font(28, "800"); k.txt(L("वर्षअनुसार","Year by year"), P, y); y += 22;
   var yr = [], yy, seg, gp, gi;
@@ -4318,7 +4378,7 @@ function amortLay(k, logo){
     seg.forEach(function(x){ gp += x.pr; gi += x.ip; });
     yr.push([L("वर्ष ","Year ") + npd(yy+1), fmt(gp,0), fmt(gi,0), fmt(seg[seg.length-1].bal,0)]);
   }
-  table([L("वर्ष","Year"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी साँवा","Balance")], [CW*0.25, CW*0.25, CW*0.25, CW*0.25], yr);
+  y = k.grid(P, y, CW, [L("वर्ष","Year"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी साँवा","Balance")], [CW*0.25, CW*0.25, CW*0.25, CW*0.25], yr);
   /* every month */
   y += 44; k.font(28, "800"); k.txt(L("महिनाअनुसार","Month by month"), P, y); y += 22;
   var mr = [];
@@ -4326,13 +4386,68 @@ function amortLay(k, logo){
     if((x.m - 1) % 12 === 0) mr.push({g: L("वर्ष ","Year ") + npd(Math.floor((x.m-1)/12) + 1)});
     mr.push([npd(x.m) + "  " + emiMonth(b, x.m), fmt(x.pay,0), fmt(x.pr,0), fmt(x.ip,0), fmt(x.bal,0)]);
   });
-  table([L("किस्ता · महिना","No. · month"), L("किस्ता","EMI"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी","Balance")],
+  y = k.grid(P, y, CW, [L("किस्ता · महिना","No. · month"), L("किस्ता","EMI"), L("साँवा","Principal"), L("ब्याज","Interest"), L("बाँकी","Balance")],
         [CW*0.32, CW*0.17, CW*0.17, CW*0.17, CW*0.17], mr);
   y += 40; k.font(21);
   k.wrap(L("Reducing balance विधि। पहिलो किस्ता अर्को महिना मानिएको; बैंकको service charge/बिमा अलग। अन्तिम किस्ता बाँकी मिलाउन थोरै फरक पर्न सक्छ।",
            "Reducing-balance method. First instalment assumed next month; bank service charges/insurance are separate. The last instalment adjusts slightly to close the balance."), CW)
     .forEach(function(t){ k.txt(t, P, y, "left", DOC.MUTE); y += 30; });
   y += 30; k.font(19, "600"); k.txt("Ganak · asrayacreate.github.io/ganak · PRERAK MULTIPURPOSE PVT LTD", W/2, y, "center", DOC.MUTE);
+  y += 30; k.tape(y); return y + 18;
+}
+
+/* उधारो: people from the flat record list (newest first), balance = given − taken */
+var UD_VIEW = "";   /* person open in the ledger ("" = everyone) */
+function udPeople(D){
+  var m = {}, order = [];
+  (D||[]).forEach(function(e, i){
+    var k = String(e.n||"").trim().replace(/\s+/g, " ").toLowerCase(); if(!k) return;
+    if(!m[k]){ m[k] = {k:k, n:String(e.n).trim(), bal:0, e:[]}; order.push(k); }
+    m[k].bal += (e.t === "g" ? 1 : -1) * (+e.a || 0);
+    m[k].e.push({n:e.n, a:+e.a || 0, t:e.t, d:e.d, s:e.s, i:i});
+  });
+  return order.map(function(k){ var x = m[k]; x.bal = Math.round(x.bal*100)/100; return x; })
+    .sort(function(a, b){ return ((b.bal !== 0) - (a.bal !== 0)) || (Math.abs(b.bal) - Math.abs(a.bal)); });
+}
+function udDate(iso){
+  var p = String(iso||"").split("-"), b = (p.length === 3) ? adToBs(+p[0], +p[1], +p[2]) : null;
+  return b ? npd(b.y + "/" + pad2(b.m) + "/" + pad2(b.d)) : String(iso||"");
+}
+function udharoLay(k, logo){
+  var W = k.W, P = 70, CW = W - 2*P, y, D = [];
+  try{ D = JSON.parse(localStorage.getItem("ganak_udharo")||"[]")||[]; }catch(e){}
+  var PP = udPeople(D), p = UD_VIEW ? PP.filter(function(x){ return x.k === UD_VIEW; })[0] : null;
+  function word(b){ return b > 0 ? L("पाउनु पर्ने बाँकी","Balance to receive") : (b < 0 ? L("तिर्नु पर्ने बाँकी","Balance to pay") : L("हिसाब चुक्ता","All settled")); }
+  function box(l, v){ y += 24; k.rect(P, y, CW, 70, "rgba(245,179,1,.30)"); k.font(30, "800"); k.txt(l, P + 16, y + 46);
+    k.font(36, "800", true); k.txt(v, W - P - 16, y + 48, "right"); y += 70; }
+  k.paper(); k.tape(0); y = 18 + 50;
+  y = k.head(P, y, logo, CW) + 26; k.rule(P, y, CW); y += 3 + 50;
+  k.font(40, "800"); k.txt(p ? L("उधारो हिसाब — ","Account statement — ") + p.n : L("उधारो खाता","Credit ledger"), P, y); y += 40;
+  k.font(23); k.txt(slipMeta(), P, y, "left", DOC.MUTE); y += 34;
+  if(p){
+    var run = 0, rows = p.e.slice().reverse().map(function(e){
+      var v = (e.t === "g" ? 1 : -1) * e.a; run += v;
+      var r = [udDate(e.d), e.s ? L("चुक्ता","Settled") : (e.t === "g" ? L("दिएको","Given") : L("लिएको","Taken")), (v > 0 ? "+ " : "− ") + fmt(e.a,0), fmt(run,0)];
+      r.col = [0, 0, v < 0 ? "#B54708" : 0, 0]; return r;
+    });
+    y = k.grid(P, y, CW, [L("मिति","Date"), L("विवरण","Entry"), L("रकम (रु)","Amount (Rs)"), L("बाँकी (रु)","Balance (Rs)")],
+               [CW*0.25, CW*0.25, CW*0.25, CW*0.25], rows, ["left","left","right","right"]);
+    box(word(p.bal), L("रु ","Rs ") + fmt(Math.abs(p.bal),0));
+  } else {
+    var rec = 0, pay = 0;
+    var rows2 = PP.map(function(x){
+      if(x.bal > 0) rec += x.bal; else pay -= x.bal;
+      var r = [x.n, npd(x.e.length), udDate(x.e[0].d), x.bal ? (x.bal > 0 ? "+ " : "− ") + fmt(Math.abs(x.bal),0) : L("चुक्ता","settled")];
+      r.col = [DOC.INK, 0, 0, x.bal < 0 ? "#B54708" : 0]; return r;
+    });
+    y = k.grid(P, y, CW, [L("नाम","Name"), L("record","Records"), L("अन्तिम","Last"), L("बाँकी (रु)","Balance (Rs)")],
+               [CW*0.4, CW*0.15, CW*0.2, CW*0.25], rows2, ["left","right","right","right"]);
+    y += 20; k.font(25); k.txt(L("जम्मा पाउनु पर्ने","Total to receive"), P + 16, y + 30, "left", DOC.INK2); k.font(26, "700", true); k.txt(L("रु ","Rs ") + fmt(rec,0), W - P - 16, y + 30, "right");
+    y += 44; k.font(25); k.txt(L("जम्मा तिर्नु पर्ने","Total to pay"), P + 16, y + 30, "left", DOC.INK2); k.font(26, "700", true); k.txt(L("रु ","Rs ") + fmt(pay,0), W - P - 16, y + 30, "right", "#B54708");
+    y += 30; box(L(rec - pay >= 0 ? "खुद पाउनु पर्ने" : "खुद तिर्नु पर्ने", rec - pay >= 0 ? "Net to receive" : "Net to pay"), L("रु ","Rs ") + fmt(Math.abs(rec - pay),0));
+  }
+  k.brk(y);
+  y += 60; k.font(19, "600"); k.txt("Ganak · asrayacreate.github.io/ganak · PRERAK MULTIPURPOSE PVT LTD", W/2, y, "center", DOC.MUTE);
   y += 30; k.tape(y); return y + 18;
 }
 
@@ -4479,8 +4594,12 @@ window.addEventListener("hashchange", route);
 /*==V2: sidebar, settings, profile, reminders, backgrounds ==*/
 var PROF = {name:"",biz:"",ph:""};
 try{ var _p=JSON.parse(localStorage.getItem("ganak_prof")||"{}"); PROF.name=_p.name||""; PROF.biz=_p.biz||""; PROF.ph=_p.ph||""; PROF.logo=_p.logo||""; }catch(e){}
+if(!/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(PROF.logo)) PROF.logo="";   /* only a real image (a restored file could carry anything) */
 var REM = [];
 try{ REM = JSON.parse(localStorage.getItem("ganak_rem")||"[]")||[]; }catch(e){}
+/* keep only well-formed reminders (a restored backup file could carry anything) */
+REM = (Array.isArray(REM) ? REM : []).filter(function(r){ return r && typeof r.t === "string"; })
+  .map(function(r){ return {t:r.t, d:/^\d{4}-\d{2}-\d{2}$/.test(r.d||"") ? r.d : "", shown:!!r.shown}; });
 var REM_EDIT = -1;
 var REMPRESETS = [
   [["साहुलाई भुक्तानी","Pay supplier"]],
@@ -4582,13 +4701,58 @@ function renderDrawer(){
         +'<span style="display:flex;gap:6px"><input class="pfin" style="margin:0;flex:1" type="date" id="remED" value="'+esc(r.d||"")+'">'
         +'<button class="rembtn" id="remESave">✓</button><button class="rx" id="remECancel">✕</button></span></span></div>';
     } else {
-      h+='<div class="remit"><span class="rt">'+esc(r.t)+'</span><span class="rd '+cls+'">'+(r.d===t?L("आज","today"):r.d)+'</span>'
+      h+='<div class="remit"><span class="rt">'+esc(r.t)+'</span><span class="rd '+cls+'">'+(r.d===t?L("आज","today"):esc(r.d))+'</span>'
         +'<button class="re" data-edit="'+i+'" aria-label="edit">✏️</button>'
         +'<button class="rx" data-del="'+i+'" aria-label="delete">✕</button></div>';
     }
   });
+  h+='<div class="dr-sec" id="bksec">'+L("Backup / Restore","Backup / Restore")+'</div>'
+    +'<div class="drnote">'+esc(bkSummary(bkData().data))+'</div>'
+    +'<div class="bkrow"><button class="rembtn" id="bkSave">💾 '+L("Backup फाइल बनाउने","Make a backup file")+'</button>'
+    +'<label class="plbtn bkin">'+L("Restore","Restore")+'<input type="file" id="bkFile" accept=".json,application/json" hidden></label></div>'
+    +'<div class="drnote">'+L("बिजक, उधारो, दर, प्रोफाइल, पठाएका हिसाब, रिमाइन्डर — सबै एउटै फाइलमा। WhatsApp/Drive मा आफैंलाई पठाएर राख्नुहोस्; फोन फेरे वा data मेटिए Restore गर्नुहोस्।",
+      "Invoices, ledger, rates, profile, sent results, reminders — all in one file. Send it to yourself (WhatsApp/Drive); restore it on a new phone or after clearing data.")+'</div>';
   d.innerHTML=h;
 }
+/* ---- backup / restore: every ganak_* key in one JSON file ---- */
+function bkData(){
+  var o = {app:"ganak", v:1, at:new Date().toISOString(), data:{}};
+  try{ for(var i = 0; i < localStorage.length; i++){ var k = localStorage.key(i); if(/^ganak_/.test(k)) o.data[k] = localStorage.getItem(k); } }catch(e){}
+  return o;
+}
+function bkSummary(d){
+  function n(k){ try{ var x = JSON.parse(d[k]||"[]"); return Array.isArray(x) ? x.length : 0; }catch(e){ return 0; } }
+  return L("बिजक "+npd(n("ganak_invoices"))+" · उधारो record "+npd(n("ganak_udharo"))+" · पठाएका हिसाब "+npd(n("ganak_hist"))+" · रिमाइन्डर "+npd(n("ganak_rem")),
+           "Invoices "+n("ganak_invoices")+" · ledger records "+n("ganak_udharo")+" · sent results "+n("ganak_hist")+" · reminders "+n("ganak_rem"));
+}
+function bkSave(){
+  var o = bkData(), b = new Blob([JSON.stringify(o)], {type:"application/json"}), name = "ganak-backup-" + todayISO() + ".json", f = null;
+  try{ f = new File([b], name, {type:"application/json"}); }catch(e){}
+  if(f && navigator.canShare && navigator.canShare({files:[f]})){
+    navigator.share({files:[f], title:"Ganak backup"}).catch(function(err){ if(!(err && err.name === "AbortError")) saveBlob(b, name, L("Backup save भयो ✓","Backup saved ✓")); });
+  } else saveBlob(b, name, L("Backup save भयो ✓ (Downloads)","Backup saved ✓ (Downloads)"));
+}
+function bkRestore(file){
+  var rd = new FileReader();
+  rd.onload = function(){
+    var o = null; try{ o = JSON.parse(rd.result); }catch(e){}
+    if(!o || o.app !== "ganak" || !o.data || typeof o.data !== "object"){ alert(L("यो Ganak को backup फाइल होइन।","This is not a Ganak backup file.")); return; }
+    var keys = Object.keys(o.data).filter(function(k){ return /^ganak_[a-z_]+$/.test(k) && typeof o.data[k] === "string"; });
+    if(!keys.length){ alert(L("फाइलमा data छैन।","The file has no data.")); return; }
+    var when = String(o.at||"").slice(0,10);
+    if(!confirm(L("यो backup ("+when+")\n"+bkSummary(o.data)+"\nले यो फोनको Ganak data बदल्छ। Restore गर्ने?",
+                  "This backup ("+when+")\n"+bkSummary(o.data)+"\nwill replace Ganak's data on this phone. Restore?"))) return;
+    try{
+      var old = []; for(var i = 0; i < localStorage.length; i++){ var k = localStorage.key(i); if(/^ganak_/.test(k)) old.push(k); }
+      old.forEach(function(k){ localStorage.removeItem(k); });
+      keys.forEach(function(k){ localStorage.setItem(k, o.data[k]); });
+    }catch(e){ alert(L("Restore भएन — फोनमा ठाउँ कम हुनसक्छ।","Restore failed — the phone may be out of space.")); return; }
+    location.reload();
+  };
+  rd.readAsText(file);
+}
+document.addEventListener("click", function(e){ if(e.target.closest && e.target.closest("#bkSave")) bkSave(); });
+document.addEventListener("change", function(e){ if(e.target.id === "bkFile" && e.target.files && e.target.files[0]){ bkRestore(e.target.files[0]); e.target.value = ""; } });
 var DR_FROM=null;   /* the button that opened Settings — focus goes back there on close */
 function openDrawer(scrollRem){
   if(!document.getElementById("drawer").classList.contains("on")) DR_FROM=document.activeElement;
@@ -4754,7 +4918,7 @@ function notiShow(r, isDue){
   d.id="notibar"; d.className="notibar"+(isDue?" due":"");
   d.innerHTML='<span class="nbic">🔔</span><span class="nbt">'
     +'<span class="nbk">'+(isDue?L("भाखा नाघेको रिमाइन्डर","Overdue reminder"):L("आजको रिमाइन्डर","Due today"))+'</span>'
-    +'<span class="nbm">'+esc(r.t)+' · 📅 '+(r.d===todayISO()?L("आज","today"):r.d)+'</span></span>'
+    +'<span class="nbm">'+esc(r.t)+' · 📅 '+(r.d===todayISO()?L("आज","today"):esc(r.d))+'</span></span>'
     +'<button class="nbx" aria-label="dismiss">✕</button>';
   document.body.appendChild(d);
   requestAnimationFrame(function(){ d.classList.add("show"); });
@@ -4804,7 +4968,7 @@ function ntFill(){
     +(isDue?L("भाखा नाघेको!","OVERDUE!"):isToday?L("आजको काम","DUE TODAY"):L("रिमाइन्डर","REMINDER"))
     +(list.length>1?' · '+npd(NT_I%list.length+1)+'/'+npd(list.length):'')+'</span>'
     +'<span class="ntt">'+esc(r.t)+'</span>'
-    +'<span class="ntd">📅 '+(isToday?L("आज","today"):r.d)+'</span>';
+    +'<span class="ntd">📅 '+(isToday?L("आज","today"):esc(r.d))+'</span>';
 }
 function ntStart(){
   ntFill();
