@@ -1,4 +1,4 @@
-var C="ganak-v7-1";
+var C="ganak-v8-0";
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     return c.addAll(["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png"]);
