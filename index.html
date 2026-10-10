@@ -706,6 +706,9 @@ body[data-theme="dark"] .tw tr.gr td{background:#2A2414;color:#F0D58C;border-bot
 .pdfbar{background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);border-radius:16px}
 .pdfbar button{border-radius:12px;flex:1 1 auto;white-space:nowrap;padding:10px 8px}
 @media(max-width:400px){.pdfbar{gap:6px;padding:8px}.pdfbar #pvPrint .sbt{display:none}.pdfbar button.px{flex-basis:34px}}
+.ivnew{display:block;width:100%;margin:8px 0 2px;padding:10px;font-size:13px}
+.ivrow{display:flex;border-top:1px solid var(--ol)}.ivrow .hitem{border-top:0;flex:1}
+.ivdel{flex:0 0 44px;border:0;background:none;color:var(--mute);font-size:15px;cursor:pointer}
 /* invoice download row */
 .ivact{display:flex;gap:8px;margin:16px 0 4px}.ivact .rembtn{flex:1;padding:12px 14px;font-size:14px}.ivact .mini{flex:0 0 auto;padding:10px 14px}
 .sched-act .azgo{background:var(--g-amb);color:#1A1405;border-color:transparent}
@@ -1170,11 +1173,11 @@ function sigFmt(x){ var a = Math.abs(x); return fmt(x, a>=1000 ? 2 : a>=1 ? 4 : 
 /* TV duty (Rs) by screen size — Department of Customs TV tariff (archive.customs.gov.np) rows found; + Rs 565 customs service tax */
 var TV_DUTY = { "32":14400, "33":18150, "40":24000, "43":25800, "50":62500, "65":81250 }, TV_CST = 565;
 function emiOf(P, rate, n){ var r = rate/1200; return (r === 0) ? P/n : P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1); }
-/* editable row list — cols: [key, label, "n" for number, "half"?]; first column is numbered */
+/* editable row list — cols: [key, label, "n" for number, "half"?, extra input attrs?]; first column is numbered */
 function listHtml(items, cols){
   return items.map(function(it,i){
     return '<div class="fields" data-i="'+i+'" style="border-top:1px dashed var(--line);padding-top:8px">'
-      + cols.map(function(c,j){ return '<label class="f'+(c[3]?' '+c[3]:'')+'"><span class="fl">'+(j===0?(i+1)+'. ':'')+c[1]+'</span><input data-ik="'+c[0]+'"'+(c[2]==="n"?' type="number" inputmode="decimal" step="any"':'')+' value="'+esc(it[c[0]]===undefined?"":it[c[0]])+'"></label>'; }).join("")
+      + cols.map(function(c,j){ return '<label class="f'+(c[3]?' '+c[3]:'')+'"><span class="fl">'+(j===0?(i+1)+'. ':'')+c[1]+'</span><input data-ik="'+c[0]+'"'+(c[2]==="n"?' type="number" inputmode="decimal" step="any"':'')+(c[4]?' '+c[4]:'')+' value="'+esc(it[c[0]]===undefined?"":it[c[0]])+'"></label>'; }).join("")
       + (items.length>1 ? '<button class="mini" data-del="'+i+'" style="grid-column:1/-1;justify-self:end">✕ '+L("हटाउने","Remove")+'</button>' : '')
       + '</div>';
   }).join("");
@@ -2902,7 +2905,9 @@ var TOOLS = [
       + '<div class="fields">'+f("ivDisc", L("छुट","Discount")+' <em>%</em>', "half", 'type="number" inputmode="decimal" step="any"')+'</div>'
       + '<div class="note" style="margin:0 0 10px">ℹ️ '+L("विक्रेताको नाम/फोन/logo: Settings → Profile बाट आउँछ।","Seller name/phone/logo come from Settings → Profile.")+'</div><div id="out"></div>'
       + '<div class="ivact"><button class="rembtn" id="ivPdf">⬇️ '+L("PDF Download","Download PDF")+'</button>'
-      + '<button class="mini" id="ivImg">🖼 '+L("फोटो","Image")+'</button></div>';
+      + '<button class="mini" id="ivImg">🖼 '+L("फोटो","Image")+'</button></div>'
+      + '<button class="mini ivnew" id="ivNew">＋ '+L("नयाँ बिजक (यो save गरेर अर्को नम्बर)","New invoice (saves this one, next number)")+'</button>'
+      + '<div id="ivList"></div><datalist id="ivSug"></datalist>';
   },
   init:function(){
     var KEY = "ganak_invoice", ids = ["ivType","ivNo","ivSPan","ivSAddr","ivBName","ivBAddr","ivBPan","ivDisc"], D;
@@ -2910,7 +2915,43 @@ var TOOLS = [
     if(!D || !D.items) D = { ivType:"tax", ivNo:"001", ivDisc:"0", items:[{d:L("सामान / सेवा","Item / service"),q:"1",r:"1000"}] };
     ids.forEach(function(id){ if(D[id]!==undefined) $("#"+id).value = D[id]; });
     function save(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} }
-    function items(){ $("#ivItems").innerHTML = listHtml(D.items, [["d",L("विवरण","Description")],["q",L("परिमाण","Qty"),"n","half"],["r",L("दर","Rate")+' <em>'+L("रु","Rs")+'</em>',"n","half"]]); }
+    function items(){ $("#ivItems").innerHTML = listHtml(D.items, [["d",L("विवरण","Description"),"","",'list="ivSug" autocomplete="off"'],["q",L("परिमाण","Qty"),"n","half"],["r",L("दर","Rate")+' <em>'+L("रु","Rs")+'</em>',"n","half"]]); }
+    /* bill book: saved invoices (by number), next number, item names you billed before (with last rate) */
+    var LKEY = "ganak_invoices", LIST = [];
+    try{ LIST = JSON.parse(localStorage.getItem(LKEY)||"[]")||[]; }catch(e){}
+    function saveList(){ try{ localStorage.setItem(LKEY, JSON.stringify(LIST)); }catch(e){} }
+    function keep(){   /* current bill → list (replaces the saved copy with the same number) */
+      if(!lastOut || !lastOut.inv) return false;
+      var no = String(D.ivNo||"").trim();
+      LIST = LIST.filter(function(x){ return String(x.D.ivNo||"").trim() !== no; });
+      LIST.unshift({D:JSON.parse(JSON.stringify(D)), tot:lastOut.inv.tot, at:Date.now()});
+      LIST = LIST.slice(0, 100); saveList(); listUi(); return true;
+    }
+    cur.saveDoc = keep;
+    function nextNo(s){
+      s = String(s||"");
+      var m = s.match(/^(.*?)(\d+)(\D*)$/);
+      if(!m) return s ? s + "-2" : "1";
+      var nx = String(+m[2] + 1); while(nx.length < m[2].length) nx = "0" + nx;
+      return m[1] + nx + m[3];
+    }
+    var SUG = {};
+    function sugFill(){
+      SUG = {};
+      LIST.slice().reverse().forEach(function(x){ (x.D.items||[]).forEach(function(it){ if(it.d) SUG[it.d.trim()] = it.r; }); });
+      $("#ivSug").innerHTML = Object.keys(SUG).slice(0, 200).map(function(d){ return '<option value="'+esc(d)+'">'; }).join("");
+    }
+    function listUi(){
+      sugFill();
+      if(!LIST.length){ $("#ivList").innerHTML = ""; return; }
+      $("#ivList").innerHTML = '<details class="hist ivlist"'+(listUi.open?' open':'')+'><summary>📂 '+L("पुराना बिजक","Saved invoices")+' <span class="sc">'+npd(LIST.length)+'</span></summary>'
+        + LIST.map(function(x, i){
+            return '<div class="ivrow"><button class="hitem" data-iv="'+i+'"><span class="hn">'+esc(L("नं. ","No. ")+(x.D.ivNo||"—"))+' · '+esc(x.D.ivBName||L("ग्राहक —","Buyer —"))+'</span>'
+              + '<span class="hd">'+esc(histWhen(x.at))+'</span><span class="hv"><b>'+esc(rs(x.tot))+'</b></span></button>'
+              + '<button class="ivdel" data-ivdel="'+i+'" aria-label="'+L("मेटाउने","Delete")+'">✕</button></div>';
+          }).join("") + '</details>';
+    }
+    function fillForm(){ ids.forEach(function(id){ $("#"+id).value = (D[id]===undefined ? "" : D[id]); }); items(); render(); }
     function calc(){
       var tax = D.ivType !== "pan", sub = 0, rows = [], it = [], neg = 0;
       var biz = PROF.biz || PROF.name, bs = adToBs(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate());
@@ -2946,16 +2987,36 @@ var TOOLS = [
               "A tax invoice must show the 'Tax Invoice' heading, seller name/address/VAT no., invoice no., date, item description, quantity, rate, taxable value, 13% VAT and total; abbreviated invoices are not allowed above Rs 10,000 (VAT Rules 2053, rule 17). Computer-issued invoices need IRD approval to be valid — this app is not approved billing software; use it for quotations/proformas or to copy onto your bill pad."] };
     }
     function render(){ ids.forEach(function(id){ D[id] = $("#"+id).value; }); save(); showOut(cur, calc()); }
-    items(); render();
+    items(); render(); listUi();
+    $("#cust").addEventListener("toggle", function(e){ if(e.target.classList && e.target.classList.contains("ivlist")) listUi.open = e.target.open; }, true);
     $("#cust").addEventListener("input", function(e){
       var el = e.target, box = el.closest("[data-i]");
-      if(box && el.dataset.ik){ D.items[+box.dataset.i][el.dataset.ik] = el.value; }
+      if(box && el.dataset.ik){
+        var it = D.items[+box.dataset.i]; it[el.dataset.ik] = el.value;
+        /* picked a known item → bring its last rate if the rate box is still empty */
+        if(el.dataset.ik === "d" && !it.r && SUG[el.value.trim()]){
+          it.r = SUG[el.value.trim()]; var ri = box.querySelector('[data-ik="r"]'); if(ri) ri.value = it.r;
+        }
+      }
       render();
     });
     $("#cust").addEventListener("change", function(e){ if(e.target.tagName === "SELECT") render(); });
     $("#cust").addEventListener("click", function(e){
       if(e.target.closest("#ivPdf")){ if(lastOut && lastOut.inv) downloadPdf(); else toast(L("पहिले सामान र दर हाल्नुहोस्","Add items and rates first")); return; }
       if(e.target.closest("#ivImg")){ if(lastOut && lastOut.inv) shareImage(); return; }
+      if(e.target.closest("#ivNew")){
+        var was = D.ivNo, saved = keep();
+        D = { ivType:D.ivType, ivNo:nextNo(D.ivNo), ivSPan:D.ivSPan, ivSAddr:D.ivSAddr, ivBName:"", ivBAddr:"", ivBPan:"", ivDisc:"0", items:[{d:"",q:"1",r:""}] };
+        fillForm(); window.scrollTo(0, 0);
+        toast(saved ? L("बिजक नं. "+was+" save भयो → नयाँ नं. "+D.ivNo, "Invoice "+was+" saved → new no. "+D.ivNo) : L("नयाँ बिजक नं. "+D.ivNo, "New invoice no. "+D.ivNo));
+        return;
+      }
+      var ov = e.target.closest("[data-iv]");
+      if(ov){ var x = LIST[+ov.dataset.iv]; if(!x) return; keep(); D = JSON.parse(JSON.stringify(x.D)); fillForm(); window.scrollTo(0, 0);
+        toast(L("बिजक नं. "+(D.ivNo||"—")+" खुल्यो","Invoice "+(D.ivNo||"—")+" opened")); return; }
+      var dv = e.target.closest("[data-ivdel]");
+      if(dv){ var y = LIST[+dv.dataset.ivdel]; if(!y || !confirm(L("बिजक नं. "+(y.D.ivNo||"—")+" मेटाउने?","Delete invoice "+(y.D.ivNo||"—")+"?"))) return;
+        LIST.splice(+dv.dataset.ivdel, 1); saveList(); listUi(); return; }
       if(e.target.id === "ivAdd"){ D.items.push({d:"",q:"1",r:""}); items(); render(); return; }
       var del = e.target.closest("[data-del]");
       if(del){ D.items.splice(+del.dataset.del, 1); items(); render(); }
@@ -3321,7 +3382,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.6 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4017,7 +4078,7 @@ $("#btnPrint").addEventListener("click", openPdfView);
    EMI schedule never needs a giant canvas on a small phone. */
 var DOC = {INK:"#15202A", INK2:"#36424E", MUTE:"#5B6672", LINE:"#E2DCC9", PAPER:"#FFFEF8", AMB:"#F5B301"};
 function cvKit(W){
-  var cs = getComputedStyle(document.documentElement), k = {W:W, draw:false, breaks:[], y0:0};
+  var cs = getComputedStyle(document.documentElement), k = {W:W, draw:false, breaks:[], y0:0, th:[]};
   k.cv = document.createElement("canvas"); k.ctx = k.cv.getContext("2d");
   k.FS = cs.getPropertyValue("--fs") || "sans-serif"; k.FM = cs.getPropertyValue("--fm") || "monospace";
   k.font = function(px, w, mono){ k.ctx.font = (w||"")+" "+px+"px "+(mono?k.FM:k.FS); };
@@ -4063,7 +4124,7 @@ function cvKit(W){
     if(PROF.logo){ var im = new Image(); im.onload = function(){ cb(im); }; im.onerror = function(){ cb(null); }; im.src = PROF.logo; }
     else cb(null);
   };
-  k.measure = function(lay, logo){ k.cv.width = W; k.cv.height = 10; k.draw = false; k.y0 = 0; k.breaks = []; return Math.ceil(lay(k, logo)); };
+  k.measure = function(lay, logo){ k.cv.width = W; k.cv.height = 10; k.draw = false; k.y0 = 0; k.breaks = []; k.th = []; return Math.ceil(lay(k, logo)); };
   /* whole document on one canvas (photo) */
   k.run = function(lay, done){
     k.logo(function(logo){ var h = k.measure(lay, logo); k.cv.height = h; k.draw = true; lay(k, logo); done(k.cv); });
@@ -4234,9 +4295,10 @@ function amortLay(k, logo){
   y += 30;
   function table(head, ws, rows, sub){
     var xs = [], xx = P; ws.forEach(function(w){ xs.push(xx); xx += w; });
-    k.brk(y); k.rect(P, y, CW, 50, DOC.INK); k.font(21, "700");
-    head.forEach(function(h, i){ k.txt(h, i ? xs[i] + ws[i] - 12 : xs[i] + 12, y + 33, i ? "right" : "left", "#FFFFFF"); });
-    y += 50;
+    function hdr(yy){ k.rect(P, yy, CW, 50, DOC.INK); k.font(21, "700");
+      head.forEach(function(h, i){ k.txt(h, i ? xs[i] + ws[i] - 12 : xs[i] + 12, yy + 33, i ? "right" : "left", "#FFFFFF"); }); }
+    k.brk(y); hdr(y);
+    y += 50; var y0 = y;
     rows.forEach(function(r, ri){
       k.brk(y);
       if(r.g){ k.rect(P, y, CW, 40, "rgba(245,179,1,.22)"); k.font(20, "700"); k.txt(r.g, P + 12, y + 28, "left", "#5D4B18"); y += 40; return; }
@@ -4246,6 +4308,7 @@ function amortLay(k, logo){
       y += 38;
     });
     k.rect(P, y, CW, 2, DOC.INK); y += 2; k.brk(y);
+    k.th.push({y0:y0, y1:y, h:50, draw:hdr});   /* a PDF page that starts inside this table repeats the header */
   }
   /* yearly totals */
   y += 40; k.font(28, "800"); k.txt(L("वर्षअनुसार","Year by year"), P, y); y += 22;
@@ -4284,14 +4347,17 @@ function slipCanvas(done){ docCanvas(done); }
 function layToPdf(W, lay, done){
   var k = cvKit(W), PW = 595.28, PH = 841.89, M = 24, sc = (PW - 2*M) / W, sliceH = Math.floor((PH - 2*M) / sc), pages = [], y = 0;
   k.logo(function(logo){
-    var H = k.measure(lay, logo), br = k.breaks.slice().sort(function(a, b){ return a - b; });
+    var H = k.measure(lay, logo), br = k.breaks.slice().sort(function(a, b){ return a - b; }), TH = k.th.slice();
     (function next(){
       if(y >= H - 1){ build(); return; }
-      var end = Math.min(H, y + sliceH);
+      /* page starting inside a table: room for its header on top */
+      var t = y > 0 ? TH.filter(function(q){ return y > q.y0 && y < q.y1; })[0] : null, hh = t ? t.h : 0;
+      var end = Math.min(H, y + sliceH - hh);
       if(end < H){ var ok = br.filter(function(b){ return b > y + sliceH*0.4 && b <= end; }); if(ok.length) end = ok[ok.length-1]; }
-      var c = document.createElement("canvas"); c.width = W; c.height = end - y;
-      k.cv = c; k.ctx = c.getContext("2d"); k.ctx.translate(0, -y); k.y0 = y; k.draw = true; k.breaks = [];
+      var c = document.createElement("canvas"); c.width = W; c.height = end - y + hh;
+      k.cv = c; k.ctx = c.getContext("2d"); k.ctx.translate(0, hh - y); k.y0 = y - hh; k.draw = true; k.breaks = []; k.th = [];
       lay(k, logo);
+      if(t) t.draw(y - hh);
       c.toBlob(function(bl){
         bl.arrayBuffer().then(function(ab){ pages.push({w:W, h:c.height, d:new Uint8Array(ab)}); y = end; next(); });
       }, "image/jpeg", 0.9);
@@ -4953,6 +5019,7 @@ openTool=function(id){
 var HIST=[], HIST_OPEN=false;
 try{ HIST=JSON.parse(localStorage.getItem("ganak_hist")||"[]")||[]; }catch(e){}
 function histAdd(){
+  if(cur && cur.saveDoc){ cur.saveDoc(); return; }   /* बिजक keeps its own list */
   if(!cur || cur.custom || !lastOut || !lastOut.rows || lastOut.err) return;
   var big=null; lastOut.rows.forEach(function(r){ if(!big && r.c.indexOf("big")>=0) big=r; }); if(!big) big=lastOut.rows[0];
   var v=JSON.parse(JSON.stringify(state[cur.id]||{})), key=cur.id+JSON.stringify(v);
