@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ganak — नेपाली हिसाब Tools | PRERAK MULTIPURPOSE</title>
 <meta name="description" content="Ganak — निर्माण, जग्गा, मिति र पैसाको हिसाब गर्ने नेपाली free app। Powered by PRERAK MULTIPURPOSE, Hetauda.">
-<meta name="theme-color" content="#15202A">
+<meta name="theme-color" content="#2E3A5C">
 <link rel="manifest" href="manifest.json">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0Y7NMT31NK"></script>
 <script>
@@ -683,6 +683,11 @@ body[data-theme="dark"] .tw tr.gr td{background:#2A2414;color:#F0D58C;border-bot
   transition:border-color .2s,box-shadow .2s}
 .f input:focus,.f select:focus,.f textarea:focus,.search:focus,.pfin:focus{border-color:#E39B00;box-shadow:0 0 0 3px rgba(255,179,0,.28)}
 .search{border-radius:999px;box-shadow:var(--m1)}
+/* narrow phones: Copy / PDF go icon-only so the result in the bottom bar is not cut off */
+@media(max-width:420px){.sticky-in{gap:7px}.sticky .sbtn{padding:9px 11px}.sticky .sbtn:not(.wa) .sbt{display:none}}
+@media(max-width:360px){.sticky .sv{font-size:15.5px}}@media(max-width:340px){.sticky .sv{font-size:14px}}
+.fhint{display:block;min-height:16px;margin-top:4px;font-family:var(--fm);font-size:11px;line-height:16px;color:var(--mute);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ---- buttons ---- */
 .rembtn,.ex button,.instb,body[data-theme="dark"] .rembtn,body[data-theme="dark"] .ex button{background:var(--g-amb);color:#1A1405;
   border-radius:999px;box-shadow:0 3px 10px -3px rgba(255,145,0,.65)}
@@ -772,9 +777,9 @@ body[data-theme="dark"] .row.big .rv{background:linear-gradient(transparent 66%,
       <div class="sl" id="stl">नतिजा</div>
       <div class="sv" id="stv">—</div>
     </div>
-    <button class="sbtn" id="btnCopy">📋 Copy</button>
-    <button class="sbtn wa" id="btnWa">💬 Share</button>
-    <button class="sbtn" id="btnPrint">🖨 PDF</button>
+    <button class="sbtn" id="btnCopy" aria-label="Copy">📋<span class="sbt"> Copy</span></button>
+    <button class="sbtn wa" id="btnWa" aria-label="Share">💬<span class="sbt"> Share</span></button>
+    <button class="sbtn" id="btnPrint" aria-label="PDF">🖨<span class="sbt"> PDF</span></button>
   </div>
 </div>
 <div class="scrim" id="scrim"></div>
@@ -3219,8 +3224,6 @@ function applyLang(){
   b[0].className = LANG ? "" : "on"; b[1].className = LANG ? "on" : "";
   $("#q").placeholder = S(UI.search);
   backEl.textContent = S(UI.back);
-  $("#btnCopy").textContent = "📋 Copy";
-  $("#btnWa").textContent = "💬 Share";
   chipsEl.innerHTML = chipHtml();
   $("#homefoot").innerHTML = brandHtml() + footHtml();
   renderHome();
@@ -3242,7 +3245,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.0 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3544,9 +3547,17 @@ function fieldHtml(f, val){
   } else if(f.t === "date"){
     inp = '<input type="date" data-k="'+f.k+'" value="'+esc(val)+'">';
   } else {
-    inp = '<input type="number" inputmode="decimal" step="any" data-k="'+f.k+'" value="'+esc(val)+'">';
+    inp = '<input type="number" inputmode="decimal" step="any" enterkeyhint="next" data-k="'+f.k+'" value="'+esc(val)+'">';
+    if(isMoney(f)) inp += '<span class="fhint">'+esc(moneyHint(val))+'</span>';
   }
   return '<label class="f'+(f.w?" half":"")+'">'+lab+inp+'</label>';
+}
+/* रु fields: live "रु 20,00,000 · 20 लाख" under the box, so a missing/extra zero shows at once */
+function isMoney(f){ return !f.t && f.u && f.u[0] === "रु"; }
+function moneyHint(val){
+  var x = parseFloat(val);
+  if(!isFinite(x) || Math.abs(x) < 1000) return "";
+  return rs(x) + (inWords(x) ? " · " + inWords(x) : "");
 }
 function renderFields(){
   var t = cur, v = state[t.id];
@@ -3641,7 +3652,7 @@ function outLines(out){
   return A;
 }
 /* ---- v8 motion: slide between home and tools, ripple on every tap ---- */
-var NAV_ON = false, HOME_Y = 0;   /* NAV_ON: no slide on the very first screen */
+var NAV_ON = false, HOME_Y = 0, SHOWN = "";   /* NAV_ON: no slide on the very first screen; SHOWN: tool on screen */
 var RMQ = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : {matches:false};
 function navIn(el, cls){
   if(!NAV_ON || RMQ.matches) return;
@@ -3681,6 +3692,8 @@ function openTool(id){
   var t = null;
   TOOLS.forEach(function(x){ if(x.id === id) t = x; });
   if(!t){ closeTool(); return; }
+  /* same tool drawn again (language switch, "fill example" reset): no slide, stay where you were */
+  var redraw = (SHOWN === id && toolEl.style.display === "block"), keepY = window.pageYOffset || 0;
   cur = t;
   if(!t.custom){
     /* saved inputs may come from an older version: fill new fields with their default
@@ -3706,16 +3719,18 @@ function openTool(id){
   if(homeEl.style.display !== "none") HOME_Y = window.pageYOffset || 0;
   homeEl.style.display = "none";
   toolEl.style.display = "block";
-  navIn(toolEl, "vin-r");
+  if(!redraw) navIn(toolEl, "vin-r");
+  SHOWN = id;
   backEl.style.display = "block";
   tagEl.textContent = S(t.nm);
   if(t.custom){ lastOut = null; lastTable = null; $("#cust").innerHTML = t.html(); t.init(); }
   else { renderFields(); compute(); }
-  window.scrollTo(0,0);
+  window.scrollTo(0, redraw ? keepY : 0);
 }
 function closeTool(){
   cur = null; lastTable = null;
   var wasTool = toolEl.style.display === "block";
+  SHOWN = "";
   navGhost();
   toolEl.style.display = "none"; toolEl.innerHTML = "";
   homeEl.style.display = "block";
@@ -3771,7 +3786,20 @@ toolEl.addEventListener("input", function(e){
   var el = e.target; if(!el.dataset || !el.dataset.k || !cur || cur.custom) return;
   state[cur.id][el.dataset.k] = el.value;
   if(el.tagName === "SELECT") return;
+  var h = el.nextElementSibling;
+  if(h && h.className === "fhint") h.textContent = moneyHint(el.value);
   compute();
+});
+/* phone keyboard "Next"/Enter moves to the next box; on the last one it closes the keyboard */
+toolEl.addEventListener("keydown", function(e){
+  var el = e.target;
+  if(e.key !== "Enter" || el.tagName !== "INPUT" || el.type === "checkbox" || el.type === "radio") return;
+  var all = [].filter.call(toolEl.querySelectorAll("input,select,textarea"), function(x){
+    return !x.disabled && x.type !== "hidden" && x.offsetParent !== null; });
+  var i = all.indexOf(el);
+  if(i < 0) return;
+  e.preventDefault();
+  if(all[i+1]) all[i+1].focus(); else el.blur();
 });
 toolEl.addEventListener("change", function(e){
   var el = e.target; if(!el.dataset || !el.dataset.k || !cur || cur.custom) return;
@@ -4397,8 +4425,16 @@ renderHome=function(){
 };
 renderHome();
 
-var THEME="light"; try{ THEME=localStorage.getItem("ganak_theme")||"light"; }catch(e){}
-function setTheme(t){ THEME=t; try{localStorage.setItem("ganak_theme",t);}catch(e){} document.body.dataset.theme=t; renderDrawer(); }
+/* theme: the user's pick wins; until they pick, follow the phone's dark/light setting */
+var THEME_SET="", DARKQ=window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+try{ THEME_SET=localStorage.getItem("ganak_theme")||""; }catch(e){}
+var THEME=THEME_SET || (DARKQ && DARKQ.matches ? "dark" : "light");
+function themeColor(){ var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", THEME==="dark" ? "#111A2F" : "#2E3A5C"); }
+function setTheme(t){ THEME=THEME_SET=t; try{localStorage.setItem("ganak_theme",t);}catch(e){} document.body.dataset.theme=t; themeColor(); renderDrawer(); }
+if(DARKQ && DARKQ.addEventListener) DARKQ.addEventListener("change", function(e){
+  if(THEME_SET) return;
+  THEME = e.matches ? "dark" : "light"; document.body.dataset.theme = THEME; themeColor(); renderDrawer();
+});
 var RATES={cement:750,sand:65,agg:70,brick:18,steel:115,glass:950,tile:120};
 var RATES_FACTORY={cement:750,sand:65,agg:70,brick:18,steel:115,glass:950,tile:120};
 var RATEDEF=[["cement",["सिमेन्ट (रु/बोरा)","Cement (Rs/bag)"]],["sand",["बालुवा (रु/cu.ft)","Sand (Rs/cu.ft)"]],
@@ -4463,7 +4499,7 @@ TOOLS.forEach(function(t){
     return r;
   };
 });
-document.body.dataset.theme=THEME;
+document.body.dataset.theme=THEME; themeColor();
 document.body.dataset.bg=BG;
 document.body.dataset.cat=(cur?cur.cat:"");
 renderSide();
