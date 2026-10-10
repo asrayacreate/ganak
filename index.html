@@ -502,6 +502,7 @@ body[data-bg="auto"][data-cat="util"]{--paper:#EFF0F0;--grid:rgba(90,100,112,.11
 .pdfbar button.pp{background:var(--tape);color:#15202A}
 .pdfbar button.pw{background:var(--wa)}
 .pdfbar button.px{flex:0 0 44px;background:none;color:#8F9CA8;font-size:16px}
+.pdfbar button.pi{background:linear-gradient(135deg,#7C5CFF,#4B3BD6)}
 .pdfsheet{max-width:540px;margin:0 auto;background:#fff;color:#15202A;border-radius:10px;overflow:hidden;
   box-shadow:0 18px 60px rgba(0,0,0,.45);font-family:var(--fs)}
 .pdfsheet .ptape{height:9px;background-color:#F5B301;
@@ -694,6 +695,21 @@ body[data-theme="dark"] .tw tr.gr td{background:#2A2414;color:#F0D58C;border-bot
 .updbar button{border:0;cursor:pointer;font-family:var(--fs);font-weight:800;font-size:13px;border-radius:999px;padding:8px 14px;
   background:var(--g-amb);color:#1A1405}
 .updbar #updX{background:transparent;color:#C9D3DD;padding:8px 10px}
+.pdfbar{background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);border-radius:16px}
+.pdfbar button{border-radius:12px;flex:1 1 auto;white-space:nowrap;padding:10px 8px}
+@media(max-width:400px){.pdfbar{gap:6px;padding:8px}.pdfbar #pvCopy .sbt{display:none}.pdfbar button.px{flex-basis:34px}}.pdfbar button:not(.pp):not(.pw):not(.pi):not(.px){background:rgba(255,255,255,.1)}
+.pdfbar button.pp{background:var(--g-amb);color:#1A1405}.pdfbar button.pw{background:linear-gradient(135deg,#25D366,#12A383 55%,#0B7F70)}
+.hist{margin:12px 0 14px;border:1px solid var(--ol);border-radius:16px;background:var(--card);box-shadow:var(--m1);overflow:hidden}
+.hist summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
+.hist summary::-webkit-details-marker{display:none}
+.hist summary::after{content:"\25BE";margin-left:auto;color:var(--mute);font-size:12px}
+.hist[open] summary::after{content:"\25B4"}
+.hist .sc{font-family:var(--fm);font-size:11.5px;color:var(--mute);font-weight:600}
+.hitem{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;border:0;border-top:1px solid var(--ol);
+  background:none;padding:10px 14px;cursor:pointer;font-family:var(--fs);color:var(--ink)}
+.hitem .hn{font-weight:700;font-size:13px}.hitem .hd{font-size:11px;color:var(--mute);text-align:right;white-space:nowrap}
+.hitem .hv{grid-column:1/-1;font-size:12.5px;color:var(--ink2);overflow-wrap:anywhere}.hitem .hv b{font-family:var(--fm)}
+.hclear{display:block;width:100%;border:0;border-top:1px solid var(--ol);background:none;padding:10px;color:var(--mute);font-family:var(--fs);font-size:12px;cursor:pointer}
 .fhint{display:block;min-height:16px;margin-top:4px;font-family:var(--fm);font-size:11px;line-height:16px;color:var(--mute);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ---- buttons ---- */
@@ -3258,7 +3274,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v8.2 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v8.3 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3892,9 +3908,10 @@ function openPdfView(){
   var d=document.createElement("div");
   d.className="pdfview"; d.id="pdfview";
   d.innerHTML='<div class="pdfbar">'
-    +'<button class="pp" id="pvPrint">🖨 '+L("Print / PDF Save","Print / Save PDF")+'</button>'
-    +'<button id="pvCopy">📋 Copy</button>'
+    +'<button class="pp" id="pvPrint" aria-label="Print / PDF">🖨 PDF</button>'
+    +'<button id="pvCopy" aria-label="Copy">📋<span class="sbt"> Copy</span></button>'
     +'<button class="pw" id="pvShare">💬 Share</button>'
+    +'<button class="pi" id="pvImg">🖼 '+L("फोटो","Image")+'</button>'
     +'<button class="px" id="pvClose" aria-label="close">✕</button></div>'
     +'<div class="pdfsheet"><div class="ptape"></div><div class="pin">'
     +'<div class="phead">'+av+'<div><div class="pbiz">'+esc(biz)+'</div>'
@@ -3916,10 +3933,129 @@ function openPdfView(){
       ta.select(); try{document.execCommand("copy");}catch(err){} ta.remove();
       toast(L("Copy भयो ✓","Copied ✓")); return; }
     if(e.target.closest("#pvShare")){ shareOut(shareText()); return; }
+    if(e.target.closest("#pvImg")){ shareImage(); return; }
   });
   document.addEventListener("keydown",function esc2(e){ if(e.key==="Escape"){ closePv(); document.removeEventListener("keydown",esc2); } });
 }
 $("#btnPrint").addEventListener("click", openPdfView);
+
+/* ---- result as a picture (WhatsApp / Viber): the PDF sheet drawn on a 1080px canvas ----
+   Two passes over the same layout code: first measures the height, then draws. */
+function slipCanvas(done){
+  var W = 1080, P = 64, CW = W - 2*P;
+  var rs_ = getComputedStyle(document.documentElement);
+  var FS = rs_.getPropertyValue("--fs") || "sans-serif", FM = rs_.getPropertyValue("--fm") || "monospace";
+  var INK = "#15202A", INK2 = "#36424E", MUTE = "#5B6672", LINE = "#E2DCC9", PAPER = "#FFFEF8", AMB = "#F5B301";
+  var biz = (PROF.biz||PROF.name) ? (PROF.biz||PROF.name) : "PRERAK MULTIPURPOSE PVT LTD";
+  var sub = [PROF.biz?PROF.name:"", PROF.ph?"📞 "+PROF.ph:"", !PROF.biz&&!PROF.name?L("हेटौंडा","Hetauda"):""].filter(Boolean).join(" · ");
+  var cv = document.createElement("canvas"), ctx = cv.getContext("2d");
+  function font(px, w, mono){ ctx.font = (w||"")+" "+px+"px "+(mono?FM:FS); }
+  function wrap(t, maxW){
+    var out = [], line = "";
+    String(t).split(/\n/).forEach(function(par){
+      line = "";
+      par.split(/(\s+)/).forEach(function(w){
+        var tryL = line + w;
+        if(ctx.measureText(tryL).width <= maxW || !line.trim()){ line = tryL; return; }
+        out.push(line.trim()); line = w.trim();
+      });
+      out.push(line.trim());
+    });
+    return out;
+  }
+  function lay(draw, logo){
+    var y = 0;
+    function txt(t, x, yy, al, col){ if(draw){ ctx.fillStyle = col||INK; ctx.textAlign = al||"left"; ctx.fillText(t, x, yy); } }
+    function rule(yy, dbl){ if(!draw) return; ctx.fillStyle = INK; ctx.fillRect(P, yy, CW, 3); if(dbl) ctx.fillRect(P, yy+7, CW, 3); }
+    function tape(yy){ if(!draw) return; ctx.fillStyle = AMB; ctx.fillRect(0, yy, W, 18);
+      ctx.fillStyle = "rgba(21,32,42,.8)"; for(var x = 0; x < W; x += 27) ctx.fillRect(x, yy + (x % 135 ? 10 : 4), 2, 18); }
+    if(draw){ ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, cv.height);
+      ctx.fillStyle = "rgba(70,58,20,.035)"; for(var gy = 0; gy < cv.height; gy += 6) ctx.fillRect(0, gy, W, 2); }
+    tape(0); y = 18 + 48;
+    /* header: logo / monogram + business */
+    if(draw){
+      if(logo){ ctx.save(); ctx.beginPath(); ctx.moveTo(P+16,y); ctx.arcTo(P+96,y,P+96,y+96,16); ctx.arcTo(P+96,y+96,P,y+96,16);
+        ctx.arcTo(P,y+96,P,y,16); ctx.arcTo(P,y,P+96,y,16); ctx.clip(); ctx.drawImage(logo, P, y, 96, 96); ctx.restore(); }
+      else { ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(P+48, y+48, 48, 0, 7); ctx.fill();
+        font(46, "800"); ctx.fillStyle = AMB; ctx.textAlign = "center"; ctx.fillText(biz.trim().charAt(0).toUpperCase(), P+48, y+64); }
+    }
+    font(40, "800"); var bl = wrap(biz, CW - 124);
+    bl.forEach(function(l, i){ txt(l, P+124, y + 44 + i*48); });
+    var hy = y + 44 + (bl.length-1)*48;
+    if(sub){ font(26); txt(sub, P+124, hy + 40, "left", MUTE); hy += 40; }
+    y = Math.max(y + 96, hy + 12) + 28;
+    rule(y); y += 3 + 40;
+    font(26, "600"); txt(L("अनुमानित हिसाब (Estimate)","Estimate"), P, y, "left", MUTE); txt(slipMeta(), W-P, y, "right", MUTE);
+    y += 56; font(38, "800"); wrap(S(cur.nm), CW).forEach(function(l){ txt(l, P, y); y += 48; });
+    y += 6; rule(y, true); y += 10 + 34;
+    var o = lastOut;
+    if(o && o.rows && !o.err){
+      o.rows.forEach(function(r, ri){
+        var big = /\b(big|hero)\b/.test(r.c), small = /\bsub\b/.test(r.c), l = S(r.l), v = String(r.v), u = S(r.u);
+        if(/\btxt\b/.test(r.c)){
+          font(24, "600"); txt(l, P, y, "left", MUTE); y += 40;
+          font(30, "600"); wrap(v, CW).forEach(function(t){ txt(t, P, y); y += 42; }); y += 14; return;
+        }
+        if(big && ri){ y += 8; rule(y - 30, true); y += 30; }
+        var lf = big ? 30 : (small ? 24 : 28), vf = big ? 52 : (small ? 26 : 30);
+        font(vf, "800", true); var vw = ctx.measureText(v).width;
+        font(22, "", true); var uw = u ? ctx.measureText(u).width + 10 : 0;
+        font(lf, big ? "800" : "500");
+        var lmax = Math.max(CW*0.45, CW - vw - uw - 40), ll = wrap(l, lmax), lw = 0;
+        ll.forEach(function(t){ lw = Math.max(lw, ctx.measureText(t).width); });
+        var own = (vw + uw > CW - Math.min(lw, lmax) - 40);   /* value too long → its own line */
+        var lh = lf + 14;
+        ll.forEach(function(t, i){ txt(t, P, y + i*lh, "left", small ? MUTE : INK2); });
+        var vy = own ? y + ll.length*lh + (vf - lf) : y + (ll.length-1)*lh + (big ? 10 : 0);
+        if(draw){
+          if(!own){ ctx.save(); ctx.strokeStyle = "#BDB59D"; ctx.lineWidth = 2; ctx.setLineDash([2,7]); ctx.beginPath();
+            var lx = P + (ll.length > 1 ? ctx.measureText(ll[ll.length-1]).width : lw) + 14;
+            ctx.moveTo(lx, vy - 8); ctx.lineTo(W - P - vw - uw - 14, vy - 8); ctx.stroke(); ctx.restore(); }
+          if(big){ ctx.fillStyle = "rgba(245,179,1,.45)"; ctx.fillRect(W - P - vw - uw - 8, vy - vf*0.34, vw + uw + 8, vf*0.42); }
+          font(vf, "800", true); ctx.fillStyle = small ? MUTE : INK; ctx.textAlign = "right"; ctx.fillText(v, W - P - uw, vy);
+          if(u){ font(22, "", true); ctx.fillStyle = MUTE; ctx.fillText(u, W - P, vy); }
+        }
+        y = vy + (small ? 24 : 30);
+        if(big && !/\bnw\b/.test(r.c)){ var mw = moneyWords(r.v); if(mw){ font(24, "600"); wrap(mw, CW).forEach(function(t){ txt(t, W-P, y + 4, "right", MUTE); y += 34; }); } }
+        y += big ? 18 : 12;
+      });
+      if(o.table){ font(23, "600"); txt(o.table.title+" — "+L("पूरा तालिका PDF मा","full table in the PDF"), P, y + 10, "left", MUTE); y += 46; }
+      if(o.note){ y += 6; if(draw){ ctx.fillStyle = LINE; ctx.fillRect(P, y, CW, 2); } y += 40;
+        font(23); wrap("ℹ️ " + S(o.note), CW).forEach(function(t){ txt(t, P, y, "left", MUTE); y += 34; }); }
+    } else {
+      font(28, "", true); wrap(cur.share ? cur.share() : outLines(o).join("\n"), CW).forEach(function(t){ txt(t, P, y, "left", INK2); y += 40; });
+    }
+    y += 50; font(26, "700"); txt(L("धन्यवाद!","Thank you!"), P, y, "left", INK2);
+    if(draw){ ctx.fillStyle = INK2; ctx.fillRect(W - P - 300, y - 8, 300, 2); }
+    font(22); txt(L("हस्ताक्षर","Signature"), W - P - 150, y + 30, "center", MUTE);
+    y += 84; font(21, "600"); txt("Ganak · asrayacreate.github.io/ganak · PRERAK MULTIPURPOSE PVT LTD", W/2, y, "center", MUTE);
+    y += 34; tape(y); return y + 18;
+  }
+  function go(logo){ cv.width = W; cv.height = 10; cv.height = Math.ceil(lay(false, logo)); lay(true, logo); done(cv); }
+  if(PROF.logo){ var im = new Image(); im.onload = function(){ go(im); }; im.onerror = function(){ go(null); }; im.src = PROF.logo; }
+  else go(null);
+}
+function shareImage(){
+  if(!cur) return;
+  if(typeof histAdd==="function") histAdd();
+  var name = "ganak-" + cur.id + "-" + todayISO() + ".png", title = S(cur.nm);
+  function save(b){
+    var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    toast(L("फोटो save भयो ✓","Image saved ✓"));
+  }
+  slipCanvas(function(cv){
+    cv.toBlob(function(b){
+      if(!b){ toast(L("फोटो बनेन — PDF प्रयोग गर्नुहोस्","Couldn't make the image — use PDF")); return; }
+      var f = null; try{ f = new File([b], name, {type:"image/png"}); }catch(e){}
+      try{ gtag('event','image_share'); }catch(e){}
+      if(f && navigator.canShare && navigator.canShare({files:[f]})){
+        navigator.share({files:[f], title:title}).catch(function(err){ if(!(err && err.name === "AbortError")) save(b); });
+      } else save(b);
+    }, "image/png");
+  });
+}
 
 function route(){
   var id = location.hash.replace(/^#/,"");
@@ -3994,7 +4130,8 @@ function renderDrawer(){
            ["sand","Sand",L("न्यानो कागज","warm paper")],
            ["plain","Plain",L("grid बिना","no grid")]];
   h+='<div class="dr-sec">'+L("मोड (Theme)","Theme")+'</div>'
-    +'<div class="langsw lt" id="drtheme"><button data-th="light"'+(THEME==="dark"?'':' class="on"')+'>Light</button><button data-th="dark"'+(THEME==="dark"?' class="on"':'')+'>Dark</button></div>';
+    +'<div class="langsw lt" id="drtheme"><button data-th="auto"'+(THEME_SET?'':' class="on"')+'>Auto</button>'
+    +'<button data-th="light"'+(THEME_SET==="light"?' class="on"':'')+'>Light</button><button data-th="dark"'+(THEME_SET==="dark"?' class="on"':'')+'>Dark</button></div>';
   h+='<div class="dr-sec">'+L("पृष्ठभूमि","Background")+'</div><div class="bgopts">';
   BGS.forEach(function(b){
     h+='<button class="bgo'+(BG===b[0]?' on':'')+'" data-bg="'+b[0]+'"><span class="sw" style="display:block;'+bgoSw(b[0])+'"></span>'
@@ -4465,10 +4602,58 @@ openTool=function(id){
   _v4open(id);
   if(cur){ RECENT=[cur.id].concat(RECENT.filter(function(x){return x!==cur.id;})).slice(0,4); saveRecent(); }
 };
+/* results you sent (Copy / Share / PDF / photo) — kept with their inputs, so an estimate given to a
+   customer can be found and reopened later. Field tools only (custom tools keep their own data). */
+var HIST=[], HIST_OPEN=false;
+try{ HIST=JSON.parse(localStorage.getItem("ganak_hist")||"[]")||[]; }catch(e){}
+function histAdd(){
+  if(!cur || cur.custom || !lastOut || !lastOut.rows || lastOut.err) return;
+  var big=null; lastOut.rows.forEach(function(r){ if(!big && r.c.indexOf("big")>=0) big=r; }); if(!big) big=lastOut.rows[0];
+  var v=JSON.parse(JSON.stringify(state[cur.id]||{})), key=cur.id+JSON.stringify(v);
+  HIST=HIST.filter(function(x){ return x.t+JSON.stringify(x.v)!==key; });
+  HIST.unshift({t:cur.id, v:v, l:big.l, r:big.v, u:big.u||"", d:Date.now()});
+  HIST=HIST.slice(0,20);
+  try{ localStorage.setItem("ganak_hist",JSON.stringify(HIST)); }catch(e){}
+  renderHome();   /* home is hidden now; redraw so the list is current when the user goes back */
+}
+["btnCopy","btnWa","btnPrint"].forEach(function(id){ document.getElementById(id).addEventListener("click",histAdd); });
+function histWhen(ms){
+  var d=new Date(ms), now=new Date(), hm=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+  if(d.toDateString()===now.toDateString()) return L("आज ","Today ")+npd(hm);
+  var b=adToBs(d.getFullYear(),d.getMonth()+1,d.getDate());
+  return b ? bsM(b.m-1)+" "+npd(b.d) : d.toISOString().slice(0,10);
+}
+function histHtml(){
+  var items=HIST.map(function(h,i){
+    var t=null; TOOLS.forEach(function(x){ if(x.id===h.t) t=x; }); if(!t) return "";
+    return '<button class="hitem" data-hi="'+i+'"><span class="hn">'+esc(S(t.nm))+'</span><span class="hd">'+esc(histWhen(h.d))+'</span>'
+      +'<span class="hv">'+esc(S(h.l))+': <b>'+esc(h.r+(S(h.u)?" "+S(h.u):""))+'</b></span></button>';
+  }).join("");
+  if(!items) return "";
+  return '<details class="hist"'+(HIST_OPEN?' open':'')+'><summary>📒 '+L("हालै पठाएका हिसाब","Results you sent")+' <span class="sc">'+npd(HIST.length)+'</span></summary>'
+    +items+'<button class="hclear" id="histClear">'+L("सूची मेटाउने","Clear list")+'</button></details>';
+}
+listEl.addEventListener("toggle",function(e){ if(e.target.classList && e.target.classList.contains("hist")) HIST_OPEN=e.target.open; },true);
+listEl.addEventListener("click",function(e){
+  var h=e.target.closest(".hitem");
+  if(h){
+    var x=HIST[+h.dataset.hi]; if(!x) return;
+    state[x.t]=JSON.parse(JSON.stringify(x.v));
+    if(typeof saveState==="function") saveState();
+    openedInApp=true;
+    if(location.hash==="#"+x.t) openTool(x.t); else location.hash="#"+x.t;
+    return;
+  }
+  if(e.target.id==="histClear"){
+    if(!confirm(L("पठाएका हिसाबको सूची मेटाउने?","Clear the list of sent results?"))) return;
+    HIST=[]; try{ localStorage.removeItem("ganak_hist"); }catch(err){} renderHome();
+  }
+});
 var _v4home=renderHome;
 renderHome=function(){
   _v4home();
   if(cat!=="all"||query.trim()) return;
+  var hh=histHtml(); if(hh) listEl.insertAdjacentHTML("afterbegin",hh);
   var g=[]; RECENT.forEach(function(id){ TOOLS.forEach(function(t){ if(t.id===id) g.push(t); }); });
   if(!g.length) return;
   listEl.insertAdjacentHTML("afterbegin",
@@ -4481,7 +4666,12 @@ var THEME_SET="", DARKQ=window.matchMedia ? window.matchMedia("(prefers-color-sc
 try{ THEME_SET=localStorage.getItem("ganak_theme")||""; }catch(e){}
 var THEME=THEME_SET || (DARKQ && DARKQ.matches ? "dark" : "light");
 function themeColor(){ var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", THEME==="dark" ? "#111A2F" : "#2E3A5C"); }
-function setTheme(t){ THEME=THEME_SET=t; try{localStorage.setItem("ganak_theme",t);}catch(e){} document.body.dataset.theme=t; themeColor(); renderDrawer(); }
+function setTheme(t){
+  /* "auto" = follow the phone again */
+  if(t==="auto"){ THEME_SET=""; THEME=(DARKQ && DARKQ.matches) ? "dark" : "light"; try{localStorage.removeItem("ganak_theme");}catch(e){} }
+  else { THEME=THEME_SET=t; try{localStorage.setItem("ganak_theme",t);}catch(e){} }
+  document.body.dataset.theme=THEME; themeColor(); renderDrawer();
+}
 if(DARKQ && DARKQ.addEventListener) DARKQ.addEventListener("change", function(e){
   if(THEME_SET) return;
   THEME = e.matches ? "dark" : "light"; document.body.dataset.theme = THEME; themeColor(); renderDrawer();
