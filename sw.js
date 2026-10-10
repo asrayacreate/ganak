@@ -1,7 +1,8 @@
-var C="ganak-v8-1";
+var C="ganak-v8-2";
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
-    return c.addAll(["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png"]);
+    /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
+    return c.addAll(["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png"].map(function(u){ return new Request(u,{cache:"reload"}); }));
   }));
   self.skipWaiting();
 });
