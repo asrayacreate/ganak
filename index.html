@@ -24,7 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&text=GANAK&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#15202A; --ink2:#3B4854; --mute:#727E8A;
+  --ink:#15202A; --ink2:#3B4854; --mute:#5F6B77;
   --paper:#F1EFE4; --card:#FFFFFF; --line:#DFDACA; --line2:#ECE9DC; --grid:rgba(84,110,130,.10);
   --tape:#F5B301; --tape-dk:#B98700;
   --con:#B4442F; --np:#2E6B4F; --fin:#1D5B8C; --util:#5A6470;
@@ -616,6 +616,15 @@ header{box-shadow:0 8px 22px -10px rgba(11,18,26,.6)}
 .langsw{box-shadow:inset 0 1px 3px rgba(0,0,0,.45)}
 .langsw button.on{background:var(--g-tape);color:#15202A;box-shadow:0 2px 8px rgba(245,179,1,.35)}
 .langsw.lt{box-shadow:var(--in);border-color:transparent}
+/* narrow phones (360px and below): keep both language buttons whole — tighten the brand row instead of clipping "EN" */
+.brandrow .langsw{flex:0 0 auto}
+@media(max-width:400px){.brandrow{gap:6px}.brandrow .langsw button{padding:7px 11px}}
+@media(max-width:374px){.brandrow .logo-np{display:none}}
+@media(max-width:340px){.brandrow .logo{font-size:20px}.brandrow .gring{width:30px;height:30px}}
+@media(max-width:310px){.brandrow .gring{display:none}}
+/* small header/drawer buttons: invisible ~44px touch area, nothing moves */
+.hdr-back,.hdr-menu,#exBtn,#drClose{position:relative}
+.hdr-back::after,.hdr-menu::after,.hdr-ic::after,#exBtn::after,#drClose::after{content:"";position:absolute;inset:-9px -5px}
 /* cards */
 .tcard{border:0;border-left:3px solid var(--util);border-radius:var(--r2);background:var(--surf);box-shadow:var(--e2);
   padding:12px 11px 11px;transition:transform .18s var(--ease),box-shadow .25s var(--ease)}
@@ -677,7 +686,7 @@ body[data-theme="dark"] .k.fn{background:linear-gradient(145deg,#28374A,#1D2835)
 .row.big{border-top:3px double var(--ink)}
 .row .dots{border-bottom-color:#BDB59D}
 /* long values drop to their own line (right-aligned) instead of running off narrow phones */
-.row{flex-wrap:wrap;justify-content:flex-end}
+.row{flex-wrap:wrap;justify-content:flex-end}.row:not(.txt) .rv{max-width:100%;white-space:normal;text-align:right}
 body[data-theme="dark"] .row.big .rv{background:linear-gradient(transparent 66%,rgba(245,179,1,.45) 66%)}
 .slip .note::after{content:"";display:block;height:20px;width:58%;margin:13px auto 0;opacity:.72;
   background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 3px,var(--ink) 3px 4px,transparent 4px 7px,var(--ink) 7px 10px,transparent 10px 11px,var(--ink) 11px 12px,transparent 12px 15px)}
@@ -1748,6 +1757,7 @@ var TOOLS = [
   calc:function(v){
     var a = n(v.a);
     if(a<=0) return {err:["रकम हाल्नुहोस्।","Enter the amount."]};
+    if(n(v.ds) > 100) return DISC_ERR;
     var disc = a*n(v.ds)/100, base = a - disc, rows = [
       row(["रकम","Amount"], rs(a), "") ];
     if(disc>0) rows.push(row(["छुट ("+fmt(n(v.ds),1)+"%)","Discount ("+fmt(n(v.ds),1)+"%)"], "− "+rs(disc), ""));
@@ -1768,7 +1778,7 @@ var TOOLS = [
 
 
 /* ---------------- प्रतिशत / छुट ---------------- */
-{ id:"pct", cat:"fin", ic:"🏷️", neu:true,
+{ id:"pct", cat:"fin", ic:"🏷️", neu:true, neg:true,
   nm:["प्रतिशत / छुट","Percent / Discount"],
   sb:["% का ४ हिसाब एकै ठाउँ","4 percent tools in one"],
   kw:"percent percentage pratishat discount chut increase decrease badhi kami",
@@ -1804,6 +1814,7 @@ var TOOLS = [
     if(v.m==="disc"){
       var pr = n(v.pr), dp = n(v.dp);
       if(pr<=0) return {err:["मूल्य हाल्नुहोस्।","Enter the price."]};
+      if(dp<0 || dp>100) return DISC_ERR;
       var dc = pr*dp/100;
       return { rows:[
         row(["मूल्य","Price"], rs(pr), ""),
@@ -2223,7 +2234,7 @@ var TOOLS = [
       row(["तोला (दशमलवमा)","Tola (decimal)"], fmt(tot,4), ["तोला","tola"]),
       row(["तोला–लाल","Tola–laal"], fmt(t,0)+" – "+fmt(rl,2), ""),
       row(["तोला–आना–लाल","Tola–aana–laal"], fmt(t,0)+" – "+fmt(a,0)+" – "+fmt(l,2), "", "sub"),
-      row(["१ तोला","1 tola"], fmt(TOLA_G,4)+" g · "+L("१ आना ","1 aana ")+fmt(AANA,4)+" g · "+L("१ लाल ","1 laal ")+fmt(LAAL,4), "g", "sub") ];
+      row(["१ तोला","1 tola"], fmt(TOLA_G,4)+"\u00a0g · "+L("१\u00a0आना\u00a0","1\u00a0aana\u00a0")+fmt(AANA,4)+"\u00a0g · "+L("१\u00a0लाल\u00a0","1\u00a0laal\u00a0")+fmt(LAAL,4)+"\u00a0g", "", "sub") ];
     var r = n(v.rate);
     if(r > 0){
       var metal = tot*r, jarti = metal*n(v.jt)/100, jy = n(v.jy);
@@ -2510,7 +2521,7 @@ var TOOLS = [
   }},
 
 /* ---------------- तापक्रम Converter (v6.6) ---------------- */
-{ id:"temp", cat:"util", ic:"🌡️", neu:true,
+{ id:"temp", cat:"util", ic:"🌡️", neu:true, neg:true,
   nm:["तापक्रम Converter","Temperature Converter"],
   sb:["°C ↔ °F ↔ K","°C ↔ °F ↔ K"],
   kw:"temperature tapkram celsius fahrenheit kelvin degree jwaro fever thermometer garmi jado",
@@ -2790,7 +2801,7 @@ var TOOLS = [
     function save(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} }
     function items(){ $("#ivItems").innerHTML = listHtml(D.items, [["d",L("विवरण","Description")],["q",L("परिमाण","Qty"),"n","half"],["r",L("दर","Rate")+' <em>'+L("रु","Rs")+'</em>',"n","half"]]); }
     function calc(){
-      var tax = D.ivType !== "pan", sub = 0, rows = [], it = [];
+      var tax = D.ivType !== "pan", sub = 0, rows = [], it = [], neg = 0;
       var biz = PROF.biz || PROF.name, bs = adToBs(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate());
       rows.push(row(["विक्रेता","Seller"], biz || L("(Profile मा नाम राख्नुहोस्)","(set a name in Profile)"), ""));
       rows.push(row([tax ? "विक्रेताको VAT नं." : "विक्रेताको PAN","Seller "+(tax?"VAT":"PAN")+" no."], D.ivSPan || "—", "", "sub"));
@@ -2802,12 +2813,14 @@ var TOOLS = [
       if(D.ivBAddr) rows.push(row(["ग्राहकको ठेगाना","Buyer address"], D.ivBAddr, "", "sub"));
       if(D.ivBPan) rows.push(row(["ग्राहकको PAN","Buyer PAN"], D.ivBPan, "", "sub"));
       D.items.forEach(function(x,i){
-        var q = n(x.q), r = n(x.r), a = q*r; if(!(a>0) && !x.d) return;
+        var q = n(x.q), r = n(x.r), a = q*r; if(q<0 || r<0) neg = 1; if(!(a>0) && !x.d) return;
         sub += a; it.push(1);
         rows.push(row([(i+1)+". "+(x.d||"—")+" — "+fmt(q,3)+" × "+fmt(r,2), (i+1)+". "+(x.d||"—")+" — "+fmt(q,3)+" × "+fmt(r,2)], rs(a), ""));
       });
+      if(neg) return {err:["परिमाण र दर ऋणात्मक (−) हुन मिल्दैन।","Quantity and rate can't be negative."]};
       if(!(sub>0)) return {err:["कम्तीमा एउटा सामानको परिमाण र दर हाल्नुहोस्।","Enter quantity and rate for at least one item."]};
-      var dp = n(D.ivDisc), disc = sub*dp/100, base = sub - disc, vat = tax ? base*0.13 : 0, tot = base + vat, w = rupeeWords(tot);
+      var dp = n(D.ivDisc); if(dp<0 || dp>100) return DISC_ERR;
+      var disc = sub*dp/100, base = sub - disc, vat = tax ? base*0.13 : 0, tot = base + vat, w = rupeeWords(tot);
       rows.push(row(["जम्मा","Subtotal"], rs(sub), ""));
       if(disc>0) rows.push(row(["छुट ("+fmt(dp,2)+"%)","Discount ("+fmt(dp,2)+"%)"], "− "+rs(disc), ""));
       if(tax){ rows.push(row(["करयोग्य रकम","Taxable amount"], rs(base), "", "sub")); rows.push(row(["VAT १३%","VAT 13%"], rs(vat), "")); }
@@ -2980,7 +2993,7 @@ var TOOLS = [
       var off = cur*d/100; cur -= off;
       rows.push(row([(i+1)+". "+fmt(d,2)+"% छुट (बाँकीमा)", (i+1)+". "+fmt(d,2)+"% off (on what remains)"], "− "+rs(off)+" → "+rs(cur), "", "sub"));
     });
-    if(bad) return {err:["छुट ० देखि १००% सम्म हुनुपर्छ।","Each discount must be between 0 and 100%."]};
+    if(bad) return DISC_ERR;
     var eff = (1 - cur/p)*100, simple = n(v.d1)+n(v.d2)+n(v.d3), vat = (v.vt==="y") ? cur*0.13 : 0;
     rows.push(row(["जम्मा छुट","Total discount"], rs(p-cur), ""));
     rows.push(row(["वास्तविक छुट %","Effective discount"], fmt(eff,2)+"%", "", ""));
@@ -3194,7 +3207,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v7.0 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v7.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3259,16 +3272,16 @@ gpa:["NEB (SEE, ११–१२) र TU सेमेस्टरको grade, GP
 nepse:["बोनस/हकप्रदपछि सेयरको समायोजित मूल्य र कमिसनसहित औसत लागत (WACC)।","Share price after bonus/right and average cost (WACC) with commission."]
 };
 var ROMAN = {
-dhalan:"dhalan slab concrete rcc chhat casting",
+dhalan:"dhalan slab concrete rcc chhat chhad casting",
 septic:"septic tank charpi sauchalaya soak pit",
 majduri:"majduri jyala wage labour hajiri peski",
 salary:"talab salary tds katta ssf hatma",
-fdcmp:"fd muddati fixed deposit tulana compare byaj",
+fdcmp:"fd muddati mudati fixed deposit tulana compare byaj",
 udharo:"udharo khata baki ledger dine line",
 u2p:"unicode preeti ulto convert press",
-bhada:"bhada gadi truck dhuwani fare freight km",
+bhada:"bhada gadi truck dhuwani fare freight km taxi",
 tax:"income tax aayakar kar slab ird talab salary",
-words:"rakam shabda words cheque check matra lakh",
+words:"rakam shabda words cheque check matra lakh number",
 preeti:"preeti unicode font yunikod convert",
 weight:"taul weight kg kilo pau dharni quintal kwintal ton",
 cashnote:"cash note ganti counter paisa rupaiya gaddi total",
@@ -3410,13 +3423,51 @@ function cardHtml(t){
     + '<span class="nm">'+esc(S(t.nm))+'</span>'
     + '<span class="sb">'+esc(S(t.sb))+'</span></button>';
 }
+/* search: every word is matched on its own and results are ranked — "sun ko rate", "feet to meter",
+   "pani tanki" work; the tool's own name / first roman keyword counts most. Romanised spellings are
+   loosened (chh=ch, aa=a, ee=i, oo=u, w=v) so chhut/chut, eeta/ita match. */
+var SRCH_STOP = " ko ka ki ma le lai ra ani to the a an of for in on kati how much what is ";
+var SRCH_OPT = " rate dar mulya price hisab nikalne kasari calculate convert converter ";
+function srchNorm(s){ return String(s).toLowerCase().replace(/chh/g,"ch").replace(/aa/g,"a").replace(/ee/g,"i").replace(/oo/g,"u").replace(/w/g,"v"); }
+function srchWords(s){ return srchNorm(s).split(/[^a-z0-9\u0900-\u097F\u200C\u200D]+/).filter(Boolean); }
+function srchIndex(t){
+  if(t._ix) return t._ix;
+  var R = ROMAN[t.id] || "", nm = t.nm[0]+" "+t.nm[1], sb = t.sb[0]+" "+t.sb[1];
+  return (t._ix = { prim: srchWords(R)[0] || "", nmw: srchWords(nm), nms: srchNorm(nm),
+    w: srchWords(R+" "+t.kw+" "+nm), sb: srchNorm(sb), hay: (R+" "+t.kw+" "+nm+" "+sb).toLowerCase() });
+}
+function srchScore(ix, k, raw){
+  var s = 0;
+  if(ix.prim === k) s += 10;
+  if(ix.nmw.indexOf(k) >= 0) s += 8; else if(ix.nms.indexOf(k) >= 0) s += 6;
+  if(ix.w.indexOf(k) >= 0) s += 5;
+  else if(k.length >= 3 && ix.w.some(function(x){ return x.indexOf(k) === 0; })) s += 3;
+  if(ix.sb.indexOf(k) >= 0) s += 2;
+  return s || (ix.hay.indexOf(raw) >= 0 ? 1 : 0);   /* plain substring, as the old search did */
+}
+function searchTools(q, c){
+  var pool = TOOLS.filter(function(t){ return c === "all" || t.cat === c; });
+  var raws = q.toLowerCase().split(/[^a-z0-9\u0900-\u097F\u200C\u200D]+/).filter(Boolean)
+    .filter(function(x){ return SRCH_STOP.indexOf(" "+srchNorm(x)+" ") < 0; });
+  var toks = raws.map(srchNorm);
+  if(!toks.length) return pool;
+  var req = toks.filter(function(x){ return SRCH_OPT.indexOf(" "+x+" ") < 0; });
+  if(!req.length) req = toks;
+  function rank(all){   /* all: every required word must match; else any word (ranked) */
+    return pool.map(function(t, i){
+      var ix = srchIndex(t), sc = 0, ok = true;
+      toks.forEach(function(k, j){ var v = srchScore(ix, k, raws[j]); if(!v && all && req.indexOf(k) >= 0) ok = false; sc += v; });
+      return {t:t, s: ok ? sc : 0, i:i};
+    }).filter(function(r){ return r.s > 0; })
+      .sort(function(a, b){ return b.s - a.s || a.i - b.i; })
+      .map(function(r){ return r.t; });
+  }
+  var r = rank(true);
+  return r.length ? r : rank(false);
+}
 function renderHome(){
-  var q = query.trim().toLowerCase();
-  var hit = TOOLS.filter(function(t){
-    if(cat !== "all" && t.cat !== cat) return false;
-    if(!q) return true;
-    return (S(t.nm)+" "+S(t.sb)+" "+t.nm[0]+" "+t.nm[1]+" "+t.kw+" "+(ROMAN[t.id]||"")).toLowerCase().indexOf(q) >= 0;
-  });
+  var q = query.trim();
+  var hit = q ? searchTools(q, cat) : TOOLS.filter(function(t){ return cat === "all" || t.cat === cat; });
   if(!hit.length){ listEl.innerHTML = '<div class="empty">'+esc(S(UI.empty))+'</div>'; return; }
   var html = "";
   if(cat === "all" && !q){
@@ -3433,6 +3484,19 @@ function renderHome(){
 
 /* ---------- tool ---------- */
 function visFields(t, v){ return t.f.filter(function(f){ return !f.sif || f.sif(v); }); }
+var DISC_ERR = {err:["छुट ० देखि १००% सम्म हुनुपर्छ।","Each discount must be between 0 and 100%."]};
+/* lengths, rates, counts, money: a stray minus gives nonsense (रु −337, −5 कोट) — stop it once here.
+   Tools where negatives are real (temperature, % change) set neg:true. */
+function negErr(t, v){
+  if(t.neg) return null;
+  var fs = visFields(t, v);
+  for(var i = 0; i < fs.length; i++){
+    var f = fs[i];
+    if(!f.t && parseFloat(v[f.k]) < 0)
+      return {err:["“"+f.l[0]+"” मा ऋणात्मक (−) संख्या हाल्न मिल्दैन।","“"+f.l[1]+"” can't be negative."]};
+  }
+  return null;
+}
 function fieldHtml(f, val){
   var warn = (f.exrate && !(typeof RATES_OK!=="undefined" && (f.rk ? rateOk(f.rk) : RATES_OK))) ? '<span class="exrate">'+L("⚠️ नमुना दर","⚠️ example rate")+'</span>' : '';
   var lab = '<span class="fl">'+esc(S(f.l))+(f.u ? ' <em>'+esc(S(f.u))+'</em>' : '')+warn+'</span>', inp;
@@ -3487,7 +3551,7 @@ function moneyWords(val){
 }
 function compute(){
   var t = cur, v = state[t.id], out;
-  try { out = t.calc(v); } catch(e){ out = {err:["हिसाब मिलेन — नाप फेरि हेर्नुहोस्।","That didn't compute — please check the inputs."]}; }
+  try { out = negErr(t, v) || t.calc(v); } catch(e){ out = {err:["हिसाब मिलेन — नाप फेरि हेर्नुहोस्।","That didn't compute — please check the inputs."]}; }
   showOut(t, out);
 }
 /* result slip — used by every field tool and by custom tools that build rows (बिजक) */
