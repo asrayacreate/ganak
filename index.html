@@ -947,6 +947,16 @@ var MIX = { M10:[1,3,6,34], M15:[1,2,4,32], M20:[1,1.5,3,30], M25:[1,1,2,25] };
 var NEA_SL = [ [20,"०–२०","0–20",""], [10,"२१–३०","21–30","e21"], [20,"३१–५०","31–50","e31"], [100,"५१–१५०","51–150","e51"], [100,"१५१–२५०","151–250","e51"], [Infinity,"२५१+","251+","e251"] ];
 var NEA_SC = { "5":[30,50,50,75,100,150], "15":[50,75,75,100,125,175], "30":[75,100,100,125,150,200], "60":[125,125,125,150,200,250] };
 function sigFmt(x){ var a = Math.abs(x); return fmt(x, a>=1000 ? 2 : a>=1 ? 4 : a>=0.001 ? 6 : 9); }
+/* ---- v6.7 tool data ---- */
+/* TV duty (Rs) by screen size — Department of Customs TV tariff (archive.customs.gov.np) rows found; + Rs 565 customs service tax */
+var TV_DUTY = { "32":14400, "33":18150, "40":24000, "43":25800, "50":62500, "65":81250 }, TV_CST = 565;
+function emiOf(P, rate, n){ var r = rate/1200; return (r === 0) ? P/n : P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1); }
+function rupeeWords(x){                                 /* "… रुपैयाँ … पैसा मात्र" for बिजक */
+  var rup = Math.floor(Math.abs(x)), ps = Math.round((Math.abs(x)-rup)*100); if(ps===100){ rup++; ps=0; }
+  var nw = npWords(rup), ew = enWords(rup); if(nw===null) return ["",""];
+  return [ nw+" रुपैयाँ"+(ps>0 ? " "+npWords(ps)+" पैसा" : "")+" मात्र",
+           ew.charAt(0).toUpperCase()+ew.slice(1)+" rupees"+(ps>0 ? " and "+enWords(ps)+" paisa" : "")+" only" ];
+}
 
 var TOOLS = [
 
@@ -2514,6 +2524,231 @@ var TOOLS = [
     return { rows:rows,
       note:["१ तोला = ११.६६३८ ग्राम = १६ आना = १०० लाल। Karat = २४ भागमा सुनको भाग: 22K = ९१.६७%, 18K = ७५%। बजेट २०८२/८३ ले पत्थरजडित गहनामा १३% VAT लगायो; सादा सुनको गहनामा लागेको २% विलासिता शुल्क २०८३ मा हटाइएको छ। ज्याला/जर्ती पसलअनुसार फरक — बिलमा छुट्टाछुट्टै माग्नुहोस्। दर FENEGOSIDA को दैनिक दर हेरेर Settings मा राख्नुहोस्।",
             "1 tola = 11.6638 g = 16 aana = 100 laal. Karat = parts of gold in 24: 22K = 91.67%, 18K = 75%. Budget 2082/83 put 13% VAT on stone-studded jewellery; the 2% luxury fee on plain gold jewellery was removed in 2083. Making and jarti vary by shop — ask for them itemised on the bill. Keep the rate in Settings from FENEGOSIDA's daily rate."] };
+  }},
+
+/* ---------------- EMI तुलना (v6.7) ---------------- */
+{ id:"emicmp", cat:"fin", ic:"⚖️", neu:true,
+  nm:["EMI तुलना","EMI Compare"],
+  sb:["३ बैंक / अवधिको किस्ता एकै ठाउँ","3 banks / tenures side by side"],
+  kw:"emi compare tulana loan bank kista rin byaj interest tenure processing fee home loan",
+  ex:["रु २० लाख — १० / १५ / २० वर्षको किस्ता र जम्मा खर्च","Rs 20 lakh — instalment and total cost over 10 / 15 / 20 years"],
+  f:[ {k:"p",l:["ऋण रकम","Loan amount"],u:["रु","Rs"],d:2000000},
+      {k:"ra",l:["A: ब्याज दर","A: Interest rate"],u:U.pct,d:6.47,w:1,exrate:true,rk:"loan"},
+      {k:"ta",l:["A: अवधि","A: Term"],u:["वर्ष","yrs"],d:10,w:1},
+      {k:"fa",l:["A: सेवा शुल्क","A: Processing fee"],u:U.pct,d:0.5,w:1},
+      {k:"rb",l:["B: ब्याज दर","B: Interest rate"],u:U.pct,d:6.47,w:1,exrate:true,rk:"loan"},
+      {k:"tb",l:["B: अवधि","B: Term"],u:["वर्ष","yrs"],d:15,w:1},
+      {k:"fb",l:["B: सेवा शुल्क","B: Processing fee"],u:U.pct,d:0.5,w:1},
+      {k:"rc",l:["C: ब्याज दर","C: Interest rate"],u:U.pct,d:6.47,w:1,exrate:true,rk:"loan"},
+      {k:"tc",l:["C: अवधि","C: Term"],u:["वर्ष","yrs"],d:20,w:1},
+      {k:"fc",l:["C: सेवा शुल्क","C: Processing fee"],u:U.pct,d:0.5,w:1} ],
+  calc:function(v){
+    var P = n(v.p), opts = [];
+    if(P<=0) return {err:["ऋण रकम हाल्नुहोस्।","Enter the loan amount."]};
+    ["a","b","c"].forEach(function(x){
+      var rt = n(v["r"+x]), yr = n(v["t"+x]), N = Math.round(yr*12);
+      if(rt<0 || N<=0 || N>720) return;
+      var emi = emiOf(P, rt, N), intr = emi*N - P, fee = P*n(v["f"+x])/100;
+      opts.push({k:x.toUpperCase(), rt:rt, yr:yr, emi:emi, intr:intr, fee:fee, tot:P+intr+fee});
+    });
+    if(!opts.length) return {err:["कम्तीमा एउटा विकल्पको दर र अवधि (६० वर्षसम्म) हाल्नुहोस्।","Enter a rate and term (up to 60 years) for at least one option."]};
+    var rows = [ row(["ऋण रकम","Loan amount"], rs(P), "") ];
+    opts.forEach(function(o){
+      rows.push(row([o.k+": "+fmt(o.rt,2)+"% · "+fmt(o.yr,1)+" वर्ष — मासिक किस्ता", o.k+": "+fmt(o.rt,2)+"% · "+fmt(o.yr,1)+" yrs — monthly EMI"], rs(o.emi), ""));
+      rows.push(row(["   जम्मा ब्याज + सेवा शुल्क","   Total interest + fee"], rs(o.intr)+" + "+rs(o.fee), "", "sub"));
+      rows.push(row(["   जम्मा तिर्ने","   Total payable"], rs(o.tot), "", "sub"));
+    });
+    var cheap = opts.slice().sort(function(a,b){ return a.tot-b.tot; })[0], low = opts.slice().sort(function(a,b){ return a.emi-b.emi; })[0];
+    if(opts.length > 1) rows.push(row(["सबैभन्दा कम मासिक किस्ता","Lowest monthly EMI"], low.k+" — "+rs(low.emi), "", "sub"));
+    rows.push(row(["सबैभन्दा सस्तो (जम्मा खर्च): "+cheap.k,"Cheapest overall (total cost): "+cheap.k], rs(cheap.tot), "", "big"));
+    opts.forEach(function(o){ if(o !== cheap) rows.push(row([o.k+" ले बढी पर्ने",o.k+" costs more by"], rs(o.tot-cheap.tot), "", "sub")); });
+    return { rows:rows,
+      note:["Reducing balance: EMI = P × R × (1+R)^N ÷ [(1+R)^N − 1], R = मासिक दर, N = महिना। लामो अवधिमा किस्ता घट्छ तर जम्मा ब्याज बढ्छ। ब्याज दर (base rate + premium) बैंकअनुसार फरक — Settings मा आफ्नो दर राख्नुहोस्।",
+            "Reducing balance: EMI = P × R × (1+R)^N ÷ [(1+R)^N − 1], R = monthly rate, N = months. Longer terms lower the EMI but raise total interest. Rates (base rate + premium) differ by bank — keep yours in Settings."] };
+  }},
+
+/* ---------------- उपदान / Gratuity (v6.7) ---------------- */
+{ id:"gratuity", cat:"fin", ic:"🎁", neu:true,
+  nm:["उपदान (Gratuity)","Gratuity"],
+  sb:["आधारभूत तलब × ८.३३% × महिना","Basic salary × 8.33% × months"],
+  kw:"gratuity upadan labour act 2074 8.33 basic salary service retirement ssf tax",
+  ex:["आधारभूत तलब रु ३०,०००, ५ वर्ष ६ महिना सेवा","Basic salary Rs 30,000, 5 years 6 months of service"],
+  f:[ {k:"b",l:["मासिक आधारभूत तलब","Monthly basic salary"],u:["रु","Rs"],d:30000},
+      {k:"y",l:["सेवा अवधि — वर्ष","Service — years"],u:["वर्ष","yrs"],d:5,w:1},
+      {k:"m",l:["थप महिना","Extra months"],u:["महिना","months"],d:6,w:1} ],
+  calc:function(v){
+    var b = n(v.b), mo = Math.round(n(v.y)*12 + n(v.m));
+    if(b<=0) return {err:["मासिक आधारभूत तलब हाल्नुहोस्।","Enter the monthly basic salary."]};
+    if(mo<=0) return {err:["सेवा अवधि हाल्नुहोस्।","Enter the length of service."]};
+    var per = b*0.0833, tot = per*mo, free = Math.max(tot*0.5, 500000), txb = Math.max(0, tot - free);
+    return { rows:[
+      row(["मासिक उपदान (८.३३%)","Monthly gratuity (8.33%)"], rs(per), ""),
+      row(["वार्षिक (≈ १ महिनाको तलब)","Per year (≈ one month's basic)"], rs(per*12), "", "sub"),
+      row(["सेवा अवधि","Service"], fmt(mo,0)+L(" महिना"," months"), ""),
+      row(["जम्मा उपदान","Total gratuity"], rs(tot), "", "big"),
+      row(["करमा घटाइने (५०% वा ५ लाख, जुन बढी)","Tax-free part (50% or 5 lakh, higher)"], rs(Math.min(tot, free)), "", "sub"),
+      row(["करयोग्य हुन सक्ने भाग","Possibly taxable part"], rs(txb), "", "sub") ],
+      note:["श्रम ऐन २०७४ दफा ५३: रोजगारदाताले हरेक महिना आधारभूत पारिश्रमिकको ८.३३% उपदान बापत सामाजिक सुरक्षा कोषमा श्रमिकको नाममा जम्मा गर्छ (काम सुरु गरेकै दिनदेखि)। तलब बदलिएको भए हरेक अवधिको आधारभूत तलबले छुट्टै हिसाब हुन्छ। आयकर ऐन दफा ६५: स्वीकृत अवकाश कोषबाट एकमुष्ट भुक्तानीमा ५०% वा रु ५ लाख (जुन बढी) घटाएर बाँकीमा कर लाग्छ — दर/अवस्थाका लागि IRD वा लेखापाल।",
+            "Labour Act 2074 s.53: each month the employer deposits 8.33% of basic remuneration as gratuity in the SSF in the worker's name, from the first day of work. If the basic changed, each period is counted at its own basic. Income Tax Act s.65: a lump sum from an approved retirement fund is taxed after deducting 50% or Rs 5 lakh, whichever is higher — check rates/cases with IRD or an accountant."] };
+  }},
+
+/* ---------------- PF / CIT (v6.7) ---------------- */
+{ id:"pfcit", cat:"fin", ic:"🏦", neu:true,
+  nm:["सञ्चय कोष (PF) / CIT","Provident Fund / CIT"],
+  sb:["१०% + १०% PF, CIT — कर छुट र भविष्यको रकम","10% + 10% PF, CIT — tax saving and future value"],
+  kw:"pf provident fund sanchaya kosh epf cit nagarik lagani kosh citizen investment trust retirement tax deduction saving 10 percent",
+  ex:["आधारभूत रु ३०,०००, कुल तलब रु ४५,०००, CIT रु २,०००/महिना, २० वर्ष","Basic Rs 30,000, gross Rs 45,000, CIT Rs 2,000/month, 20 years"],
+  f:[ {k:"b",l:["मासिक आधारभूत तलब","Monthly basic salary"],u:["रु","Rs"],d:30000,w:1},
+      {k:"g",l:["मासिक कुल तलब (gross)","Monthly gross salary"],u:["रु","Rs"],d:45000,w:1},
+      {k:"cit",l:["CIT (मासिक, स्वैच्छिक)","CIT (monthly, voluntary)"],u:["रु","Rs"],d:2000,w:1},
+      {k:"y",l:["अवधि","Years"],u:["वर्ष","yrs"],d:20,w:1},
+      {k:"ir",l:["ब्याज दर (वार्षिक)","Interest (yearly)"],u:U.pct,d:5.25,w:1,exrate:true,rk:"epf"},
+      {k:"cap",l:["कट्टी सीमा (वार्षिक)","Deduction cap (yearly)"],u:["रु","Rs"],d:500000,w:1} ],
+  calc:function(v){
+    var b = n(v.b), g = n(v.g), cit = n(v.cit), yr = n(v.y), ir = n(v.ir);
+    if(b<=0) return {err:["मासिक आधारभूत तलब हाल्नुहोस्।","Enter the monthly basic salary."]};
+    if(g < b) g = b;
+    var pe = b*0.10, pr = b*0.10, mon = pe + pr + cit, yrC = mon*12;
+    var asm = (g + pr)*12, ded = Math.min(yrC, asm/3, n(v.cap) || 500000);
+    var save = npTaxCalc(asm, "84", "s") - npTaxCalc(asm - ded, "84", "s");
+    var N = Math.round(yr*12), i = ir/1200, fv = (N<=0) ? 0 : (i===0 ? mon*N : mon*(Math.pow(1+i,N)-1)/i);
+    var rows = [
+      row(["PF — तपाईंको १०%","PF — your 10%"], rs(pe), ""),
+      row(["PF — रोजगारदाताको १०%","PF — employer's 10%"], rs(pr), ""),
+      row(["CIT (स्वैच्छिक)","CIT (voluntary)"], rs(cit), "", "sub"),
+      row(["मासिक जम्मा योगदान","Monthly contribution"], rs(mon), ""),
+      row(["वार्षिक योगदान","Yearly contribution"], rs(yrC), "", "sub"),
+      row(["करयोग्य आयबाट घटाउन मिल्ने (वार्षिक)","Deductible from taxable income (yearly)"], rs(ded), ""),
+      row(["अनुमानित कर बचत (वार्षिक, FY 2083/84)","Est. tax saving (yearly, FY 2083/84)"], rs(save), "", "sub") ];
+    if(N>0){
+      rows.push(row([fmt(yr,1)+" वर्षमा जम्मा गरिने", "Paid in over "+fmt(yr,1)+" yrs"], rs(mon*N), "", "sub"));
+      rows.push(row([fmt(yr,1)+" वर्षपछि अनुमानित रकम", "Estimated value after "+fmt(yr,1)+" yrs"], rs(fv), "", "big"));
+      rows.push(row(["जसमध्ये ब्याज","Of which interest"], rs(fv - mon*N), "", "sub"));
+    }
+    return { rows:rows,
+      note:["श्रम ऐन २०७४ दफा ५२: आधारभूत पारिश्रमिकको १०% कट्टा गरी रोजगारदाताले उत्तिकै (१००%) थपेर सञ्चय कोषमा जम्मा गर्छ। PF, CIT, SSF को जम्मा कट्टी: योगदान, करयोग्य आयको १/३ वा रु ५ लाख — जुन कम (केही स्रोतले SSF बाहेकका कोषलाई रु ३ लाख भन्छन् — माथि सीमा बदल्न सकिन्छ)। रोजगारदाताको योगदान आयमा जोडिएर हिसाब गरिएको; कर बचत एकल करदाताको slab बाट अनुमान। ब्याज मासिक चक्रवृद्धि अनुमान — कोषले वार्षिक दर तोक्छ।",
+            "Labour Act 2074 s.52: 10% of basic is deducted and the employer adds an equal amount to the provident fund. Combined PF/CIT/SSF deduction: contribution, 1/3 of assessable income or Rs 5 lakh — whichever is lower (some sources give Rs 3 lakh for non-SSF funds — the cap above is editable). Employer contribution is added to income; tax saving uses single-filer slabs. Interest is compounded monthly as an estimate — funds declare a yearly rate."] };
+  }},
+
+/* ---------------- बिजक / कर बीजक (v6.7) ---------------- */
+{ id:"invoice", cat:"fin", ic:"🧾", neu:true, custom:true,
+  nm:["बिजक / कर बीजक","Invoice / Tax Invoice"],
+  sb:["PAN/VAT, सामानको सूची, रकम अक्षरमा, PDF","PAN/VAT, items, amount in words, PDF"],
+  kw:"invoice bijak bill kar bijak tax invoice vat pan quotation receipt bil print pdf",
+  ex:["कर बीजक — २ वटा सामान, १३% VAT, रकम अक्षरमा","Tax invoice — 2 items, 13% VAT, amount in words"],
+  html:function(){
+    function f(id,lab,cls,attr){ return '<label class="f'+(cls?' '+cls:'')+'"><span class="fl">'+lab+'</span><input id="'+id+'" '+(attr||'type="text"')+'></label>'; }
+    return '<div class="fields">'
+      + '<label class="f half"><span class="fl">'+L("किसिम","Type")+'</span><select id="ivType"><option value="tax">'+L("कर बीजक (VAT १३%)","Tax invoice (13% VAT)")+'</option><option value="pan">'+L("बिजक (PAN, VAT बिना)","Invoice (PAN, no VAT)")+'</option></select></label>'
+      + f("ivNo", L("बीजक नं.","Invoice no."), "half")
+      + f("ivSPan", L("विक्रेताको PAN/VAT नं.","Seller PAN/VAT no."), "half", 'type="text" inputmode="numeric" maxlength="9"')
+      + f("ivSAddr", L("विक्रेताको ठेगाना","Seller address"), "half")
+      + f("ivBName", L("ग्राहकको नाम","Buyer name"), "")
+      + f("ivBAddr", L("ग्राहकको ठेगाना","Buyer address"), "half")
+      + f("ivBPan", L("ग्राहकको PAN (भए)","Buyer PAN (if any)"), "half", 'type="text" inputmode="numeric" maxlength="9"')
+      + '</div><div class="eyebrow" style="margin-top:6px">'+L("सामानको सूची","Items")+'</div><div id="ivItems"></div>'
+      + '<button class="rembtn" id="ivAdd" style="width:100%;margin:4px 0 10px">＋ '+L("सामान थप्नुहोस्","Add item")+'</button>'
+      + '<div class="fields">'+f("ivDisc", L("छुट","Discount")+' <em>%</em>', "half", 'type="number" inputmode="decimal" step="any"')+'</div>'
+      + '<div class="note" style="margin:0 0 10px">ℹ️ '+L("विक्रेताको नाम/फोन/logo: Settings → Profile बाट आउँछ।","Seller name/phone/logo come from Settings → Profile.")+'</div><div id="out"></div>';
+  },
+  init:function(){
+    var KEY = "ganak_invoice", ids = ["ivType","ivNo","ivSPan","ivSAddr","ivBName","ivBAddr","ivBPan","ivDisc"], D;
+    try{ D = JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
+    if(!D || !D.items) D = { ivType:"tax", ivNo:"001", ivDisc:"0", items:[{d:L("सामान / सेवा","Item / service"),q:"1",r:"1000"}] };
+    ids.forEach(function(id){ if(D[id]!==undefined) $("#"+id).value = D[id]; });
+    function save(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} }
+    function items(){
+      $("#ivItems").innerHTML = D.items.map(function(it,i){
+        return '<div class="fields" data-i="'+i+'" style="border-top:1px dashed var(--line);padding-top:8px">'
+          + '<label class="f"><span class="fl">'+(i+1)+'. '+L("विवरण","Description")+'</span><input data-ik="d" value="'+esc(it.d||"")+'"></label>'
+          + '<label class="f half"><span class="fl">'+L("परिमाण","Qty")+'</span><input data-ik="q" type="number" inputmode="decimal" step="any" value="'+esc(it.q||"")+'"></label>'
+          + '<label class="f half"><span class="fl">'+L("दर","Rate")+' <em>'+L("रु","Rs")+'</em></span><input data-ik="r" type="number" inputmode="decimal" step="any" value="'+esc(it.r||"")+'"></label>'
+          + (D.items.length>1 ? '<button class="mini" data-ivdel="'+i+'" style="grid-column:1/-1;justify-self:end">✕ '+L("हटाउने","Remove")+'</button>' : '')
+          + '</div>';
+      }).join("");
+    }
+    function calc(){
+      var tax = D.ivType !== "pan", sub = 0, rows = [], it = [];
+      var biz = PROF.biz || PROF.name, bs = adToBs(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate());
+      rows.push(row(["विक्रेता","Seller"], biz || L("(Profile मा नाम राख्नुहोस्)","(set a name in Profile)"), ""));
+      rows.push(row([tax ? "विक्रेताको VAT नं." : "विक्रेताको PAN","Seller "+(tax?"VAT":"PAN")+" no."], D.ivSPan || "—", "", "sub"));
+      if(D.ivSAddr) rows.push(row(["ठेगाना","Address"], D.ivSAddr, "", "sub"));
+      rows.push(row(["बीजक नं.","Invoice no."], D.ivNo || "—", ""));
+      rows.push(row(["मिति","Date"], (bs ? npd(bs.y+"/"+pad2(bs.m)+"/"+pad2(bs.d)) : ""), "BS"));
+      rows.push(row(["मिति (AD)","Date (AD)"], TODAY_ISO, "", "sub"));
+      rows.push(row(["ग्राहक","Buyer"], D.ivBName || "—", ""));
+      if(D.ivBAddr) rows.push(row(["ग्राहकको ठेगाना","Buyer address"], D.ivBAddr, "", "sub"));
+      if(D.ivBPan) rows.push(row(["ग्राहकको PAN","Buyer PAN"], D.ivBPan, "", "sub"));
+      D.items.forEach(function(x,i){
+        var q = n(x.q), r = n(x.r), a = q*r; if(!(a>0) && !x.d) return;
+        sub += a; it.push(1);
+        rows.push(row([(i+1)+". "+(x.d||"—")+" — "+fmt(q,3)+" × "+fmt(r,2), (i+1)+". "+(x.d||"—")+" — "+fmt(q,3)+" × "+fmt(r,2)], rs(a), ""));
+      });
+      if(!(sub>0)) return {err:["कम्तीमा एउटा सामानको परिमाण र दर हाल्नुहोस्।","Enter quantity and rate for at least one item."]};
+      var dp = n(D.ivDisc), disc = sub*dp/100, base = sub - disc, vat = tax ? base*0.13 : 0, tot = base + vat, w = rupeeWords(tot);
+      rows.push(row(["जम्मा","Subtotal"], rs(sub), ""));
+      if(disc>0) rows.push(row(["छुट ("+fmt(dp,2)+"%)","Discount ("+fmt(dp,2)+"%)"], "− "+rs(disc), ""));
+      if(tax){ rows.push(row(["करयोग्य रकम","Taxable amount"], rs(base), "", "sub")); rows.push(row(["VAT १३%","VAT 13%"], rs(vat), "")); }
+      rows.push(row(["कुल रकम","Grand total"], rs(tot), "", "big nw"));
+      rows.push(row(["अक्षरमा","In words"], L(w[0],w[1]), "", "txt sub"));
+      if(tax && !/^\d{9}$/.test(D.ivSPan||"")) rows.push(row(["⚠️ कर बीजकमा विक्रेताको ९ अङ्कको VAT नं. चाहिन्छ","⚠️ A tax invoice needs the seller's 9-digit VAT no."], "!", "", "sub"));
+      return { title:[tax ? "कर बीजक · TAX INVOICE" : "बिजक · INVOICE", tax ? "TAX INVOICE · कर बीजक" : "INVOICE · बिजक"], rows:rows,
+        note:["कर बीजकमा 'कर बीजक' शीर्षक, विक्रेताको नाम/ठेगाना/VAT नं., बीजक नं., मिति, सामानको विवरण, परिमाण, दर, करयोग्य मूल्य, १३% VAT र जम्मा हुनुपर्छ; रु १०,००० भन्दा बढीको बिक्रीमा संक्षिप्त बीजक दिइँदैन (VAT नियमावली २०५३ नियम १७)। कम्प्युटरबाट जारी बीजक मान्य हुन IRD को स्वीकृति चाहिन्छ — यो app स्वीकृत billing software होइन; यसलाई quotation/proforma वा बिल पडमा सार्न प्रयोग गर्नुहोस्।",
+              "A tax invoice must show the 'Tax Invoice' heading, seller name/address/VAT no., invoice no., date, item description, quantity, rate, taxable value, 13% VAT and total; abbreviated invoices are not allowed above Rs 10,000 (VAT Rules 2053, rule 17). Computer-issued invoices need IRD approval to be valid — this app is not approved billing software; use it for quotations/proformas or to copy onto your bill pad."] };
+    }
+    function render(){ ids.forEach(function(id){ D[id] = $("#"+id).value; }); save(); showOut(cur, calc()); }
+    items(); render();
+    $("#cust").addEventListener("input", function(e){
+      var el = e.target, box = el.closest("[data-i]");
+      if(box && el.dataset.ik){ D.items[+box.dataset.i][el.dataset.ik] = el.value; }
+      render();
+    });
+    $("#cust").addEventListener("change", function(e){ if(e.target.tagName === "SELECT") render(); });
+    $("#cust").addEventListener("click", function(e){
+      if(e.target.id === "ivAdd"){ D.items.push({d:"",q:"1",r:""}); items(); render(); return; }
+      var del = e.target.closest("[data-ivdel]");
+      if(del){ D.items.splice(+del.dataset.ivdel, 1); items(); render(); }
+    });
+  },
+  reset:function(){ if(!confirm(L("यो बिजक खाली गरी उदाहरण भर्ने?","Clear this invoice and fill the example?"))) return; try{ localStorage.removeItem("ganak_invoice"); }catch(e){} openTool("invoice"); },
+  share:function(){ return outLines(lastOut).join("\n"); } },
+
+/* ---------------- भन्सार महसुल — यात्रु सामान (v6.7) ---------------- */
+{ id:"customs", cat:"np", ic:"🛄", neu:true,
+  nm:["भन्सार महसुल (यात्रु सामान)","Airport Customs (Baggage)"],
+  sb:["सुनको गहना र TV — छुट सीमा र महसुल","Gold jewellery and TV — allowance and duty"],
+  kw:"customs bhansar mahsul airport baggage tia gold jewellery sun tv television duty free allowance vaideshik rojgar",
+  ex:["महिला यात्रु, ८० ग्राम सुनको गहना — कति महसुल?","Woman passenger, 80 g of gold jewellery — how much duty?"],
+  f:[ {k:"it",l:["सामान","Item"],t:"s",d:"gold",o:[["gold",["सुनको गहना","Gold jewellery"]],["tv",["टेलिभिजन (LED/LCD)","Television (LED/LCD)"]]]},
+      {k:"sx",l:["यात्रु","Passenger"],t:"s",d:"f",o:[["f",["महिला (५० ग्राम छुट)","Woman (50 g free)"]],["m",["पुरुष (२५ ग्राम छुट)","Man (25 g free)"]]],w:1,sif:function(v){return v.it!=="tv";}},
+      {k:"gw",l:["सुनको गहनाको तौल","Gold jewellery weight"],u:"g",d:80,w:1,sif:function(v){return v.it!=="tv";}},
+      {k:"gd",l:["महसुल प्रति १० ग्राम","Duty per 10 g"],u:["रु","Rs"],d:12000,sif:function(v){return v.it!=="tv";}},
+      {k:"tz",l:["TV को साइज","TV size"],t:"s",d:"40",o:[["32",["३२ इन्च","32 inch"]],["33",["३३ इन्च","33 inch"]],["40",["४० इन्च","40 inch"]],["43",["४३ इन्च","43 inch"]],["50",["५० इन्च","50 inch"]],["65",["६५ इन्च","65 inch"]],["x",["अन्य साइज — महसुल आफैं","Other size — enter duty"]]],w:1,sif:function(v){return v.it==="tv";}},
+      {k:"tt",l:["यात्रुको अवस्था","Traveller"],t:"s",d:"n",o:[["n",["सामान्य यात्रु","Regular traveller"]],["w",["श्रम स्वीकृतिसहित १२ महिना+ विदेशमा काम","Worked abroad 12+ months on a labour permit"]],["s",["SSF मा आबद्ध वैदेशिक रोजगारीका श्रमिक","Migrant worker enrolled in SSF"]]],w:1,sif:function(v){return v.it==="tv";}},
+      {k:"tdx",l:["तालिकाको महसुल","Duty from the table"],u:["रु","Rs"],d:0,sif:function(v){return v.it==="tv" && v.tz==="x";}} ],
+  calc:function(v){
+    var rows = [];
+    if(v.it === "tv"){
+      var dz = (v.tz==="x") ? n(v.tdx) : TV_DUTY[v.tz];
+      if(!(dz>0)) return {err:["भन्सार विभागको TV दर तालिकाबाट महसुल हाल्नुहोस्।","Enter the duty from the Department of Customs TV table."]};
+      var ex = (v.tt==="s") || (v.tt==="w" && v.tz!=="x" && n(v.tz) <= 32), tot = ex ? 0 : dz + TV_CST;
+      rows.push(row(["TV","TV"], (v.tz==="x" ? L("अन्य साइज","Other size") : v.tz+L(" इन्च"," inch")), ""));
+      rows.push(row(["महसुल (तालिका)","Duty (table)"], rs(dz), ""));
+      rows.push(row(["भन्सार सेवा शुल्क","Customs service tax"], rs(TV_CST), "", "sub"));
+      if(ex) rows.push(row(["छुट","Exemption"], L(v.tt==="s" ? "SSF आबद्ध श्रमिक — जुनसुकै साइज" : "१२ महिना+ श्रमिक — ३२ इन्चसम्म", v.tt==="s" ? "SSF-enrolled worker — any size" : "12+ month worker — up to 32 inch"), "", "sub"));
+      rows.push(row(["तिर्नुपर्ने महसुल","Duty payable"], rs(tot), "", "big"));
+    } else {
+      var w = n(v.gw), free = (v.sx==="m") ? 25 : 50, extra = Math.max(0, w - free), per = n(v.gd);
+      if(w<=0) return {err:["सुनको गहनाको तौल (ग्राम) हाल्नुहोस्।","Enter the gold jewellery weight in grams."]};
+      if(extra > 100) return {err:["छुटपछि थप १०० ग्रामसम्म मात्र महसुल तिरेर ल्याउन पाइन्छ — "+fmt(w,2)+" ग्राम सीमाभन्दा बढी हो (जफत हुन सक्छ)।","Only up to 100 g beyond the free allowance may be brought in on duty — "+fmt(w,2)+" g is over the limit (may be seized)."]};
+      rows.push(row(["सुनको गहना","Gold jewellery"], fmt(w,2), "g"));
+      rows.push(row(["महसुल नलाग्ने","Duty-free"], fmt(Math.min(w,free),2), "g", "sub"));
+      rows.push(row(["महसुल लाग्ने (थप)","Dutiable (extra)"], fmt(extra,2), "g"));
+      rows.push(row(["तिर्नुपर्ने महसुल","Duty payable"], rs(extra/10*per), "", "big"));
+    }
+    return { rows:rows,
+      note:["भन्सार विभाग: विदेशबाट फर्कने यात्रुले सुनको गहना पुरुष २५ ग्राम, महिला ५० ग्राम सम्म महसुल नतिरी, र त्यसपछि महसुल तिरेर थप १०० ग्रामसम्म ल्याउन पाउँछन्। प्रति १० ग्रामको महसुल (रु १२,००० — समाचार स्रोत) आधिकारिक रूपमा पुष्टि भएको छैन — विमानस्थलमा सोधेर माथि बदल्नुहोस्। TV: भन्सार विभागको TV दर तालिका (महसुल + रु ५६५ सेवा शुल्क); श्रम स्वीकृतिसहित १२ महिना+ काम गरेर फर्केकालाई ३२ इन्चसम्म छुट, SSF आबद्ध श्रमिकलाई जुनसुकै साइज छुट (समाचार)। नियम बदलिन सक्छ — customs.gov.np हेर्नुहोस्।",
+            "Department of Customs: returning passengers may bring gold jewellery up to 25 g (men) / 50 g (women) duty-free, then up to 100 g more on duty. The duty per 10 g (Rs 12,000 — news source) is not officially confirmed — ask at the airport and change it above. TV: Department of Customs TV tariff (duty + Rs 565 service tax); workers back after 12+ months on a labour permit get up to 32 inch free, SSF-enrolled workers any size (news). Rules change — check customs.gov.np."] };
   }}
 
 ];
@@ -2601,7 +2836,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.6 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.7 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -2652,7 +2887,12 @@ vol:["लिटर, घन मिटर, घन फिट, gallon र पाथ�
 temp:["सेल्सियस, फरेनहाइट र केल्भिनबीच तापक्रम — ज्वरो नाप्दा पनि।","Temperature between Celsius, Fahrenheit and Kelvin — handy for fever readings too."],
 mix:["M10–M25 ग्रेडको कंक्रिटमा सिमेन्ट बोरा, बालुवा, गिट्टी, पानी र लागत — घन मिटर वा घन फिटबाट।","Cement bags, sand, aggregate, water and cost for M10–M25 concrete, from cu.m or cu.ft."],
 elec:["NEA को slab अनुसार बिजुलीको बिल — ५/१५/३०/६० एम्पियर र थ्री फेज, सेवा शुल्क र VAT सहित।","NEA slab-wise electricity bill — 5/15/30/60 A and three phase, with service charge and VAT."],
-gold:["सुन/चाँदीको गहनाको मूल्य — तोला–आना–लाल, karat, ज्याला, जर्ती र VAT सहित।","Gold/silver jewellery price — tola–aana–laal, karat, making, jarti and VAT."]
+gold:["सुन/चाँदीको गहनाको मूल्य — तोला–आना–लाल, karat, ज्याला, जर्ती र VAT सहित।","Gold/silver jewellery price — tola–aana–laal, karat, making, jarti and VAT."],
+emicmp:["तीन बैंक वा अवधिको EMI, जम्मा ब्याज, सेवा शुल्क र कुल खर्च एकै ठाउँ — कुन सस्तो?","EMI, total interest, fees and total cost for three banks or terms — which is cheaper?"],
+gratuity:["श्रम ऐन २०७४ अनुसार उपदान — आधारभूत तलबको ८.३३% × सेवा महिना।","Gratuity under the Labour Act 2074 — 8.33% of basic × months of service."],
+pfcit:["सञ्चय कोष (१०% + १०%) र CIT — कर छुट, कर बचत र भविष्यमा जम्मा हुने रकम।","Provident fund (10% + 10%) and CIT — deduction, tax saving and future value."],
+invoice:["PAN/VAT सहितको बिजक वा कर बीजक — सामानको सूची, छुट, १३% VAT, रकम अक्षरमा, PDF।","Invoice or tax invoice with PAN/VAT — items, discount, 13% VAT, amount in words, PDF."],
+customs:["विदेशबाट ल्याउँदा सुनको गहना र TV मा लाग्ने भन्सार महसुल — छुट सीमासहित।","Airport customs duty on gold jewellery and TVs brought from abroad — with allowances."]
 };
 var ROMAN = {
 dhalan:"dhalan slab concrete rcc chhat casting",
@@ -2695,7 +2935,12 @@ vol:"aayatan volume litre liter ghan feet cft gallon pathi mana muri",
 temp:"tapkram temperature celsius fahrenheit kelvin jwaro degree",
 mix:"concrete mix ratio grade m20 m25 cement bora balua gitti pani dhalan",
 elec:"bijuli bill nea batti unit meter ampere mahasul electricity",
-gold:"sun gahana gold jewellery tola lal aana karat jyala jarti chandi"
+gold:"sun gahana gold jewellery tola lal aana karat jyala jarti chandi",
+emicmp:"emi tulana compare loan kista bank byaj",
+gratuity:"upadan gratuity labour act basic talab",
+pfcit:"sanchaya kosh pf cit nagarik lagani kosh retirement kar chhut",
+invoice:"bijak bill kar bijak invoice vat pan quotation",
+customs:"bhansar mahsul customs airport sun gahana tv vaideshik"
 };
 function printHead(){
   var biz=(typeof PROF!=="undefined"&&PROF.biz)?PROF.biz:"PRERAK MULTIPURPOSE";
@@ -2771,6 +3016,11 @@ timber:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circl
   mix:'<path d="M5 8.5h14l-1.6 11H6.6z"/><path d="M8.5 5.5h7"/><circle cx="9.3" cy="13" r="1.4" fill="#F5B301" stroke="none"/><circle cx="12.6" cy="15.6" r="1.4"/><circle cx="15" cy="12.2" r="1.4"/>',
   elec:'<path d="M13.5 2.5L5.5 13.5h5.5l-1 8 8-11h-5.5z" fill="#F5B301" stroke="none"/><path d="M13.5 2.5L5.5 13.5h5.5l-1 8 8-11h-5.5z"/>',
   gold:'<circle cx="12" cy="15" r="5.5"/><path d="M9.3 6.6l1.3-2.6h2.8l1.3 2.6-2.7 3.2z" fill="#F5B301" stroke="none"/><path d="M9.3 6.6l1.3-2.6h2.8l1.3 2.6-2.7 3.2z"/>',
+  emicmp:'<rect x="3.5" y="12" width="4" height="8" fill="#F5B301" stroke="none"/><rect x="3.5" y="12" width="4" height="8"/><rect x="10" y="8" width="4" height="12"/><rect x="16.5" y="4" width="4" height="16"/>',
+  gratuity:'<rect x="4" y="9.5" width="16" height="10.5"/><rect x="3" y="6.5" width="18" height="3" fill="#F5B301" stroke="none"/><rect x="3" y="6.5" width="18" height="3"/><path d="M12 6.5v13.5M12 6.5C10 3 7 3.5 8 5.5s4 1 4 1 3 1 4-1-2-2.5-4 1"/>',
+  pfcit:'<path d="M3.5 9L12 4l8.5 5"/><rect x="5" y="9" width="14" height="9.5"/><circle cx="12" cy="13.8" r="2.4" fill="#F5B301" stroke="none"/><line x1="3.5" y1="20.5" x2="20.5" y2="20.5"/>',
+  invoice:'<path d="M5.5 3.5h13v17l-2.2-1.4-2.1 1.4-2.2-1.4-2.2 1.4-2.1-1.4-2.2 1.4z"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="11.5" x2="13" y2="11.5"/><rect x="11.5" y="14" width="4" height="2.6" fill="#F5B301" stroke="none"/>',
+  customs:'<rect x="5" y="7.5" width="14" height="12.5" rx="1.5"/><path d="M9.5 7.5V5a1.2 1.2 0 0 1 1.2-1.2h2.6A1.2 1.2 0 0 1 14.5 5v2.5"/><rect x="5" y="11.5" width="14" height="3" fill="#F5B301" stroke="none"/><line x1="9" y1="20" x2="9" y2="21.5"/><line x1="15" y1="20" x2="15" y2="21.5"/>',
 };
 function icHtml(t){
   var inner = ICONS[t.id];
@@ -2862,13 +3112,17 @@ function moneyWords(val){
 function compute(){
   var t = cur, v = state[t.id], out;
   try { out = t.calc(v); } catch(e){ out = {err:["हिसाब मिलेन — नाप फेरि हेर्नुहोस्।","That didn't compute — please check the inputs."]}; }
+  showOut(t, out);
+}
+/* result slip — used by every field tool and by custom tools that build rows (बिजक) */
+function showOut(t, out){
   lastOut = out; lastTable = out.table || null;
   var box = $("#out");
   if(out.err){ box.innerHTML = '<div class="err">⚠️ '+esc(S(out.err))+'</div>'; stickyEl.style.display = "none"; return; }
-  var html = printHead() + '<div class="slip"><div class="slip-h"><span>'+esc(S(UI.result))+' · '+esc(S(t.nm))+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>';
+  var html = printHead() + '<div class="slip"><div class="slip-h"><span>'+esc(out.title ? S(out.title) : S(UI.result)+' · '+S(t.nm))+'</span><span class="slipmeta">'+esc(slipMeta())+'</span></div>';
   out.rows.forEach(function(r){
     html += slipRow(S(r.l), r.v, S(r.u), r.c);
-    if(r.c.indexOf("big") >= 0){
+    if(r.c.indexOf("big") >= 0 && !/\bnw\b/.test(r.c)){
       var mw = moneyWords(r.v);
       if(mw) html += '<div class="row txt sub"><span class="rl">'+esc(L("अक्षरमा","In words"))+'</span><span class="rv">'+esc(mw)+'</span></div>';
     }
@@ -2894,16 +3148,22 @@ function shareText(){
       A.push("• " + S(f.l) + (f.u ? " ("+S(f.u)+")" : "") + ": " + val);
     });
     A.push("─────────────");
-    if(lastOut && lastOut.rows){
-      lastOut.rows.forEach(function(r){
-        A.push((r.c.indexOf("big") >= 0 ? "➡️ " : "") + S(r.l) + ": " + r.v + (S(r.u) ? " " + S(r.u) : ""));
-        if(r.c.indexOf("big") >= 0){ var mw = moneyWords(r.v); if(mw) A.push("   ("+mw+")"); }
-      });
-      if(lastOut.note) A.push("ℹ️ " + S(lastOut.note));
-    } else if(lastOut && lastOut.err){ A.push("⚠️ " + S(lastOut.err)); }
+    A = A.concat(outLines(lastOut));
   }
   A.push("─────────────", "Powered by PRERAK MULTIPURPOSE PVT LTD · Hetauda");
   return A.join("\n");
+}
+function outLines(out){
+  var A = [];
+  if(out && out.rows){
+    out.rows.forEach(function(r){
+      var big = r.c.indexOf("big") >= 0;
+      A.push((big ? "➡️ " : "") + S(r.l) + ": " + r.v + (S(r.u) ? " " + S(r.u) : ""));
+      if(big && !/\bnw\b/.test(r.c)){ var mw = moneyWords(r.v); if(mw) A.push("   ("+mw+")"); }
+    });
+    if(out.note) A.push("ℹ️ " + S(out.note));
+  } else if(out && out.err){ A.push("⚠️ " + S(out.err)); }
+  return A;
 }
 function openTool(id){
   var t = null;
@@ -2935,7 +3195,7 @@ function openTool(id){
   toolEl.style.display = "block";
   backEl.style.display = "block";
   tagEl.textContent = S(t.nm);
-  if(t.custom){ $("#cust").innerHTML = t.html(); t.init(); }
+  if(t.custom){ lastOut = null; lastTable = null; $("#cust").innerHTML = t.html(); t.init(); }
   else { renderFields(); compute(); }
   window.scrollTo(0,0);
 }
@@ -3629,7 +3889,8 @@ var RATEGRP=[
   [["सुन / चाँदी (रु/तोला)","Gold / silver (Rs/tola)"],[["gold",["छापावाल सुन (24K)","Fine gold (24K)"],295700],["tejabi",["तेजाबी सुन","Tejabi gold"],291200],["silver",["चाँदी","Silver"],4400]]],
   [["बिजुली — NEA (रु/युनिट)","Electricity — NEA (Rs/unit)"],[["e5",["५A ०–२० (२० नाघेमा)","5A 0–20 (if over 20)"],3],["e15",["१५A ०–२०","15A 0–20"],4],["e30",["३०A ०–२०","30A 0–20"],5],["e60",["६०A ०–२०","60A 0–20"],6],
     ["e21",["२१–३० युनिट","21–30 units"],6.5],["e31",["३१–५० युनिट","31–50 units"],8],["e51",["५१–२५० युनिट","51–250 units"],9.5],["e251",["२५१+ युनिट","251+ units"],11],
-    ["e3w",["३ फेज असार–कात्तिक","3-phase Asar–Kartik"],10.5],["e3d",["३ फेज मंसिर–जेठ","3-phase Mangsir–Jestha"],11.5]]]
+    ["e3w",["३ फेज असार–कात्तिक","3-phase Asar–Kartik"],10.5],["e3d",["३ फेज मंसिर–जेठ","3-phase Mangsir–Jestha"],11.5]]],
+  [["ब्याज दर (% वार्षिक)","Interest rates (% a year)"],[["loan",["कर्जा (EMI तुलना)","Loan (EMI compare)"],6.47],["epf",["सञ्चय कोष / CIT","Provident fund / CIT"],5.25]]]
 ];
 RATEGRP.forEach(function(g){ g[1].forEach(function(r){ RATES[r[0]]=r[2]; RATES_FACTORY[r[0]]=r[2]; }); });
 try{ var _rr=JSON.parse(localStorage.getItem("ganak_rates")||"{}"); for(var _rk in RATES) if(_rr[_rk]>0) RATES[_rk]=_rr[_rk]; }catch(e){}
