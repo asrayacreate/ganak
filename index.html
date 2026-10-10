@@ -951,6 +951,30 @@ function sigFmt(x){ var a = Math.abs(x); return fmt(x, a>=1000 ? 2 : a>=1 ? 4 : 
 /* TV duty (Rs) by screen size — Department of Customs TV tariff (archive.customs.gov.np) rows found; + Rs 565 customs service tax */
 var TV_DUTY = { "32":14400, "33":18150, "40":24000, "43":25800, "50":62500, "65":81250 }, TV_CST = 565;
 function emiOf(P, rate, n){ var r = rate/1200; return (r === 0) ? P/n : P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1); }
+/* editable row list — cols: [key, label, "n" for number, "half"?]; first column is numbered */
+function listHtml(items, cols){
+  return items.map(function(it,i){
+    return '<div class="fields" data-i="'+i+'" style="border-top:1px dashed var(--line);padding-top:8px">'
+      + cols.map(function(c,j){ return '<label class="f'+(c[3]?' '+c[3]:'')+'"><span class="fl">'+(j===0?(i+1)+'. ':'')+c[1]+'</span><input data-ik="'+c[0]+'"'+(c[2]==="n"?' type="number" inputmode="decimal" step="any"':'')+' value="'+esc(it[c[0]]===undefined?"":it[c[0]])+'"></label>'; }).join("")
+      + (items.length>1 ? '<button class="mini" data-del="'+i+'" style="grid-column:1/-1;justify-self:end">✕ '+L("हटाउने","Remove")+'</button>' : '')
+      + '</div>';
+  }).join("");
+}
+/* ---- v6.8 tool data ---- */
+/* NEB letter grades (SEE, 11–12): min %, grade, point; TU semester (Operational Guideline 2070) */
+var GRADE_SC = { neb:[[90,"A+",4.0],[80,"A",3.6],[70,"B+",3.2],[60,"B",2.8],[50,"C+",2.4],[40,"C",2.0],[35,"D",1.6],[0,"NG",0]],
+                 tu:[[90,"A",4.0],[80,"A-",3.7],[70,"B+",3.3],[60,"B",3.0],[50,"B-",2.7],[0,"F",0]] };
+/* NEPSE broker commission by transaction amount (broker rate cards); SEBON fee 0.015%; DP Rs 25 per buy */
+var NEPSE_COMM = [[50000,0.36],[500000,0.33],[2000000,0.31],[10000000,0.27],[Infinity,0.24]];
+/* सार्वजनिक बिदा / चाडपर्व 2083 — Nepal Gazette list as reported (edusanjal, collegenp, NRB, Hamro Patro); h = holiday, v = Kathmandu valley, f = festival */
+var HOLI = { 2083:[[1,1,"h","नयाँ वर्ष २०८३","New Year 2083"],[1,18,"h","बुद्ध जयन्ती · उभौली · श्रमिक दिवस","Buddha Jayanti · Ubhauli · Labour Day"],[2,15,"h","गणतन्त्र दिवस","Republic Day"],
+  [5,12,"h","जनै पूर्णिमा · रक्षाबन्धन","Janai Purnima · Raksha Bandhan"],[5,13,"v","गाईजात्रा (उपत्यका)","Gai Jatra (valley)"],[5,19,"h","कृष्ण जन्माष्टमी","Krishna Janmashtami"],[5,23,"h","जेनजी शहीद दिवस","Gen-Z Martyrs' Day"],[5,29,"f","हरितालिका तीज","Haritalika Teej"],
+  [6,3,"h","संविधान दिवस","Constitution Day"],[6,9,"v","इन्द्रजात्रा (उपत्यका)","Indra Jatra (valley)"],[6,25,"h","घटस्थापना","Ghatasthapana"],[6,31,"h","दशैं बिदा","Dashain holiday"],
+  [7,1,"h","दशैं बिदा","Dashain holiday"],[7,2,"h","दशैं बिदा","Dashain holiday"],[7,3,"h","दशैं बिदा","Dashain holiday"],[7,4,"h","दशैं बिदा","Dashain holiday"],[7,5,"h","दशैं बिदा","Dashain holiday"],[7,6,"h","दशैं बिदा","Dashain holiday"],
+  [7,22,"h","लक्ष्मी पूजा (तिहार)","Laxmi Puja (Tihar)"],[7,23,"h","तिहार बिदा","Tihar holiday"],[7,24,"h","तिहार बिदा","Tihar holiday"],[7,25,"h","भाइटीका","Bhai Tika"],[7,26,"h","तिहार बिदा","Tihar holiday"],[7,29,"h","छठ पर्व","Chhath"],
+  [9,9,"h","उधौली पर्व · योमरी पुन्ही","Udhauli · Yomari Punhi"],[9,10,"h","क्रिसमस","Christmas"],[9,15,"h","तमु ल्होसार","Tamu Lhosar"],[10,1,"h","माघे संक्रान्ति","Maghe Sankranti"],[10,16,"h","शहीद दिवस","Martyrs' Day"],
+  [10,28,"f","सरस्वती पूजा (शैक्षिक संस्था)","Saraswati Puja (schools)"],[12,8,"h","फागु पूर्णिमा (तराई)","Fagu Purnima (Terai)"],[12,23,"v","घोडेजात्रा (उपत्यका)","Ghode Jatra (valley)"]] };
+function tithiName(ti){ return (ti===14) ? ["पूर्णिमा","Purnima"] : (ti===29) ? ["औंसी","Aunsi"] : [(ti<15?"शुक्ल ":"कृष्ण ")+TITHI[ti%15], (ti<15?"Shukla ":"Krishna ")+TITHI[ti%15]]; }
 function rupeeWords(x){                                 /* "… रुपैयाँ … पैसा मात्र" for बिजक */
   var rup = Math.floor(Math.abs(x)), ps = Math.round((Math.abs(x)-rup)*100); if(ps===100){ rup++; ps=0; }
   var nw = npWords(rup), ew = enWords(rup); if(nw===null) return ["",""];
@@ -2657,16 +2681,7 @@ var TOOLS = [
     if(!D || !D.items) D = { ivType:"tax", ivNo:"001", ivDisc:"0", items:[{d:L("सामान / सेवा","Item / service"),q:"1",r:"1000"}] };
     ids.forEach(function(id){ if(D[id]!==undefined) $("#"+id).value = D[id]; });
     function save(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} }
-    function items(){
-      $("#ivItems").innerHTML = D.items.map(function(it,i){
-        return '<div class="fields" data-i="'+i+'" style="border-top:1px dashed var(--line);padding-top:8px">'
-          + '<label class="f"><span class="fl">'+(i+1)+'. '+L("विवरण","Description")+'</span><input data-ik="d" value="'+esc(it.d||"")+'"></label>'
-          + '<label class="f half"><span class="fl">'+L("परिमाण","Qty")+'</span><input data-ik="q" type="number" inputmode="decimal" step="any" value="'+esc(it.q||"")+'"></label>'
-          + '<label class="f half"><span class="fl">'+L("दर","Rate")+' <em>'+L("रु","Rs")+'</em></span><input data-ik="r" type="number" inputmode="decimal" step="any" value="'+esc(it.r||"")+'"></label>'
-          + (D.items.length>1 ? '<button class="mini" data-ivdel="'+i+'" style="grid-column:1/-1;justify-self:end">✕ '+L("हटाउने","Remove")+'</button>' : '')
-          + '</div>';
-      }).join("");
-    }
+    function items(){ $("#ivItems").innerHTML = listHtml(D.items, [["d",L("विवरण","Description")],["q",L("परिमाण","Qty"),"n","half"],["r",L("दर","Rate")+' <em>'+L("रु","Rs")+'</em>',"n","half"]]); }
     function calc(){
       var tax = D.ivType !== "pan", sub = 0, rows = [], it = [];
       var biz = PROF.biz || PROF.name, bs = adToBs(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate());
@@ -2706,8 +2721,8 @@ var TOOLS = [
     $("#cust").addEventListener("change", function(e){ if(e.target.tagName === "SELECT") render(); });
     $("#cust").addEventListener("click", function(e){
       if(e.target.id === "ivAdd"){ D.items.push({d:"",q:"1",r:""}); items(); render(); return; }
-      var del = e.target.closest("[data-ivdel]");
-      if(del){ D.items.splice(+del.dataset.ivdel, 1); items(); render(); }
+      var del = e.target.closest("[data-del]");
+      if(del){ D.items.splice(+del.dataset.del, 1); items(); render(); }
     });
   },
   reset:function(){ if(!confirm(L("यो बिजक खाली गरी उदाहरण भर्ने?","Clear this invoice and fill the example?"))) return; try{ localStorage.removeItem("ganak_invoice"); }catch(e){} openTool("invoice"); },
@@ -2749,6 +2764,242 @@ var TOOLS = [
     return { rows:rows,
       note:["भन्सार विभाग: विदेशबाट फर्कने यात्रुले सुनको गहना पुरुष २५ ग्राम, महिला ५० ग्राम सम्म महसुल नतिरी, र त्यसपछि महसुल तिरेर थप १०० ग्रामसम्म ल्याउन पाउँछन्। प्रति १० ग्रामको महसुल (रु १२,००० — समाचार स्रोत) आधिकारिक रूपमा पुष्टि भएको छैन — विमानस्थलमा सोधेर माथि बदल्नुहोस्। TV: भन्सार विभागको TV दर तालिका (महसुल + रु ५६५ सेवा शुल्क); श्रम स्वीकृतिसहित १२ महिना+ काम गरेर फर्केकालाई ३२ इन्चसम्म छुट, SSF आबद्ध श्रमिकलाई जुनसुकै साइज छुट (समाचार)। नियम बदलिन सक्छ — customs.gov.np हेर्नुहोस्।",
             "Department of Customs: returning passengers may bring gold jewellery up to 25 g (men) / 50 g (women) duty-free, then up to 100 g more on duty. The duty per 10 g (Rs 12,000 — news source) is not officially confirmed — ask at the airport and change it above. TV: Department of Customs TV tariff (duty + Rs 565 service tax); workers back after 12+ months on a labour permit get up to 32 inch free, SSF-enrolled workers any size (news). Rules change — check customs.gov.np."] };
+  }},
+
+/* ---------------- नेपाली ⇄ अंग्रेजी अंक (v6.8) ---------------- */
+{ id:"digits", cat:"util", ic:"🔢", neu:true,
+  nm:["नेपाली ⇄ अंग्रेजी अंक","Nepali ⇄ English Digits"],
+  sb:["१२३ ↔ 123 — पाठभित्रका अंक बदल्ने","१२३ ↔ 123 — convert digits inside text"],
+  kw:"nepali number digits anka ank convert english devanagari 123 numerals unicode",
+  ex:["फोन ९८४१२३४५६७ → 9841234567","Phone ९८४१२३४५६७ → 9841234567"],
+  f:[ {k:"m",l:["कतातिर?","Direction"],t:"s",d:"auto",o:[["auto",["आफैं पत्ता लगाउने","Detect automatically"]],["ne",["नेपाली अंकमा (१२३)","To Nepali digits (१२३)"]],["en",["अंग्रेजी अंकमा (123)","To English digits (123)"]]]},
+      {k:"t",l:["पाठ / अंक","Text / number"],t:"ta",d:"फोन ९८४१२३४५६७, मिति 2083-06-24"} ],
+  calc:function(v){
+    var t = String(v.t||"");
+    if(!t.trim()) return {err:["अंक भएको पाठ हाल्नुहोस्।","Enter text with digits."]};
+    var nNe = (t.match(/[०-९]/g)||[]).length, nEn = (t.match(/[0-9]/g)||[]).length;
+    var to = (v.m==="ne"||v.m==="en") ? v.m : (nNe >= nEn && nNe > 0 ? "en" : "ne");
+    var out = (to==="ne") ? np(t) : t.replace(/[०-९]/g, function(d){ return String("०१२३४५६७८९".indexOf(d)); });
+    return { rows:[
+      row(["बदलिएको अंक","Digits converted"], fmt(to==="ne" ? nEn : nNe, 0), "", "sub"),
+      row([to==="ne" ? "नेपाली अंकमा" : "अंग्रेजी अंकमा", to==="ne" ? "In Nepali digits" : "In English digits"], out, "", "txt big nw") ],
+      note:["देवनागरी अंक ० १ २ ३ ४ ५ ६ ७ ८ ९ = Unicode U+0966–U+096F; अरू अक्षर जस्ताको तस्तै रहन्छन्। Copy गरेर जहाँ पनि टाँस्नुहोस्।",
+            "Devanagari digits ० १ २ ३ ४ ५ ६ ७ ८ ९ = Unicode U+0966–U+096F; other characters are left as they are. Copy and paste anywhere."] };
+  }},
+
+/* ---------------- नेपाली पात्रो (v6.8) ---------------- */
+{ id:"patro", cat:"np", ic:"🗓️", neu:true,
+  nm:["नेपाली पात्रो","Nepali Patro"],
+  sb:["महिनाको पात्रो — तिथि, चाडपर्व, बिदा","Month view — tithi, festivals, holidays"],
+  kw:"patro calendar nepali tithi chadparba festival bida holiday dashain tihar bs month gate",
+  ex:["२०८३ कात्तिक — दशैं, तिहार, छठ र हरेक दिनको तिथि","Kartik 2083 — Dashain, Tihar, Chhath and each day's tithi"],
+  f:[ {k:"y",l:["साल","Year"],u:"BS",d:TB.y,w:1},
+      {k:"m",l:["महिना","Month"],t:"s",d:String(TB.m),o:BS_MONTH_OPTS,w:1} ],
+  calc:function(v){
+    var y = n(v.y), m = n(v.m) || 1;
+    if(y < BS_START_YEAR || y > BS_MAX_YEAR) return {err:["साल "+npd(BS_START_YEAR)+" देखि "+npd(BS_MAX_YEAR)+" BS सम्म मात्र मिल्छ।","Year must be between "+BS_START_YEAR+" and "+BS_MAX_YEAR+" BS."]};
+    var dim = bsDaysInMonth(y,m), a1 = bsToAd(y,m,1), aN = bsToAd(y,m,dim), hl = HOLI[y] || [], nh = 0;
+    var WD = ["आइत","सोम","मङ्गल","बुध","बिही","शुक्र","शनि"], WDE = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var rows = [
+      row(["महिना","Month"], npd(y)+" "+bsM(m-1), ""),
+      row(["अंग्रेजी मिति","English dates"], AD_MONTHS[a1.m-1].slice(0,3)+" "+a1.d+", "+a1.y+" – "+AD_MONTHS[aN.m-1].slice(0,3)+" "+aN.d+", "+aN.y, "", "sub"),
+      row(["जम्मा दिन","Days"], npd(dim), "", "sub") ];
+    var grid = [], wk = [], i;
+    for(i=0;i<a1.wd;i++) wk.push("");
+    for(var d=1; d<=dim; d++){
+      var a = bsToAd(y,m,d), tn = tithiName(patro(a.y,a.m,a.d,0.25).ti), ev = hl.filter(function(h){ return h[0]===m && h[1]===d; })[0];
+      var isT = (y===TB.y && m===TB.m && d===TB.d), mark = ev ? (ev[2]==="h" ? "🔴 " : "🟡 ") : "";
+      if(ev && ev[2]==="h") nh++;
+      rows.push(row([mark+npd(d)+" "+WD[a.wd]+" · "+AD_MONTHS[a.m-1].slice(0,3)+" "+a.d+(isT?" ← आज":""), mark+d+" "+WDE[a.wd]+" · "+AD_MONTHS[a.m-1].slice(0,3)+" "+a.d+(isT?" ← today":"")],
+        L(tn[0],tn[1]) + (ev ? " · "+L(ev[3],ev[4]) : ""), "", (ev || a.wd===6 || isT) ? "" : "sub"));
+      wk.push(npd(d)+" ("+a.d+")"); if(wk.length===7){ grid.push(wk); wk = []; }
+    }
+    if(wk.length){ while(wk.length<7) wk.push(""); grid.push(wk); }
+    if(hl.length) rows.push(row(["यो महिनाका सार्वजनिक बिदा (सूचीमा)","Listed public holidays this month"], npd(nh), L("दिन","days"), "sub"));
+    return { rows:rows,
+      table:{ title:L("🗓️ महिनाको पात्रो","🗓️ Month grid"), sub:npd(y)+" "+bsM(m-1), head:LANG ? WDE : WD, rows:grid },
+      note:["मिति: Bikram Sambat तालिका (२०००–"+npd(BS_MAX_YEAR)+")। तिथि: सूर्योदय (बिहान ६ बजे) को चन्द्र–सूर्य कोणबाट (हरेक १२° = एक तिथि) अनुमान — तिथि फेरिने दिन पात्रोसँग फरक पर्न सक्छ। चाडपर्व/बिदा: २०८३ को सरकारी सूची (समाचारमा प्रकाशित) — महाशिवरात्रि, रामनवमी, इद, ल्होसार आदिको मिति पुष्टि नभएकाले राखिएको छैन। 🔴 सार्वजनिक बिदा · 🟡 उपत्यका/विशेष।",
+            "Dates: Bikram Sambat table (2000–"+BS_MAX_YEAR+"). Tithi: estimated from the moon–sun angle at sunrise (6 am; every 12° is one tithi) — may differ from a printed patro on days the tithi changes. Festivals/holidays: the 2083 government list as reported — Maha Shivaratri, Ram Navami, Eid, Lhosar etc. are left out until their dates are confirmed. 🔴 public holiday · 🟡 valley/special."] };
+  }},
+
+/* ---------------- एकाइ मूल्य तुलना (v6.8) ---------------- */
+{ id:"uprice", cat:"util", ic:"🛒", neu:true,
+  nm:["एकाइ मूल्य तुलना","Unit Price Compare"],
+  sb:["कुन प्याक सस्तो? — प्रति kg / लिटर / गोटा","Which pack is cheaper? — per kg / litre / piece"],
+  kw:"unit price compare sasto cheaper pack kg litre gram ml per piece shopping bazar rate tulana",
+  ex:["५०० g को रु ९५ कि १ kg को रु १८०?","Rs 95 for 500 g or Rs 180 for 1 kg?"],
+  f:[ {k:"pa",l:["A: मूल्य","A: Price"],u:["रु","Rs"],d:95,w:1}, {k:"qa",l:["A: परिमाण","A: Quantity"],d:500,w:1},
+      {k:"ua",l:["A: एकाइ","A: Unit"],t:"s",d:"g",o:[["g",["ग्राम","gram"]],["kg",["किलो","kg"]],["ml",["मिलिलिटर","ml"]],["l",["लिटर","litre"]],["pc",["गोटा","piece"]]]},
+      {k:"pb",l:["B: मूल्य","B: Price"],u:["रु","Rs"],d:180,w:1}, {k:"qb",l:["B: परिमाण","B: Quantity"],d:1,w:1},
+      {k:"ub",l:["B: एकाइ","B: Unit"],t:"s",d:"kg",o:[["g",["ग्राम","gram"]],["kg",["किलो","kg"]],["ml",["मिलिलिटर","ml"]],["l",["लिटर","litre"]],["pc",["गोटा","piece"]]]},
+      {k:"pc",l:["C: मूल्य","C: Price"],u:["रु","Rs"],d:0,w:1}, {k:"qc",l:["C: परिमाण","C: Quantity"],d:0,w:1},
+      {k:"uc",l:["C: एकाइ","C: Unit"],t:"s",d:"kg",o:[["g",["ग्राम","gram"]],["kg",["किलो","kg"]],["ml",["मिलिलिटर","ml"]],["l",["लिटर","litre"]],["pc",["गोटा","piece"]]]} ],
+  calc:function(v){
+    var UB = { g:["m",0.001], kg:["m",1], ml:["v",0.001], l:["v",1], pc:["c",1] }, BU = { m:["kg","kg"], v:["लिटर","litre"], c:["गोटा","piece"] }, it = [], kind = null, bad = false;
+    ["a","b","c"].forEach(function(x){
+      var pr = n(v["p"+x]), q = n(v["q"+x]), u = UB[v["u"+x]] || UB.kg;
+      if(pr<=0 || q<=0) return;
+      if(kind && kind !== u[0]) bad = true; kind = kind || u[0];
+      it.push({k:x.toUpperCase(), pr:pr, q:q, u:v["u"+x], per:pr/(q*u[1])});
+    });
+    if(bad) return {err:["एउटै किसिमको एकाइ राख्नुहोस् — तौल (g/kg), आयतन (ml/लिटर) वा गोटा।","Use the same kind of unit — weight (g/kg), volume (ml/litre) or pieces."]};
+    if(it.length < 2) return {err:["कम्तीमा दुई वटा सामानको मूल्य र परिमाण हाल्नुहोस्।","Enter price and quantity for at least two items."]};
+    var bu = BU[kind], best = it.slice().sort(function(a,b){ return a.per-b.per; })[0], rows = [];
+    it.forEach(function(o){ rows.push(row([o.k+": "+rs(o.pr)+" / "+fmt(o.q,3)+" "+o.u, o.k+": "+rs(o.pr)+" / "+fmt(o.q,3)+" "+o.u], rs(o.per), ["प्रति "+bu[0],"per "+bu[1]])); });
+    it.forEach(function(o){ if(o!==best) rows.push(row([o.k+" भन्दा "+best.k+" सस्तो", best.k+" cheaper than "+o.k], fmt((1-best.per/o.per)*100,1)+"%", "", "sub")); });
+    rows.push(row(["सबैभन्दा सस्तो: "+best.k,"Cheapest: "+best.k], rs(best.per), ["प्रति "+bu[0],"per "+bu[1]], "big nw"));
+    return { rows:rows,
+      note:["मूल्य ÷ (परिमाणलाई kg / लिटर / गोटामा बदलेर) = एकाइ मूल्य (१ kg = १,००० g, १ लिटर = १,००० ml)। गुणस्तर, ब्रान्ड र म्याद पनि हेर्नुहोस्।",
+            "Price ÷ (quantity in kg / litres / pieces) = unit price (1 kg = 1,000 g, 1 litre = 1,000 ml). Also check quality, brand and expiry."] };
+  }},
+
+/* ---------------- छुटमाथि छुट (v6.8) ---------------- */
+{ id:"stackdisc", cat:"fin", ic:"🏷️", neu:true,
+  nm:["छुटमाथि छुट","Stacked Discount"],
+  sb:["२०% + १०% = २८% — वास्तविक छुट कति?","20% + 10% = 28% — the real discount"],
+  kw:"discount chut stacked successive double extra offer sale percent chutmathi",
+  ex:["रु १०,००० मा २०% छुट अनि थप १०%","Rs 10,000 with 20% off, then a further 10%"],
+  f:[ {k:"p",l:["मूल्य","Price"],u:["रु","Rs"],d:10000},
+      {k:"d1",l:["पहिलो छुट","First discount"],u:U.pct,d:20,w:1},
+      {k:"d2",l:["दोस्रो छुट","Second discount"],u:U.pct,d:10,w:1},
+      {k:"d3",l:["तेस्रो छुट","Third discount"],u:U.pct,d:0,w:1},
+      {k:"vt",l:["VAT","VAT"],t:"s",d:"n",o:[["n",["नजोड्ने","Don't add"]],["y",["छुटपछि १३% जोड्ने","Add 13% after discounts"]]],w:1} ],
+  calc:function(v){
+    var p = n(v.p), cur = p, rows = [ row(["मूल्य","Price"], rs(p), "") ];
+    if(p<=0) return {err:["मूल्य हाल्नुहोस्।","Enter the price."]};
+    var bad = false;
+    ["d1","d2","d3"].forEach(function(k,i){
+      var d = n(v[k]); if(d<0 || d>100) bad = true; if(!(d>0) || bad) return;
+      var off = cur*d/100; cur -= off;
+      rows.push(row([(i+1)+". "+fmt(d,2)+"% छुट (बाँकीमा)", (i+1)+". "+fmt(d,2)+"% off (on what remains)"], "− "+rs(off)+" → "+rs(cur), "", "sub"));
+    });
+    if(bad) return {err:["छुट ० देखि १००% सम्म हुनुपर्छ।","Each discount must be between 0 and 100%."]};
+    var eff = (1 - cur/p)*100, simple = n(v.d1)+n(v.d2)+n(v.d3), vat = (v.vt==="y") ? cur*0.13 : 0;
+    rows.push(row(["जम्मा छुट","Total discount"], rs(p-cur), ""));
+    rows.push(row(["वास्तविक छुट %","Effective discount"], fmt(eff,2)+"%", "", ""));
+    if(simple > 0 && Math.abs(simple-eff) > 0.005) rows.push(row(["सिधै जोड्दा (गलत)","Simple sum (wrong)"], fmt(simple,2)+"%", "", "sub"));
+    if(vat > 0) rows.push(row(["१३% VAT","13% VAT"], "+ "+rs(vat), ""));
+    rows.push(row(["तिर्ने मूल्य","Final price"], rs(cur+vat), "", "big"));
+    return { rows:rows,
+      note:["छुटमाथिको छुट बाँकी रकममा लाग्छ: वास्तविक छुट = १ − (१ − d₁)(१ − d₂)(१ − d₃)। त्यसैले २०% + १०% = २८%, ३०% होइन। VAT छुटपछिको रकममा लाग्छ।",
+            "Each extra discount applies to what remains: effective = 1 − (1 − d₁)(1 − d₂)(1 − d₃). So 20% + 10% = 28%, not 30%. VAT applies after the discounts."] };
+  }},
+
+/* ---------------- GPA / CGPA (v6.8) ---------------- */
+{ id:"gpa", cat:"util", ic:"🎓", neu:true, custom:true,
+  nm:["GPA / CGPA","GPA / CGPA"],
+  sb:["NEB (SEE, ११–१२) र TU — grade र GPA","NEB (SEE, 11–12) and TU — grades and GPA"],
+  kw:"gpa cgpa grade neb see class 11 12 tu tribhuvan university semester marks percentage credit hour result",
+  ex:["NEB: ५ विषयको अंक र credit hour → GPA","NEB: marks and credit hours of 5 subjects → GPA"],
+  html:function(){
+    return '<div class="fields">'
+      + '<label class="f half"><span class="fl">'+L("प्रणाली","System")+'</span><select id="gpSys"><option value="neb">'+L("NEB (SEE, ११–१२)","NEB (SEE, 11–12)")+'</option><option value="tu">'+L("TU (सेमेस्टर)","TU (semester)")+'</option></select></label>'
+      + '<label class="f half"><span class="fl">'+L("के निकाल्ने?","Find")+'</span><select id="gpMode"><option value="gpa">'+L("GPA — विषयको अंकबाट","GPA — from subject marks")+'</option><option value="cgpa">'+L("CGPA — सेमेस्टर/वर्षको GPA बाट","CGPA — from term GPAs")+'</option></select></label>'
+      + '</div><div id="gpRows"></div><button class="rembtn" id="gpAdd" style="width:100%;margin:4px 0 10px">＋ '+L("थप्नुहोस्","Add")+'</button><div id="out"></div>';
+  },
+  init:function(){
+    var KEY = "ganak_gpa", D;
+    try{ D = JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
+    if(!D || !D.s || !D.c) D = { sys:"neb", mode:"gpa",
+      s:[{n:L("नेपाली","Nepali"),cr:"3",mk:"78"},{n:L("अंग्रेजी","English"),cr:"4",mk:"85"},{n:L("गणित","Maths"),cr:"5",mk:"92"},{n:L("विज्ञान","Science"),cr:"5",mk:"67"},{n:L("सामाजिक","Social"),cr:"4",mk:"74"}],
+      c:[{n:L("पहिलो सेमेस्टर","Semester 1"),g:"3.4",cr:"15"},{n:L("दोस्रो सेमेस्टर","Semester 2"),g:"3.6",cr:"15"}] };
+    $("#gpSys").value = D.sys; $("#gpMode").value = D.mode;
+    function list(){ return D.mode==="cgpa" ? D.c : D.s; }
+    function cols(){ return D.mode==="cgpa" ? [["n",L("सेमेस्टर / वर्ष","Semester / year")],["g","GPA","n","half"],["cr",L("Credit hour","Credit hours"),"n","half"]]
+                                             : [["n",L("विषय","Subject")],["cr",L("Credit hour","Credit hours"),"n","half"],["mk",L("प्राप्ताङ्क %","Marks %"),"n","half"]]; }
+    function items(){ $("#gpRows").innerHTML = listHtml(list(), cols()); }
+    function calc(){
+      var sc = GRADE_SC[D.sys], rows = [], sw = 0, sc_ = 0, low = 0, minP = (D.sys==="tu") ? 2.7 : 1.6;
+      rows.push(row(["प्रणाली","System"], D.sys==="tu" ? L("TU सेमेस्टर","TU semester") : "NEB", "", "sub"));
+      list().forEach(function(x){
+        var cr = n(x.cr);
+        if(D.mode==="cgpa"){
+          var gg = n(x.g); if(!(cr>0) || x.g==="" || gg<0 || gg>4) return;
+          sw += gg*cr; sc_ += cr; rows.push(row([(x.n||"—")+" ("+fmt(cr,1)+" cr)", (x.n||"—")+" ("+fmt(cr,1)+" cr)"], fmt(gg,2), "", "sub"));
+        } else {
+          var mk = n(x.mk); if(!(cr>0) || x.mk==="" || mk<0 || mk>100) return;
+          var gr = sc.filter(function(t){ return mk >= t[0]; })[0];
+          if(gr[2] < minP) low++;
+          sw += gr[2]*cr; sc_ += cr;
+          rows.push(row([(x.n||"—")+" ("+fmt(cr,1)+" cr) · "+fmt(mk,2)+"%", (x.n||"—")+" ("+fmt(cr,1)+" cr) · "+fmt(mk,2)+"%"], gr[1]+" ("+gr[2].toFixed(1)+")", "", gr[2] < minP ? "" : "sub"));
+        }
+      });
+      if(!(sc_>0)) return {err:["कम्तीमा एउटा पङ्क्तिमा credit hour र अंक/GPA (० देखि) हाल्नुहोस्।","Fill credit hours and marks/GPA in at least one row."]};
+      var gpa = sw/sc_;
+      rows.push(row(["जम्मा credit hour","Total credit hours"], fmt(sc_,1), "", "sub"));
+      if(low) rows.push(row([D.sys==="tu" ? "⚠️ B- भन्दा तल (F) विषय" : "⚠️ NG आएका विषय", D.sys==="tu" ? "⚠️ Courses below B- (F)" : "⚠️ Subjects with NG"], npd(low), "", ""));
+      if(D.sys==="tu") rows.push(row(["सेमेस्टर पास (CGPA ३.० र हरेक विषय B-)","Semester pass (CGPA 3.0, each course B-)"], (gpa >= 3 && !low) ? L("✓ पास","✓ Pass") : L("✗ पुगेन","✗ Not met"), "", "sub"));
+      rows.push(row([D.mode==="cgpa" ? "CGPA" : "GPA", D.mode==="cgpa" ? "CGPA" : "GPA"], gpa.toFixed(2), "/ 4.0", "big nw"));
+      return { rows:rows,
+        note:[ D.sys==="tu" ? "TU सेमेस्टर (Operational Guideline २०७०): A ९०%+ = ४.०, A- ८०–८९.९ = ३.७, B+ ७०–७९.९ = ३.३, B ६०–६९.९ = ३.०, B- ५०–५९.९ = २.७, F ५०% भन्दा कम। विषय पास B- (२.७), सेमेस्टर पास CGPA ३.०। GPA = Σ(grade point × credit) ÷ Σ credit।"
+                                : "NEB (SEE, कक्षा ११–१२): A+ ९०–१०० = ४.०, A ८०–८९ = ३.६, B+ ७०–७९ = ३.२, B ६०–६९ = २.८, C+ ५०–५९ = २.४, C ४०–४९ = २.०, D ३५–३९ = १.६, ३५ भन्दा कम NG। GPA = Σ(grade point × credit hour) ÷ Σ credit hour। सैद्धान्तिक/प्रयोगात्मक छुट्टै न्यूनतम अंक NEB को सूचना हेर्नुहोस्।",
+               D.sys==="tu" ? "TU semester (Operational Guideline 2070): A 90%+ = 4.0, A- 80–89.9 = 3.7, B+ 70–79.9 = 3.3, B 60–69.9 = 3.0, B- 50–59.9 = 2.7, F below 50%. Course pass B- (2.7), semester pass CGPA 3.0. GPA = Σ(grade point × credit) ÷ Σ credit."
+                                : "NEB (SEE, class 11–12): A+ 90–100 = 4.0, A 80–89 = 3.6, B+ 70–79 = 3.2, B 60–69 = 2.8, C+ 50–59 = 2.4, C 40–49 = 2.0, D 35–39 = 1.6, below 35 NG. GPA = Σ(grade point × credit hour) ÷ Σ credit hour. Check NEB notices for separate theory/practical minimums."] };
+    }
+    function render(){ D.sys = $("#gpSys").value; D.mode = $("#gpMode").value; try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} showOut(cur, calc()); }
+    items(); render();
+    $("#cust").addEventListener("input", function(e){ var el = e.target, box = el.closest("[data-i]"); if(box && el.dataset.ik){ list()[+box.dataset.i][el.dataset.ik] = el.value; } render(); });
+    $("#cust").addEventListener("change", function(e){ if(e.target.tagName === "SELECT"){ D.sys = $("#gpSys").value; D.mode = $("#gpMode").value; items(); render(); } });
+    $("#cust").addEventListener("click", function(e){
+      if(e.target.id === "gpAdd"){ list().push(D.mode==="cgpa" ? {n:"",g:"",cr:""} : {n:"",cr:"",mk:""}); items(); render(); return; }
+      var del = e.target.closest("[data-del]"); if(del){ list().splice(+del.dataset.del, 1); items(); render(); }
+    });
+  },
+  reset:function(){ if(!confirm(L("तपाईंको अंक हटाएर उदाहरण भर्ने?","Clear your entries and fill the example?"))) return; try{ localStorage.removeItem("ganak_gpa"); }catch(e){} openTool("gpa"); },
+  share:function(){ return outLines(lastOut).join("\n"); } },
+
+/* ---------------- NEPSE सेयर — बोनस / WACC (v6.8) ---------------- */
+{ id:"nepse", cat:"fin", ic:"📊", neu:true,
+  nm:["NEPSE सेयर — बोनस / WACC","NEPSE Share — Bonus / WACC"],
+  sb:["बोनस/हकप्रदपछिको मूल्य र औसत लागत (WACC)","Price after bonus/right and average cost (WACC)"],
+  kw:"nepse share sheyar bonus right hakprad wacc average cost kitta meroshare broker commission sebon dp adjusted price",
+  ex:["रु ६०० को सेयरमा २०% बोनस → समायोजित मूल्य रु ५००","20% bonus on a Rs 600 share → adjusted price Rs 500"],
+  f:[ {k:"m",l:["के निकाल्ने?","Find"],t:"s",d:"adj",o:[["adj",["बोनस / हकप्रदपछिको मूल्य","Price after bonus / right"]],["wacc",["औसत लागत (WACC)","Average cost (WACC)"]]]},
+      {k:"ltp",l:["Book close अघिको मूल्य (LTP)","Last price before book close (LTP)"],u:["रु","Rs"],d:600,sif:function(v){return v.m!=="wacc";}},
+      {k:"b",l:["बोनस","Bonus"],u:U.pct,d:20,w:1,sif:function(v){return v.m!=="wacc";}},
+      {k:"r",l:["हकप्रद","Right"],u:U.pct,d:0,w:1,sif:function(v){return v.m!=="wacc";}},
+      {k:"rp",l:["हकप्रद मूल्य","Right issue price"],u:["रु","Rs"],d:100,w:1,sif:function(v){return v.m!=="wacc";}},
+      {k:"q1",l:["खरिद १: कित्ता","Buy 1: units"],d:100,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"p1",l:["खरिद १: दर","Buy 1: rate"],u:["रु","Rs"],d:500,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"q2",l:["खरिद २: कित्ता","Buy 2: units"],d:50,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"p2",l:["खरिद २: दर","Buy 2: rate"],u:["रु","Rs"],d:450,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"q3",l:["खरिद ३: कित्ता","Buy 3: units"],d:0,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"p3",l:["खरिद ३: दर","Buy 3: rate"],u:["रु","Rs"],d:0,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"bk",l:["बोनस कित्ता","Bonus units"],d:15,w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"bc",l:["बोनसको लागत","Bonus cost"],t:"s",d:"100",o:[["100",["रु १०० प्रति कित्ता","Rs 100 per unit"]],["0",["शून्य","Zero"]]],w:1,sif:function(v){return v.m==="wacc";}},
+      {k:"cm",l:["कमिसन, SEBON, DP","Commission, SEBON, DP"],t:"s",d:"y",o:[["y",["लागतमा जोड्ने","Add to cost"]],["n",["नजोड्ने","Leave out"]]],sif:function(v){return v.m==="wacc";}} ],
+  calc:function(v){
+    if(v.m !== "wacc"){
+      var ltp = n(v.ltp), B = n(v.b)/100, R = n(v.r)/100, rp = n(v.rp);
+      if(ltp<=0) return {err:["Book close अघिको मूल्य हाल्नुहोस्।","Enter the last price before book close."]};
+      if(B<0 || R<0) return {err:["बोनस/हकप्रद ऋणात्मक हुँदैन।","Bonus/right can't be negative."]};
+      var adj = (ltp + rp*R)/(1 + B + R);
+      return { rows:[
+        row(["Book close अघिको मूल्य","Price before book close"], rs(ltp), ""),
+        row(["बोनस / हकप्रद","Bonus / right"], fmt(B*100,2)+"% / "+fmt(R*100,2)+"%", "", "sub"),
+        row(["प्रति १०० कित्ता पाइने","Per 100 units you get"], fmt(B*100,2)+L(" बोनस + "," bonus + ")+fmt(R*100,2)+L(" हकप्रद"," right"), L("कित्ता","units"), "sub"),
+        row(["समायोजित मूल्य","Adjusted price"], rs(adj), "", "big") ],
+        note:["बोनस: मूल्य ÷ (१ + बोनस%) · हकप्रद: (मूल्य + हकप्रद मूल्य × हकप्रद%) ÷ (१ + हकप्रद%) — दुवै भए (मूल्य + हकप्रद मूल्य × R) ÷ (१ + B + R)। NEPSE ले book close पछि यसरी मूल्य मिलाउँछ (ShareSansar)।",
+              "Bonus: price ÷ (1 + bonus%) · Right: (price + issue price × right%) ÷ (1 + right%) — with both, (price + issue price × R) ÷ (1 + B + R). NEPSE adjusts the price like this after book close (ShareSansar)."] };
+    }
+    var rows = [], tq = 0, tc = 0, buys = 0;
+    [1,2,3].forEach(function(i){
+      var q = n(v["q"+i]), pr = n(v["p"+i]); if(!(q>0 && pr>0)) return;
+      var amt = q*pr, rate = NEPSE_COMM.filter(function(t){ return amt <= t[0]; })[0][1];
+      var fee = (v.cm==="n") ? 0 : amt*rate/100 + amt*0.015/100 + 25, cost = amt + fee;
+      tq += q; tc += cost; buys++;
+      rows.push(row([L("खरिद ","Buy ")+i+": "+fmt(q,0)+" × "+fmt(pr,2), L("खरिद ","Buy ")+i+": "+fmt(q,0)+" × "+fmt(pr,2)], rs(cost), "", "sub"));
+      if(fee > 0) rows.push(row(["   कमिसन "+fmt(rate,2)+"% + SEBON ०.०१५% + DP २५","   Commission "+fmt(rate,2)+"% + SEBON 0.015% + DP 25"], rs(fee), "", "sub"));
+    });
+    if(!buys) return {err:["कम्तीमा एउटा खरिदको कित्ता र दर हाल्नुहोस्।","Enter units and rate for at least one purchase."]};
+    var bk = n(v.bk), bc = (v.bc==="0") ? 0 : 100;
+    if(bk > 0){ tq += bk; tc += bk*bc; rows.push(row([L("बोनस ","Bonus ")+fmt(bk,0)+" × "+fmt(bc,0), L("बोनस ","Bonus ")+fmt(bk,0)+" × "+fmt(bc,0)], rs(bk*bc), "", "sub")); }
+    rows.push(row(["जम्मा कित्ता","Total units"], fmt(tq,0), L("कित्ता","units")));
+    rows.push(row(["जम्मा लागत","Total cost"], rs(tc), ""));
+    rows.push(row(["WACC (प्रति कित्ता औसत लागत)","WACC (average cost per unit)"], rs(tc/tq), "", "big"));
+    return { rows:rows,
+      note:["WACC = जम्मा लागत ÷ जम्मा कित्ता। ब्रोकर कमिसन कारोबार रकमअनुसार: रु ५० हजारसम्म ०.३६%, ५ लाखसम्म ०.३३%, २० लाखसम्म ०.३१%, १ करोडसम्म ०.२७%, माथि ०.२४%; SEBON ०.०१५%; DP रु २५ (ब्रोकर दर-तालिका)। बोनसको लागत: स्रोतहरू फरक छन् (रु १०० वा शून्य) — MeroShare मा राखिएको तरिका हेर्नुहोस्। पुँजीगत लाभकर हिसाबका लागि WACC MeroShare मा अपडेट गर्नुहोस्।",
+            "WACC = total cost ÷ total units. Broker commission by deal size: up to Rs 50k 0.36%, 5 lakh 0.33%, 20 lakh 0.31%, 1 crore 0.27%, above 0.24%; SEBON 0.015%; DP Rs 25 (broker rate cards). Bonus cost: sources differ (Rs 100 or zero) — match what MeroShare uses. Update WACC in MeroShare for capital-gains tax."] };
   }}
 
 ];
@@ -2836,7 +3087,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v6.7 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v6.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -2892,7 +3143,13 @@ emicmp:["तीन बैंक वा अवधिको EMI, जम्मा �
 gratuity:["श्रम ऐन २०७४ अनुसार उपदान — आधारभूत तलबको ८.३३% × सेवा महिना।","Gratuity under the Labour Act 2074 — 8.33% of basic × months of service."],
 pfcit:["सञ्चय कोष (१०% + १०%) र CIT — कर छुट, कर बचत र भविष्यमा जम्मा हुने रकम।","Provident fund (10% + 10%) and CIT — deduction, tax saving and future value."],
 invoice:["PAN/VAT सहितको बिजक वा कर बीजक — सामानको सूची, छुट, १३% VAT, रकम अक्षरमा, PDF।","Invoice or tax invoice with PAN/VAT — items, discount, 13% VAT, amount in words, PDF."],
-customs:["विदेशबाट ल्याउँदा सुनको गहना र TV मा लाग्ने भन्सार महसुल — छुट सीमासहित।","Airport customs duty on gold jewellery and TVs brought from abroad — with allowances."]
+customs:["विदेशबाट ल्याउँदा सुनको गहना र TV मा लाग्ने भन्सार महसुल — छुट सीमासहित।","Airport customs duty on gold jewellery and TVs brought from abroad — with allowances."],
+digits:["नेपाली (१२३) र अंग्रेजी (123) अंक दुवैतिर बदल्ने — पाठभित्रका अंक पनि।","Switch Nepali (१२३) and English (123) digits both ways — even inside text."],
+patro:["महिनाभरिको नेपाली पात्रो — हरेक दिनको अंग्रेजी मिति, तिथि, चाडपर्व र सार्वजनिक बिदा।","A month of the Nepali calendar — each day's AD date, tithi, festivals and public holidays."],
+uprice:["फरक साइजका प्याकमध्ये कुन सस्तो — प्रति kg, लिटर वा गोटाको मूल्य।","Which pack size is cheaper — price per kg, litre or piece."],
+stackdisc:["छुटमाथि छुटको वास्तविक प्रतिशत र तिर्ने मूल्य — VAT सहित।","The real percentage of stacked discounts and the final price — with VAT."],
+gpa:["NEB (SEE, ११–१२) र TU सेमेस्टरको grade, GPA र CGPA — credit hour सहित।","Grades, GPA and CGPA for NEB (SEE, 11–12) and TU semesters — with credit hours."],
+nepse:["बोनस/हकप्रदपछि सेयरको समायोजित मूल्य र कमिसनसहित औसत लागत (WACC)।","Share price after bonus/right and average cost (WACC) with commission."]
 };
 var ROMAN = {
 dhalan:"dhalan slab concrete rcc chhat casting",
@@ -2940,7 +3197,13 @@ emicmp:"emi tulana compare loan kista bank byaj",
 gratuity:"upadan gratuity labour act basic talab",
 pfcit:"sanchaya kosh pf cit nagarik lagani kosh retirement kar chhut",
 invoice:"bijak bill kar bijak invoice vat pan quotation",
-customs:"bhansar mahsul customs airport sun gahana tv vaideshik"
+customs:"bhansar mahsul customs airport sun gahana tv vaideshik",
+digits:"nepali anka ank number digit convert english",
+patro:"patro calendar tithi chadparba bida holiday dashain tihar mahina",
+uprice:"ekai mulya unit price sasto tulana pack kg litre",
+stackdisc:"chut mathi chut discount double offer sale",
+gpa:"gpa cgpa grade neb see tu result marks",
+nepse:"nepse share sheyar bonus hakprad right wacc kitta"
 };
 function printHead(){
   var biz=(typeof PROF!=="undefined"&&PROF.biz)?PROF.biz:"PRERAK MULTIPURPOSE";
@@ -2960,8 +3223,8 @@ var NAK=[["अश्विनी","Ashwini","चु,चे,चो,ला"],["भ
 var RASHI=[["मेष","Mesh (Aries)"],["वृष","Brish (Taurus)"],["मिथुन","Mithun (Gemini)"],["कर्कट","Karkat (Cancer)"],["सिंह","Simha (Leo)"],["कन्या","Kanya (Virgo)"],["तुला","Tula (Libra)"],["वृश्चिक","Brischik (Scorpio)"],["धनु","Dhanu (Sagittarius)"],["मकर","Makar (Capricorn)"],["कुम्भ","Kumbha (Aquarius)"],["मीन","Meen (Pisces)"]];
 var TITHI=["प्रतिपदा","द्वितीया","तृतीया","चतुर्थी","पञ्चमी","षष्ठी","सप्तमी","अष्टमी","नवमी","दशमी","एकादशी","द्वादशी","त्रयोदशी","चतुर्दशी"];
 var NAMESUG={"चु":"चूडामणि","चे":"चेतन, चेतना","ला":"लक्ष्मी, लता, लाजु","ली":"लीला, लीलाराज","ले":"लेखनाथ","लो":"लोकेश, लोचन","अ":"अनिल, अञ्जना, अशोक","ई":"ईश्वर, ईश्वरी","उ":"उमेश, उमा, उज्ज्वल","ए":"एकराज, एलिना","ओ":"ओमप्रकाश, ओजस्वी","वा":"वासुदेव","वी":"वीरेन्द्र, वीणा","वे":"वेदप्रसाद, वेदिका","का":"कार्तिक, कामना","की":"कीर्ति, कीर्तिमान","कु":"कुमार, कुसुम, कुन्ती","घ":"घनश्याम","छ":"छविलाल","के":"केशव, केसाङ","को":"कोपिला, कोमल","हा":"हार्दिक","ही":"हीरा, हीरामणि","हु":"हुमकला","हे":"हेमन्त, हेमा","हो":"होमनाथ","ड":"डम्बर","डो":"डोलराज, डोल्मा","मा":"माधव, माया, मानिता","मी":"मीरा, मीना","मे":"मेघराज, मेनुका","मो":"मोहन, मोनिका","टी":"टीकाराम, टीका","टे":"टेकबहादुर, टेकराज","पा":"पार्वती, पासाङ","पी":"पीताम्बर","पू":"पूजा, पूर्णिमा, पूर्ण","ठ":"ठाकुरप्रसाद","पे":"पेम्बा","रा":"राम, राधा, राजेश","री":"रीता, रीना","रू":"रूपा, रूपक","रे":"रेणुका, रेशम","रो":"रोशन, रोजिना","ता":"तारा, ताराप्रसाद","ती":"तीर्थ, तीर्थराज","ते":"तेजेन्द्र, तेन्जिङ","तो":"तोयराज","ना":"नारायण, नारायणी","नी":"नीलम, नीता","नू":"नूतन","ने":"नेत्रप्रसाद","नो":"नोर्बु","या":"यादव, याम","ये":"येशी","यो":"योगेन्द्र, योजना","भा":"भावना, भानु","भी":"भीम, भीमबहादुर","भू":"भूपेन्द्र, भूमिका","धा":"धावा","जा":"जानकी, जागृति","जी":"जीवन, जीतबहादुर","खे":"खेमराज, खेम","गा":"गायत्री","गी":"गीता, गीतेन्द्र","गे":"गेहेन्द्र","गो":"गोपाल, गोमा, गोविन्द","सा":"सागर, सावित्री","सी":"सीता, सीमा","सू":"सूर्य","से":"सेजल","सो":"सोम, सोनम, सोमनाथ","दा":"दामोदर, दावा","दी":"दीपक, दीपा","झ":"झलक, झलकमान","दे":"देवी, देवेन्द्र, देवकी","दो":"दोर्जे","च":"चन्द्र, चम्पा"};
-function patro(by,bm,bd){
-  var d = Date.UTC(by,bm-1,bd,6,15)/86400000 + 2440587.5 - 2451545;
+function patro(by,bm,bd,uh){
+  var d = (uh===undefined ? Date.UTC(by,bm-1,bd,6,15) : Date.UTC(by,bm-1,bd) + uh*3600000)/86400000 + 2440587.5 - 2451545;
   var rad = Math.PI/180;
   var g = (357.529 + 0.98560028*d)*rad;
   var sun = 280.459 + 0.98564736*d + 1.915*Math.sin(g) + 0.02*Math.sin(2*g);
@@ -3021,6 +3284,12 @@ timber:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circl
   pfcit:'<path d="M3.5 9L12 4l8.5 5"/><rect x="5" y="9" width="14" height="9.5"/><circle cx="12" cy="13.8" r="2.4" fill="#F5B301" stroke="none"/><line x1="3.5" y1="20.5" x2="20.5" y2="20.5"/>',
   invoice:'<path d="M5.5 3.5h13v17l-2.2-1.4-2.1 1.4-2.2-1.4-2.2 1.4-2.1-1.4-2.2 1.4z"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="11.5" x2="13" y2="11.5"/><rect x="11.5" y="14" width="4" height="2.6" fill="#F5B301" stroke="none"/>',
   customs:'<rect x="5" y="7.5" width="14" height="12.5" rx="1.5"/><path d="M9.5 7.5V5a1.2 1.2 0 0 1 1.2-1.2h2.6A1.2 1.2 0 0 1 14.5 5v2.5"/><rect x="5" y="11.5" width="14" height="3" fill="#F5B301" stroke="none"/><line x1="9" y1="20" x2="9" y2="21.5"/><line x1="15" y1="20" x2="15" y2="21.5"/>',
+  digits:'<rect x="3" y="5.5" width="8" height="13"/><rect x="13" y="5.5" width="8" height="13" fill="#F5B301" stroke="none"/><rect x="13" y="5.5" width="8" height="13"/><path d="M5.5 9.5l1.5-1v7M15.2 9.2c.6-1 2.8-1 3.1.4.3 1.6-3.3 3-3.3 5.9h3.4"/>',
+  patro:'<rect x="3.5" y="5" width="17" height="15.5"/><line x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/><path d="M14.8 12.2a3.2 3.2 0 1 0 0 5.6 2.6 2.6 0 0 1 0-5.6z" fill="#F5B301" stroke="none"/>',
+  uprice:'<path d="M3.5 4.5h2.5l2 10.5h10l2-7.5H7"/><circle cx="9.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/><rect x="10" y="9" width="6" height="3" fill="#F5B301" stroke="none"/>',
+  stackdisc:'<path d="M3.5 12.5V5h7.5l9.5 9.5-7.5 7.5z"/><circle cx="7.5" cy="9" r="1.5" fill="#F5B301" stroke="none"/><path d="M11 15.5l4-4M11.5 12.2h.01M14.5 15.2h.01"/>',
+  gpa:'<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.5v4.5c2.8 2.2 8.2 2.2 11 0v-4.5"/><path d="M21.5 9.5v5" stroke="#F5B301" stroke-width="2.2"/>',
+  nepse:'<path d="M3.5 19.5h17"/><path d="M4.5 16l4.5-5 3.5 3 6.5-7.5" stroke="#F5B301" stroke-width="2.2"/><path d="M15 6.5h4v4"/>',
 };
 function icHtml(t){
   var inner = ICONS[t.id];
