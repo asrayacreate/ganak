@@ -1,4 +1,4 @@
-var C="ganak-v9-6", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
+var C="ganak-v9-7", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
@@ -40,9 +40,9 @@ self.addEventListener("fetch",function(e){
     }));
   }
 });
-/* 📲 today's date at the top of the phone screen: keep today's notification there — a new day replaces it,
-   and when the app opens (or the daily sync runs) it is put back if it was tapped or swiped away. Not
-   "silent": Android hides silent ones from the status bar; renotify:false keeps a same-day refresh quiet. */
+/* 📲 today's date at the top of the phone screen, until it is switched off in the app: a new day replaces
+   it (when the app opens or the daily sync runs), and if it is swiped away or cleared it comes straight
+   back. Quiet: no sound or vibration, and renotify:false never re-alerts. */
 function todayNote(force){
   return caches.open(D).then(function(c){
     return c.match("./__days.json").then(function(r){ return r ? r.json() : null; }).then(function(j){
@@ -51,7 +51,7 @@ function todayNote(force){
       if(!x) return;
       return self.registration.getNotifications({tag:"ganak-today"}).then(function(ns){
         if(!force && j.shown === day && ns.length) return;
-        return self.registration.showNotification(x.t, {body:x.b, tag:"ganak-today", renotify:false, requireInteraction:true,
+        return self.registration.showNotification(x.t, {body:x.b, tag:"ganak-today", renotify:false, silent:true, requireInteraction:true,
           icon:x.ic || "./icon-192.png", badge:x.bd || "./icon-192.png", data:{u:"./#patro"}}).then(function(){
           j.shown = day; return c.put("./__days.json", new Response(JSON.stringify(j), {headers:{"Content-Type":"application/json"}}));
         });
@@ -61,6 +61,7 @@ function todayNote(force){
 }
 self.addEventListener("message",function(e){ if(e.data && e.data.k==="ganak-today") e.waitUntil(todayNote(e.data.force)); });
 self.addEventListener("periodicsync",function(e){ if(e.tag==="ganak-today") e.waitUntil(todayNote(false)); });
+self.addEventListener("notificationclose",function(e){ if(e.notification.tag==="ganak-today") e.waitUntil(todayNote(true)); });   /* swiped away → back */
 self.addEventListener("notificationclick",function(e){
   if(e.notification.tag!=="ganak-today") e.notification.close();   /* the date stays at the top after a tap */
   e.waitUntil(self.clients.matchAll({type:"window",includeUncontrolled:true}).then(function(ws){
