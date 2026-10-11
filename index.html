@@ -963,8 +963,13 @@ body[data-theme="dark"] .wc::before{background:linear-gradient(160deg,rgba(255,2
 .hclock .wc-n{font-size:calc(var(--sz)*.11)}
 .hcl-i{display:flex;flex-direction:column;align-items:flex-start;gap:2px;flex:1 1 auto;min-width:0}
 .hcl-top{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
-.hcl-k{font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--mute);white-space:nowrap}
-.hcl-all{flex:0 0 auto;padding:2px 0;border:0;background:none;cursor:pointer;font:700 11.5px var(--fs);color:var(--fin);white-space:nowrap}
+.hcl-tabs{display:inline-flex;padding:2px;border:1px solid var(--ol2);border-radius:999px;background:var(--card)}
+.hcl-tabs button{padding:3px 9px;border:0;border-radius:999px;background:none;cursor:pointer;font:700 11.5px var(--fs);color:var(--mute);white-space:nowrap}
+.hcl-tabs button.on{background:var(--g-amb);color:#1A1405;box-shadow:0 2px 6px -2px rgba(255,145,0,.6)}
+.hcl-all{flex:0 0 auto;margin-top:1px;padding:2px 0;border:0;background:none;cursor:pointer;font:700 11.5px var(--fs);color:var(--fin);white-space:nowrap}
+/* the small Vedic dial: segments, hand and the muhurta number only */
+.hclock .vdn,.hclock .vdlb,.hclock .vdc2,.hclock .vst,.hclock .vdp{display:none}
+.hclock .vdc1{font-size:50px;dominant-baseline:central}
 body[data-theme="dark"] .hcl-all{color:#8CC4F5}
 .hcl-sel{max-width:100%;margin:1px 0 2px;padding:4px 24px 4px 9px;border:1px solid var(--ol2);border-radius:999px;cursor:pointer;
   font:700 12.5px var(--fs);color:var(--ink);text-overflow:ellipsis;-webkit-appearance:none;appearance:none;background-color:var(--card);
@@ -3791,7 +3796,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v9.2 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v9.3 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4783,13 +4788,35 @@ function wcShow(){   /* clock + list for the current mode / zone */
     : (function(){ var z = wzOf(document.getElementById("wcSrc").value), p = tzParts(z[6], T);
         return "🕗 " + L(z[4]+" मा ", "In "+z[5]+" ") + hm12(p.h, p.mi) + L(" हुँदा —"," is —"); })();
 }
-/* Home: "मेरो घडी" — the aquarium watch on the picked country, with a picker */
+/* Home clock card: 🕉️ वैदिक (muhurta dial, Vedic time, tithi) or 🌍 देश (aquarium watch on the picked country) */
+var HCLK = "v";
+try{ HCLK = localStorage.getItem("ganak_hclk") === "w" ? "w" : "v"; }catch(e){}
 function homeClockHtml(){
+  var tabs = '<div class="hcl-top"><span class="hcl-tabs" role="group" aria-label="'+L("घडी","Clock")+'">'
+    + '<button data-hck="v"'+(HCLK === "v" ? ' class="on"' : '')+'>🕉️ '+L("वैदिक","Vedic")+'</button>'
+    + '<button data-hck="w"'+(HCLK === "w" ? ' class="on"' : '')+'>🌍 '+L("देश","World")+'</button></span></div>';
+  if(HCLK === "v") return '<div class="hclock"><div data-go="vedic" role="button" aria-label="'+L("वैदिक घडी खोल्नुहोस्","Open the Vedic clock")+'">'
+    + '<div class="wc vd" id="hvDial"><div class="wc-face">'+vdDialSvg()+'<div class="wc-glass"></div></div></div></div>'
+    + '<div class="hcl-i">'+tabs+'<div class="hcl-t" id="hvT"></div><div class="hcl-d" id="hvMu"></div><div class="hcl-n" id="hvP"></div>'
+    + '<button class="hcl-all" data-go="vedic">'+L("पूरा पञ्चाङ्ग →","Full panchang →")+'</button></div></div>';
   return '<div class="hclock"><div data-go="wclock" role="button" aria-label="'+L("विश्व घडी खोल्नुहोस्","Open the world clock")+'">'+watchHtml("hwWatch")+'</div>'
-    + '<div class="hcl-i"><div class="hcl-top"><span class="hcl-k">🕰️ '+L("मेरो घडी","My clock")+'</span>'
-    + '<button class="hcl-all" data-go="wclock">'+L("सबै देश →","All →")+'</button></div>'
+    + '<div class="hcl-i">'+tabs
     + '<select class="hcl-sel" id="hwZone" aria-label="'+L("देश रोज्नुहोस्","Choose a country")+'">'+wzOptions(WC.z)+'</select>'
-    + '<div class="hcl-t" id="hwTime"></div><div class="hcl-d" id="hwDay"></div><div class="hcl-n" id="hwNp"></div></div></div>';
+    + '<div class="hcl-t" id="hwTime"></div><div class="hcl-d" id="hwDay"></div><div class="hcl-n" id="hwNp"></div>'
+    + '<button class="hcl-all" data-go="wclock">'+L("सबै देश →","All countries →")+'</button></div></div>';
+}
+var HV = {V:null, at:0, txt:""};
+function hvTick(now){   /* Home's Vedic clock: muhurta : kala : kashtha, its name, tithi + nakshatra (refreshed each minute) */
+  var w = document.getElementById("hvDial"); if(!w) return;
+  if(!HV.V || now >= HV.V.next || now - HV.at > 60000){
+    var g = grahas(now, true), tn = tithiName(Math.floor(grRev(g.trop.mo - g.trop.su)/12)), nk = NAK[Math.floor(g.sid.mo/(360/27))];
+    HV.V = vedDay(now, VLOC[VD.loc]); HV.at = now; HV.txt = L(tn[0], tn[1]) + " · " + L(nk[0]+" नक्षत्र", nk[1]);
+  }
+  var T = vedTime(now, HV.V), M = MUHURTA[T.mu];
+  vdDialSet(w, T);
+  document.getElementById("hvT").textContent = npd(pad2(T.mu + 1))+":"+npd(pad2(T.kala))+":"+npd(pad2(T.kashtha));
+  document.getElementById("hvMu").textContent = (T.day ? "☀️ " : "🌙 ") + L("मुहूर्त ","Muhurta ") + npd(T.mu + 1) + " · " + L(M[0], M[1]).replace(/ \(.+\)/, "") + (T.mu === 7 ? " ✨" : T.mu === 28 ? " 🙏" : "");
+  document.getElementById("hvP").textContent = HV.txt + " · " + L(WDN[HV.V.wd], WDNE[HV.V.wd]);
 }
 function hwText(T){
   var w = document.getElementById("hwWatch"); if(!w) return;
@@ -4815,6 +4842,7 @@ function clockTick(){
   if(tw && tw.offsetParent){ any = true;
     if(WC.mode === "live"){ p = zoneNow(WC.z, now); handsTo(tw, p.h, p.mi, p.s); if(tick){ wcText(now); wcFill(now); } } }
   if(hw && hw.offsetParent){ any = true; p = zoneNow(WC.z, now); handsTo(hw, p.h, p.mi, p.s); if(tick) hwText(now); }
+  var hv = document.getElementById("hvDial"); if(hv && hv.offsetParent){ any = true; if(tick) hvTick(now); }
   var vd = document.getElementById("vdDial"); if(vd && vd.offsetParent){ any = true; if(tick) vdTick(now); }
   CLK.sec = sec; CLK.raf = any ? requestAnimationFrame(clockTick) : 0;
 }
@@ -4956,8 +4984,8 @@ function vdDialSvg(){   /* upper half = day (sunrise left → sunset right), low
   for(i = 0; i < 8; i++){ var p1 = vdArcP(98, i*45).split(" "), p2 = vdArcP(111, i*45).split(" ");   /* प्रहर marks, inside the ring */ h += '<line class="vdp" x1="'+p1[0]+'" y1="'+p1[1]+'" x2="'+p2[0]+'" y2="'+p2[1]+'"/>'; }
   return h + '<line class="vdh" x1="12" y1="150" x2="288" y2="150"/>'
     + '<text class="vdlb" x="68" y="163">'+L("पूर्व","EAST")+'</text><text class="vdlb" x="232" y="163">'+L("पश्चिम","WEST")+'</text>'
-    + '<g id="vdHand"><line class="vdhl" x1="150" y1="150" x2="250" y2="150"/><circle class="vdsun" cx="252" cy="150" r="9"/></g>'
-    + '<circle class="vdc" cx="150" cy="150" r="38"/><text class="vdc1" id="vdCN" x="150" y="148"></text><text class="vdc2" id="vdCM" x="150" y="166"></text></svg>';
+    + '<g class="vdhand"><line class="vdhl" x1="150" y1="150" x2="250" y2="150"/><circle class="vdsun" cx="252" cy="150" r="9"/></g>'
+    + '<circle class="vdc" cx="150" cy="150" r="38"/><text class="vdc1" x="150" y="148"></text><text class="vdc2" x="150" y="166"></text></svg>';
 }
 var NAK_AB = [["अश्वि","Ashw"],["भरणी","Bhar"],["कृत्ति","Krit"],["रोहि","Rohi"],["मृग","Mrig"],["आर्द्रा","Ardr"],["पुन","Puna"],["पुष्य","Push"],["आश्ले","Ashl"],
   ["मघा","Magh"],["पू.फा","PPha"],["उ.फा","UPha"],["हस्त","Hast"],["चित्रा","Chit"],["स्वाती","Swat"],["विशा","Vish"],["अनु","Anur"],["ज्येष्ठा","Jyes"],["मूल","Mula"],
@@ -5026,13 +5054,16 @@ function vdRefresh(now){   /* the slow parts (panchang, grahas, day times) — o
   $("#vdAya").textContent = L("अयनांश (लाहिरी) ","Ayanamsa (Lahiri) ")+npd(Math.floor(G.aya))+"°"+npd(pad2(Math.floor((G.aya % 1)*60)))+"′";
   VD.last = now;
 }
+function vdDialSet(w, T){   /* hand, lit muhurta, night sky and centre number of a muhurta dial */
+  w.querySelector(".vdhand").setAttribute("transform", "rotate("+(-T.ang).toFixed(2)+" 150 150)");
+  [].forEach.call(w.querySelectorAll(".vdm"), function(p){ p.classList.toggle("on", +p.dataset.m === T.mu); });
+  w.firstChild.classList.toggle("night", !T.day);
+  w.querySelector(".vdc1").textContent = npd(T.mu + 1); w.querySelector(".vdc2").textContent = L("मुहूर्त","MUHURTA");
+}
 function vdTick(now){   /* every second: the hand, muhurta, kala, kashtha, ghati */
   if(!VD.V || now >= VD.V.next || now - VD.last > 60000) vdRefresh(now);
-  var T = vedTime(now, VD.V), M = MUHURTA[T.mu], hd = document.getElementById("vdHand");
-  if(hd) hd.setAttribute("transform", "rotate("+(-T.ang).toFixed(2)+" 150 150)");
-  [].forEach.call(document.querySelectorAll("#vdDial .vdm"), function(p){ p.classList.toggle("on", +p.dataset.m === T.mu); });
-  document.getElementById("vdDial").firstChild.classList.toggle("night", !T.day);
-  $("#vdCN").textContent = npd(T.mu + 1); $("#vdCM").textContent = L("मुहूर्त","MUHURTA");
+  var T = vedTime(now, VD.V), M = MUHURTA[T.mu];
+  vdDialSet(document.getElementById("vdDial"), T);
   $("#vdMu").textContent = L(M[0], M[1]) + (T.mu === 7 ? " ✨" : T.mu === 28 ? " 🙏" : "");
   $("#vdT").textContent = npd(pad2(T.mu + 1))+" : "+npd(pad2(T.kala))+" : "+npd(pad2(T.kashtha));
   $("#vdG").textContent = L("इष्टकाल ","Ishtakaal ")+npd(T.gh)+L(" घडी "," ghati ")+npd(T.pa)+L(" पला "," pala ")+npd(T.vi)+L(" विपला"," vipala");
@@ -5732,6 +5763,8 @@ document.getElementById("hhero").addEventListener("change",function(e){
 document.getElementById("hhero").addEventListener("click",function(e){
   if(e.target.closest("#bizEdit")||e.target.closest("#rateNudge")){ openDrawer(false); return; }
   if(e.target.closest("#hnotice")){ openDrawer(true); return; }
+  var hk=e.target.closest("[data-hck]");
+  if(hk){ if(hk.dataset.hck!==HCLK){ HCLK=hk.dataset.hck; try{ localStorage.setItem("ganak_hclk",HCLK); }catch(err){} renderHomeHero(); } return; }
   var go=e.target.closest("[data-go]"); if(go){ openedInApp=true; location.hash="#"+go.dataset.go; return; }
   var hs=e.target.closest("#hslide");
   if(hs && hs.dataset.id){ openedInApp=true; location.hash="#"+hs.dataset.id; }
@@ -5829,7 +5862,9 @@ function renderHomeHero(){
     +'<button class="instb'+(window.__dp?' on':'')+'" id="instBtn">📲 '+L("Phone मा install गर्नुहोस्","Install on your phone")+'</button>'
     +'<span class="hic2">'+TAPEIC+'</span></div>'
     +'<div class="htoday" id="htoday" hidden></div>';
-  htToday(); wcTilt(document.getElementById("hwWatch")); hwText(Date.now()); clockStart();
+  htToday(); wcTilt(document.getElementById("hwWatch") || document.getElementById("hvDial"));
+  if(HCLK === "v") hvTick(Date.now()); else hwText(Date.now());
+  clockStart();
 }
 /* home "आज" card: today's BS date + tithi, and today's / the next listed festival */
 function htToday(){
@@ -6070,10 +6105,19 @@ function voiceParse(s){
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   /* a new sw.js (new version) takes over while the app is open → offer a one-tap reload.
      No bar on the very first install (there was no old version on screen). */
-  var swHad = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.register("./sw.js").catch(function(){});
+  var swHad = !!navigator.serviceWorker.controller, swT0 = Date.now(), swTouched = false;
+  document.addEventListener("pointerdown", function(){ swTouched = true; }, true);
+  document.addEventListener("keydown", function(){ swTouched = true; }, true);
+  navigator.serviceWorker.register("./sw.js").then(function(reg){
+    /* back in the app (phones keep it open for days) → look for a newer version */
+    document.addEventListener("visibilitychange", function(){
+      if(document.visibilityState === "visible"){ swT0 = Date.now(); swTouched = false; reg.update().catch(function(){}); }
+    });
+  }).catch(function(){});
   navigator.serviceWorker.addEventListener("controllerchange", function(){
     if(!swHad){ swHad = true; return; }
+    /* the new version arrived right at launch (nothing tapped yet) or while the app was in the background → just load it */
+    if(document.visibilityState === "hidden" || (!swTouched && Date.now() - swT0 < 8000)){ location.reload(); return; }
     if(document.getElementById("updbar")) return;
     var d = document.createElement("div");
     d.id = "updbar"; d.className = "updbar"; d.setAttribute("role","status");
