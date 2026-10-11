@@ -1,4 +1,4 @@
-var C="ganak-v9-0";
+var C="ganak-v9-1";
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
