@@ -3825,7 +3825,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v9.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v9.6 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -5105,11 +5105,22 @@ function vdTick(now){   /* every second: the hand, muhurta, kala, kashtha, ghati
 }
 
 
-/* ---- 📲 आजको मिति on the phone screen: a quiet daily notification (lock screen + notification panel).
-   The page writes the next 60 days' texts into Cache Storage; sw.js shows today's one when the app
-   opens and, where the browser allows periodic background sync, once a day by itself. ---- */
-var TN = {on:false};
-try{ TN.on = localStorage.getItem("ganak_tnote") === "1"; }catch(e){}
+/* ---- 📲 आजको मिति at the top of the phone screen. In a browser: a daily notification — the page writes
+   the next 60 days' texts into Cache Storage; sw.js shows today's one when the app opens (and puts it back
+   if it was tapped or swiped away) and, where periodic background sync is allowed, once a day by itself.
+   Inside the Android app (it opens us with ?app=2&bar=0|1) the app shows it natively instead: an always-on
+   status-bar date, switched with ganak://datebar/on|off. ---- */
+var TN = {web:false, app:false, nat:/[?&]app=2(&|#|$)/.test(location.search)};
+try{
+  TN.web = localStorage.getItem("ganak_tnote") === "1"; TN.app = localStorage.getItem("ganak_tnn") === "1";
+  if(!TN.nat) TN.nat = sessionStorage.getItem("ganak_native") === "1";
+  else if(sessionStorage.getItem("ganak_native") !== "1"){   /* first load of this app session: take the app's own on/off */
+    sessionStorage.setItem("ganak_native", "1");
+    var tnq = location.search.match(/[?&]bar=([01])/);
+    if(tnq){ TN.app = tnq[1] === "1"; localStorage.setItem("ganak_tnn", tnq[1]); }
+  }
+}catch(e){}
+function tnOn(){ return TN.nat ? TN.app : TN.web; }
 function tnTile(b, big){   /* notification pictures: a calendar tile (month band, big day, weekday) or the status-bar badge (white day number) */
   var c = document.createElement("canvas"), x = c.getContext("2d"), S = big ? 192 : 96, f = getComputedStyle(document.documentElement).getPropertyValue("--fs") || "sans-serif";
   c.width = c.height = S; x.textAlign = "center"; x.textBaseline = "middle";
@@ -5136,17 +5147,16 @@ function tnDays(){   /* the next 60 days: short title, details, and (first 14 da
 }
 function tnSync(force){   /* save the texts for the service worker (rebuilt once a day, or after a language / place change), then show or clear today's */
   if(!("serviceWorker" in navigator) || !window.caches) return;
-  var key = TN.on ? todayISO() + "|" + LANG + "|" + VD.loc : "off";
+  var key = TN.web ? todayISO() + "|" + LANG + "|" + VD.loc : "off";
   caches.open("ganak-days").then(function(c){
     return c.match("./__days.json").then(function(r){ return r ? r.json() : {}; }).catch(function(){ return {}; }).then(function(old){
       if(old && old.v === key && !force) return;
-      /* keep "already shown today", so a notification swiped away stays away until tomorrow */
-      var j = {v:key, on:TN.on, days:TN.on ? tnDays() : {}, shown:(old && old.shown) || ""};
+      var j = {v:key, on:TN.web, days:TN.web ? tnDays() : {}, shown:(old && old.shown) || ""};
       return c.put("./__days.json", new Response(JSON.stringify(j), {headers:{"Content-Type":"application/json"}}));
     });
   })
     .then(function(){ return navigator.serviceWorker.ready; }).then(function(reg){
-      if(!TN.on) return reg.getNotifications({tag:"ganak-today"}).then(function(ns){ ns.forEach(function(n){ n.close(); }); });
+      if(!TN.web) return reg.getNotifications({tag:"ganak-today"}).then(function(ns){ ns.forEach(function(n){ n.close(); }); });
       if(reg.active) reg.active.postMessage({k:"ganak-today", force:!!force});
       if(reg.periodicSync && navigator.permissions) return navigator.permissions.query({name:"periodic-background-sync"}).then(function(st){
         if(st.state === "granted") return reg.periodicSync.register("ganak-today", {minInterval:6*3600000});
@@ -5154,24 +5164,32 @@ function tnSync(force){   /* save the texts for the service worker (rebuilt once
     }).catch(function(){});
 }
 function tnToggle(){
-  if(TN.on){ TN.on = false; try{ localStorage.setItem("ganak_tnote", "0"); }catch(e){} tnSync(); renderHomeHero(); renderDrawer();
+  if(TN.nat){   /* the Android app: always-on, quiet; its status-bar icon is today's day number */
+    TN.app = !TN.app; try{ localStorage.setItem("ganak_tnn", TN.app ? "1" : "0"); }catch(e){}
+    if(TN.app && TN.web){ TN.web = false; try{ localStorage.setItem("ganak_tnote", "0"); }catch(e){} tnSync(); }   /* no second (web) copy */
+    renderHomeHero(); renderDrawer();
+    location.href = "intent://datebar/" + (TN.app ? "on" : "off") + "#Intent;scheme=ganak;package=io.github.asrayacreate.twa;end";
+    toast(TN.app ? L("✓ आजको मिति अब स्क्रिनको माथि सधैं देखिन्छ","✓ Today's date now stays at the top of your screen") : L("स्क्रिनको माथिबाट आजको मिति हटाइयो","Today's date removed from the top of the screen"));
+    return;
+  }
+  if(TN.web){ TN.web = false; try{ localStorage.setItem("ganak_tnote", "0"); }catch(e){} tnSync(); renderHomeHero(); renderDrawer();
     toast(L("फोनको स्क्रिनबाट आजको मिति हटाइयो","Today's date removed from the phone screen")); return; }
   if(!("Notification" in window) || !("serviceWorker" in navigator)){ toast(L("यो फोन/ब्राउजरमा notification चल्दैन","Notifications don't work in this browser")); return; }
   Promise.resolve(Notification.requestPermission()).then(function(pm){
     if(pm !== "granted"){ toast(L("Notification को अनुमति चाहिन्छ — फोनको Settings › Apps › Ganak मा दिनुहोस्","Allow notifications for Ganak in your phone's settings")); return; }
-    TN.on = true; try{ localStorage.setItem("ganak_tnote", "1"); }catch(e){}
+    TN.web = true; try{ localStorage.setItem("ganak_tnote", "1"); }catch(e){}
     tnSync(true); renderHomeHero(); renderDrawer();
     toast(L("✓ आजको मिति अब फोनको स्क्रिनमा देखिन्छ","✓ Today's date now shows on your phone screen"));
   });
 }
 function tnBtn(){   /* the switch (Home "आज" card and Settings) */
-  var ok = ("Notification" in window) && ("serviceWorker" in navigator);
-  if(!ok) return "";
-  return '<button class="tnbtn'+(TN.on ? ' on' : '')+'" data-tn="1">📲 '+(TN.on ? L("फोनको स्क्रिनमा आजको मिति: खुला ✓","Today's date on phone screen: on ✓") : L("आजको मिति फोनको स्क्रिनमा देखाउने","Show today's date on my phone screen"))+'</button>';
+  if(!TN.nat && !(("Notification" in window) && ("serviceWorker" in navigator))) return "";
+  var on = tnOn();
+  return '<button class="tnbtn'+(on ? ' on' : '')+'" data-tn="1">📲 '+(on ? L("स्क्रिनको माथि आजको मिति: खुला ✓","Today's date at the top of the screen: on ✓") : L("आजको मिति फोनको स्क्रिनको माथि सधैं देखाउने","Always show today's date at the top of my phone"))+'</button>';
 }
 document.addEventListener("click", function(e){ if(e.target.closest && e.target.closest("[data-tn]")){ e.preventDefault(); tnToggle(); } });
-if(TN.on){ tnSync(false); }
-document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible" && TN.on) tnSync(false); });
+if(TN.web){ tnSync(false); }
+document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible" && TN.web) tnSync(false); });
 
 /* ---- documents: result photo, invoice, EMI schedule → canvas → PNG / PDF (no library) ----
    cvKit = shared drawing helpers. A renderer (lay) is a plain function of k: the first pass (draw=false)
@@ -5978,7 +5996,7 @@ function htToday(){
     + '<span class="htd-t"><b>'+esc(L("आज "+WDN[b.wd], "Today · "+WDNE[b.wd]))+' · '+esc(L(tn[0], tn[1]))+'</b>'
     + (now.length ? '<span class="htd-e">🎉 '+esc(now.map(function(u){ return L(u.ne, u.en); }).join(" · "))+'</span>' : '')
     + (nx ? '<span class="htd-n">'+evKind(nx.k)[0]+' '+esc(L(nx.ne, nx.en))+' — <em>'+esc(relDays(nx.days))+'</em></span>' : '')
-    + '</span><span class="htd-go" aria-hidden="true">›</span></button>' + (TN.on ? '' : tnBtn());
+    + '</span><span class="htd-go" aria-hidden="true">›</span></button>' + (tnOn() ? '' : tnBtn());
   el.hidden = false;
   if(el._h !== h){ el._h = h; el.innerHTML = h; }   /* the 20-second ticker repaints only when something changed */
 }

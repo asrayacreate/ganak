@@ -14,7 +14,7 @@ android {
         targetSdk 36
         /* must be higher than the version now on Play — CI passes 1000 + the run number */
         versionCode((project.findProperty("versionCode") ?: "1000") as int)
-        versionName "9.5"
+        versionName "9.6"
     }
 
     signingConfigs {
