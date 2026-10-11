@@ -1,0 +1,52 @@
+/* Ganak for Google Play: a Trusted Web Activity (the same app PWABuilder made — same package, same website)
+   plus the "आजको मिति" home-screen widget. Built by .github/workflows/android.yml. */
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "io.github.asrayacreate.twa"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "io.github.asrayacreate.twa"
+        minSdk 21
+        targetSdk 36
+        /* must be higher than the version now on Play — CI passes 1000 + the run number */
+        versionCode((project.findProperty("versionCode") ?: "1000") as int)
+        versionName "9.5"
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv("KEYSTORE_FILE")
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv("KEYSTORE_FILE")) signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
+
+dependencies {
+    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+    testImplementation "junit:junit:4.13.2"
+}

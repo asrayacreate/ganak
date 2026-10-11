@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appName">Ganak — नेपाली हिसाब Tools</string>
+    <string name="launcherName">Ganak</string>
+    <string name="launchUrl">https://asrayacreate.github.io/ganak/index.html</string>
+    <string name="providerAuthority">io.github.asrayacreate.twa.fileprovider</string>
+    <string name="assetStatements">[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://asrayacreate.github.io\"}}]</string>
+    <string name="widgetName">आजको मिति — Ganak</string>
+    <string name="widgetDesc">नेपाली मिति, तिथि र चाडपर्व — हरेक दिन आफैं फेरिन्छ</string>
+</resources>
