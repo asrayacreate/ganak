@@ -3,6 +3,8 @@
 #   ANDROID_KEYSTORE_BASE64  — the keystore file from the PWABuilder zip, base64-encoded
 #   ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD — from signing-key-info.txt
 # Without them it still builds and tests (unsigned release bundle + a debug APK).
+# With them it also saves upload_certificate.pem (public) and prints the key's SHA-256, for Play Console
+# (e.g. "Request upload key reset" when the old PWABuilder key is lost).
 name: Android app (TWA + widget)
 
 on:
@@ -55,6 +57,16 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: gradle --no-daemon -PversionCode=$((1000 + GITHUB_RUN_NUMBER)) testDebugUnitTest assembleDebug bundleRelease assembleRelease
 
+      - name: Upload key certificate for Play Console (only if the secrets are set)
+        if: env.KEYSTORE_FILE != ''
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          keytool -exportcert -rfc -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" \
+            -file android/app/build/outputs/upload_certificate.pem
+          keytool -list -v -keystore "$KEYSTORE_FILE" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" | grep -E "SHA256:|Valid"
+
       - uses: actions/upload-artifact@v4
         with:
           name: ganak-android-${{ github.run_number }}
@@ -62,3 +74,4 @@ jobs:
             android/app/build/outputs/bundle/release/*.aab
             android/app/build/outputs/apk/release/*.apk
             android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/upload_certificate.pem
