@@ -955,20 +955,24 @@ body[data-theme="dark"] .wc::before{background:linear-gradient(160deg,rgba(255,2
     linear-gradient(155deg,rgba(255,255,255,.12) 0 38%,transparent 38.5%),radial-gradient(circle at 50% 50%,transparent 64%,rgba(255,255,255,.18) 72%,transparent 74%)}
 .wc-face.set .wc-hand{transition:transform .9s var(--emph)}
 /* home: "my clock" card with a country picker */
-.hclock{display:flex;align-items:center;gap:14px;margin:0 0 13px;padding:14px 14px 14px 12px;overflow:hidden;border:1px solid var(--ol);border-radius:22px;
-  background:radial-gradient(90% 130% at 0 50%,rgba(56,189,248,.18),transparent 65%),var(--card);box-shadow:var(--m1)}
-.hclock .wc{--sz:min(40vw,176px);cursor:pointer}
-.hcl-i{display:flex;flex-direction:column;align-items:flex-start;gap:3px;flex:1 1 auto;min-width:0}
-.hcl-k{font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
-.hcl-sel{max-width:100%;margin:2px 0 3px;padding:6px 26px 6px 10px;border:1px solid var(--ol2);border-radius:999px;cursor:pointer;
-  font:700 13px var(--fs);color:var(--ink);text-overflow:ellipsis;-webkit-appearance:none;appearance:none;background-color:var(--card);
+.hclock{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:9px 12px 9px 9px;overflow:hidden;border:1px solid var(--ol);border-radius:20px;
+  background:radial-gradient(70% 130% at 0 50%,rgba(56,189,248,.18),transparent 65%),var(--card);box-shadow:var(--m1)}
+.hclock .wc{--sz:min(28vw,112px);cursor:pointer}
+/* small watch: only १२ ३ ६ ९, no minute ticks, brand or date window — keeps it readable */
+.hclock .wc-n:not(:nth-of-type(3n)),.hclock .wc-ticks.m,.hclock .wc-brand,.hclock .wc-date{display:none}
+.hclock .wc-n{font-size:calc(var(--sz)*.11)}
+.hcl-i{display:flex;flex-direction:column;align-items:flex-start;gap:2px;flex:1 1 auto;min-width:0}
+.hcl-top{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
+.hcl-k{font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--mute);white-space:nowrap}
+.hcl-all{flex:0 0 auto;padding:2px 0;border:0;background:none;cursor:pointer;font:700 11.5px var(--fs);color:var(--fin);white-space:nowrap}
+body[data-theme="dark"] .hcl-all{color:#8CC4F5}
+.hcl-sel{max-width:100%;margin:1px 0 2px;padding:4px 24px 4px 9px;border:1px solid var(--ol2);border-radius:999px;cursor:pointer;
+  font:700 12.5px var(--fs);color:var(--ink);text-overflow:ellipsis;-webkit-appearance:none;appearance:none;background-color:var(--card);
   background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);
   background-position:calc(100% - 14px) 52%,calc(100% - 9px) 52%;background-size:5px 5px;background-repeat:no-repeat}
-.hcl-t{font-family:var(--fm);font-size:clamp(18px,5.4vw,27px);font-weight:800;line-height:1.15;color:var(--ink)}
-.hcl-d{font-size:12.5px;color:var(--ink2)}
-.hcl-n{font-size:12px;line-height:1.35;color:var(--mute)}
-.hcl-go{margin-top:5px;border-radius:999px}
-@media(max-width:340px){.hclock{flex-direction:column}.hclock .wc{--sz:min(70vw,220px)}.hcl-i{align-items:center;text-align:center}}
+.hcl-t{font-family:var(--fm);font-size:clamp(17px,5vw,22px);font-weight:800;line-height:1.15;color:var(--ink)}
+.hcl-d{font-size:11.5px;color:var(--ink2)}
+.hcl-n{font-size:11px;line-height:1.3;color:var(--mute)}
 .wc-read{text-align:center;margin-top:18px}
 .wc-zone{font-size:13px;font-weight:700;color:var(--mute)}
 .wc-time{margin-top:2px;font-family:var(--fm);font-size:clamp(25px,7.6vw,34px);font-weight:800;color:var(--ink);letter-spacing:.3px}
@@ -3699,7 +3703,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v9.0 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v9.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4700,10 +4704,10 @@ function wcShow(){   /* clock + list for the current mode / zone */
 /* Home: "मेरो घडी" — the aquarium watch on the picked country, with a picker */
 function homeClockHtml(){
   return '<div class="hclock"><div data-go="wclock" role="button" aria-label="'+L("विश्व घडी खोल्नुहोस्","Open the world clock")+'">'+watchHtml("hwWatch")+'</div>'
-    + '<div class="hcl-i"><span class="hcl-k">🕰️ '+L("मेरो घडी","My clock")+'</span>'
+    + '<div class="hcl-i"><div class="hcl-top"><span class="hcl-k">🕰️ '+L("मेरो घडी","My clock")+'</span>'
+    + '<button class="hcl-all" data-go="wclock">'+L("सबै देश →","All →")+'</button></div>'
     + '<select class="hcl-sel" id="hwZone" aria-label="'+L("देश रोज्नुहोस्","Choose a country")+'">'+wzOptions(WC.z)+'</select>'
-    + '<div class="hcl-t" id="hwTime"></div><div class="hcl-d" id="hwDay"></div><div class="hcl-n" id="hwNp"></div>'
-    + '<button class="mini hcl-go" data-go="wclock">'+L("सबै देशको समय →","All countries →")+'</button></div></div>';
+    + '<div class="hcl-t" id="hwTime"></div><div class="hcl-d" id="hwDay"></div><div class="hcl-n" id="hwNp"></div></div></div>';
 }
 function hwText(T){
   var w = document.getElementById("hwWatch"); if(!w) return;
@@ -4711,7 +4715,7 @@ function hwText(T){
   if(sel && sel.value !== WC.z && document.activeElement !== sel) sel.value = WC.z;
   document.getElementById("hwTime").textContent = hm12(p.h, p.mi);
   document.getElementById("hwDay").textContent = dayLine(z, p);
-  document.getElementById("hwNp").textContent = z[0] === "np" ? L("नेपाल समय · UTC+५:४५","Nepal time · UTC+5:45") : "🇳🇵 "+L("नेपाल ","Nepal ")+hm12(np.h, np.mi)+" · "+vsNepal(z, T);
+  document.getElementById("hwNp").textContent = z[0] === "np" ? L("नेपाल समय · UTC+५:४५","Nepal time · UTC+5:45") : vsNepal(z, T)+" · 🇳🇵 "+hm12(np.h, np.mi);
   wcFace(w, z, p);
 }
 /* one animation loop turns the hands of every watch on screen; it stops when none is visible
