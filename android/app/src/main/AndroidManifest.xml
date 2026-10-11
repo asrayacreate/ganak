@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Ganak (Trusted Web Activity) — opens https://asrayacreate.github.io/ganak/ full screen in Chrome,
-     verified by /.well-known/assetlinks.json; plus the "आजको मिति" home-screen widget. -->
+     verified by /.well-known/assetlinks.json; plus the "आजको मिति" home-screen widget and today's
+     date always at the top of the phone (status bar). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <queries>
         <intent>
@@ -21,7 +23,7 @@
         <meta-data android:name="asset_statements" android:resource="@string/assetStatements" />
 
         <activity
-            android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
+            android:name=".LauncherActivity"
             android:label="@string/launcherName"
             android:alwaysRetainTaskState="true"
             android:exported="true">
@@ -42,6 +44,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="asrayacreate.github.io" android:pathPrefix="/ganak" />
+            </intent-filter>
+        </activity>
+
+        <!-- 📲 switch from the web app: ganak://datebar/on | off -->
+        <activity
+            android:name=".DateBarActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="ganak" android:host="datebar" />
             </intent-filter>
         </activity>
 
@@ -68,7 +85,7 @@
             </intent-filter>
         </service>
 
-        <!-- home-screen widget: today's Nepali date, tithi and festival -->
+        <!-- home-screen widget: today's Nepali date, tithi and festival; also keeps the status-bar date current -->
         <receiver
             android:name=".DateWidget"
             android:label="@string/widgetName"
@@ -77,6 +94,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/date_widget_info" />
         </receiver>
