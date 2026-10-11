@@ -1,4 +1,4 @@
-var C="ganak-v9-3";
+var C="ganak-v9-4", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
@@ -8,7 +8,7 @@ self.addEventListener("install",function(e){
 });
 self.addEventListener("activate",function(e){
   e.waitUntil(caches.keys().then(function(ks){
-    return Promise.all(ks.filter(function(k){return k!==C;}).map(function(k){return caches.delete(k);}));
+    return Promise.all(ks.filter(function(k){return k!==C&&k!==D;}).map(function(k){return caches.delete(k);}));
   }));
   self.clients.claim();
 });
@@ -39,4 +39,27 @@ self.addEventListener("fetch",function(e){
       });
     }));
   }
+});
+/* 📲 today's date on the phone screen: once a day (or when the app asks) show today's text quietly */
+function todayNote(force){
+  return caches.open(D).then(function(c){
+    return c.match("./__days.json").then(function(r){ return r ? r.json() : null; }).then(function(j){
+      if(!j || !j.on) return;
+      var day = new Date(Date.now() + 345*60000).toISOString().slice(0,10), x = j.days && j.days[day];   /* Nepal date (UTC+5:45) */
+      if(!x || (!force && j.shown === day)) return;
+      return self.registration.showNotification(x.t, {body:x.b, tag:"ganak-today", renotify:false, silent:true,
+        icon:"./icon-192.png", badge:"./icon-192.png", data:{u:"./#patro"}}).then(function(){
+        j.shown = day; return c.put("./__days.json", new Response(JSON.stringify(j), {headers:{"Content-Type":"application/json"}}));
+      });
+    });
+  }).catch(function(){});
+}
+self.addEventListener("message",function(e){ if(e.data && e.data.k==="ganak-today") e.waitUntil(todayNote(e.data.force)); });
+self.addEventListener("periodicsync",function(e){ if(e.tag==="ganak-today") e.waitUntil(todayNote(false)); });
+self.addEventListener("notificationclick",function(e){
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({type:"window",includeUncontrolled:true}).then(function(ws){
+    for(var i=0;i<ws.length;i++){ if("focus" in ws[i]) return ws[i].focus(); }
+    return self.clients.openWindow((e.notification.data && e.notification.data.u) || "./");
+  }));
 });
