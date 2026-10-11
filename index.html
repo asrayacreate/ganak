@@ -3825,7 +3825,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v9.4 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v9.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -5110,24 +5110,38 @@ function vdTick(now){   /* every second: the hand, muhurta, kala, kashtha, ghati
    opens and, where the browser allows periodic background sync, once a day by itself. ---- */
 var TN = {on:false};
 try{ TN.on = localStorage.getItem("ganak_tnote") === "1"; }catch(e){}
-function tnDays(){
+function tnTile(b, big){   /* notification pictures: a calendar tile (month band, big day, weekday) or the status-bar badge (white day number) */
+  var c = document.createElement("canvas"), x = c.getContext("2d"), S = big ? 192 : 96, f = getComputedStyle(document.documentElement).getPropertyValue("--fs") || "sans-serif";
+  c.width = c.height = S; x.textAlign = "center"; x.textBaseline = "middle";
+  if(!big){ x.fillStyle = "#fff"; x.font = "900 " + (b.d > 9 ? 74 : 92) + "px " + f; x.fillText(npd(b.d), 48, 54); return c.toDataURL("image/png"); }
+  x.beginPath(); x.moveTo(34, 8); x.arcTo(184, 8, 184, 184, 26); x.arcTo(184, 184, 8, 184, 26); x.arcTo(8, 184, 8, 8, 26); x.arcTo(8, 8, 184, 8, 26); x.closePath();
+  x.fillStyle = "#FFFEF8"; x.fill(); x.save(); x.clip(); x.fillStyle = "#C62828"; x.fillRect(0, 0, S, 54); x.restore();
+  x.fillStyle = "#fff"; x.font = "800 30px " + f; x.fillText(bsM(b.m-1), 96, 32);
+  x.fillStyle = "#15202A"; x.font = "800 " + (b.d > 9 ? 82 : 92) + "px " + f; x.fillText(npd(b.d), 96, 114);
+  x.fillStyle = "#5B6672"; x.font = "700 24px " + f; x.fillText(L(WDN[b.wd], WDNE[b.wd]), 96, 164);
+  return c.toDataURL("image/png");
+}
+function tnDays(){   /* the next 60 days: short title, details, and (first 14 days) the tile + badge pictures */
   var p = tzParts("Asia/Kathmandu", Date.now()), loc = VLOC[VD.loc], out = {}, i;
   for(i = 0; i < 60; i++){
     var t = Date.UTC(p.y, p.m-1, p.d + i), a = new Date(t), y = a.getUTCFullYear(), m = a.getUTCMonth()+1, d = a.getUTCDate(), b = adToBs(y, m, d);
     if(!b) continue;
     var tn = tithiName(patro(y, m, d, 0.25).ti), rs = sunRS(t, loc[2], loc[3]);
     var ev = (HOLI[b.y] || []).filter(function(h){ return h[0] === b.m && h[1] === b.d; }).map(function(h){ return (h[2] === "h" ? "🔴 " : "🟡 ") + L(h[3], h[4]); });
-    out[y+"-"+pad2(m)+"-"+pad2(d)] = { t:"📅 " + L("आज ","Today ") + npd(b.y)+" "+bsM(b.m-1)+" "+npd(b.d)+", "+L(WDN[b.wd], WDNE[b.wd]),
-      b:L(tn[0], tn[1]) + (ev.length ? " · " + ev.join(", ") : "") + "\n" + AD_MONTHS[m-1]+" "+d+", "+y + " · 🌅 " + npTime(rs[0]) + " · 🌇 " + npTime(rs[1]) };
+    out[y+"-"+pad2(m)+"-"+pad2(d)] = { t:L("आज ","Today ") + bsM(b.m-1)+" "+npd(b.d)+" · "+L(WDN[b.wd], WDNE[b.wd]),
+      b:L("वि.सं. ","BS ") + npd(b.y) + " · " + L(tn[0], tn[1]) + (ev.length ? " · " + ev.join(", ") : "") + "\n" + AD_MONTHS[m-1]+" "+d+", "+y + " · 🌅 " + npTime(rs[0]) + " · 🌇 " + npTime(rs[1]),
+      ic:i < 14 ? tnTile(b, true) : "", bd:i < 14 ? tnTile(b, false) : "" };
   }
   return out;
 }
-function tnSync(force){   /* save the texts for the service worker, then show (or clear) today's notification */
+function tnSync(force){   /* save the texts for the service worker (rebuilt once a day, or after a language / place change), then show or clear today's */
   if(!("serviceWorker" in navigator) || !window.caches) return;
-  var j = {on:TN.on, days:TN.on ? tnDays() : {}};
-  caches.open("ganak-days").then(function(c){   /* keep "already shown today", so a notification swiped away stays away until tomorrow */
+  var key = TN.on ? todayISO() + "|" + LANG + "|" + VD.loc : "off";
+  caches.open("ganak-days").then(function(c){
     return c.match("./__days.json").then(function(r){ return r ? r.json() : {}; }).catch(function(){ return {}; }).then(function(old){
-      if(old && old.shown) j.shown = old.shown;
+      if(old && old.v === key && !force) return;
+      /* keep "already shown today", so a notification swiped away stays away until tomorrow */
+      var j = {v:key, on:TN.on, days:TN.on ? tnDays() : {}, shown:(old && old.shown) || ""};
       return c.put("./__days.json", new Response(JSON.stringify(j), {headers:{"Content-Type":"application/json"}}));
     });
   })

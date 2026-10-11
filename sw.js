@@ -1,4 +1,4 @@
-var C="ganak-v9-4", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
+var C="ganak-v9-5", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
@@ -48,7 +48,7 @@ function todayNote(force){
       var day = new Date(Date.now() + 345*60000).toISOString().slice(0,10), x = j.days && j.days[day];   /* Nepal date (UTC+5:45) */
       if(!x || (!force && j.shown === day)) return;
       return self.registration.showNotification(x.t, {body:x.b, tag:"ganak-today", renotify:false, silent:true,
-        icon:"./icon-192.png", badge:"./icon-192.png", data:{u:"./#patro"}}).then(function(){
+        icon:x.ic || "./icon-192.png", badge:x.bd || "./icon-192.png", data:{u:"./#patro"}}).then(function(){
         j.shown = day; return c.put("./__days.json", new Response(JSON.stringify(j), {headers:{"Content-Type":"application/json"}}));
       });
     });
