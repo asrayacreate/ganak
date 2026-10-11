@@ -17,7 +17,9 @@ PWABuilder बाट download गरेको zip मा `signing.keystore` (व
 
 1. Keystore लाई base64 बनाउनुहोस्:
    - Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("signing.keystore")) | Set-Clipboard`
-   - Mac/Linux: `base64 -w0 signing.keystore` (Mac मा `base64 -i signing.keystore`)
+     (keystore भएको folder खोल्नुहोस् → माथि address bar मा `powershell` लेखेर Enter → यो command
+     paste गरेर Enter; base64 text आफैँ copy हुन्छ)
+   - Mac: `base64 -i signing.keystore | pbcopy` · Linux: `base64 -w0 signing.keystore`
 2. GitHub → यो repository → **Settings → Secrets and variables → Actions → New repository secret**:
    - `ANDROID_KEYSTORE_BASE64` — माथिको base64 text
    - `ANDROID_KEYSTORE_PASSWORD` — signing-key-info.txt को "Key store password"
@@ -29,6 +31,24 @@ PWABuilder बाट download गरेको zip मा `signing.keystore` (व
 
 Version code = 1000 + run number (Play मा पहिले भएको भन्दा ठूलो हुन्छ)।
 Keystore कहिल्यै repository मा commit नगर्नुहोस् — secret मा मात्र राख्नुहोस्।
+Secret राखेपछि हरेक build को Artifacts मा `upload_certificate.pem` पनि आउँछ, र log मा key को SHA-256।
+
+## पुरानो key (PWABuilder को zip) हरायो भने
+पहिले computer को Downloads, Google Drive र email मा `signing.keystore`, `signing-key-info.txt` वा
+"Google Play package" नाम भएको zip खोज्नुहोस्। भेटिएन भने नयाँ upload key बनाएर Google लाई बदल्न
+भन्न सकिन्छ (Play App Signing भएकाले app, यसका user र website को assetlinks जस्ताको तस्तै रहन्छन्):
+
+1. **नयाँ key:** pwabuilder.com मा `https://asrayacreate.github.io/ganak/` हालेर Android package
+   बनाउनुहोस् (Package ID `io.github.asrayacreate.twa`, Signing key: **New / Create new**) → zip download।
+   यसबाट `signing.keystore` र `signing-key-info.txt` मात्र चाहिन्छ।
+2. माथिको भाग अनुसार ती ४ secret GitHub मा राख्नुहोस् र **Run workflow** गर्नुहोस्।
+3. Run को Artifacts बाट `upload_certificate.pem` लिनुहोस्।
+4. **Play Console → Ganak → Test and release → App integrity → Play app signing (Settings) →
+   Request upload key reset** → कारण "I lost my upload key" → `upload_certificate.pem` upload।
+   (Button चल्दैन भने Play developer account को owner/admin बाट गर्नुपर्छ।)
+5. Google ले स्वीकृत गरेर नयाँ key चल्ने मिति email/Play Console मा देखाउँछ (केही दिनदेखि करिब एक
+   हप्ता)। त्यो
+   मितिपछि **Run workflow** → `app-release.aab` लाई Play मा upload।
 
 ## Widget राख्ने
 Home screen मा खाली ठाउँ थिचिराख्नुहोस् → **Widgets** → **Ganak — आजको मिति** → तानेर राख्नुहोस्।
