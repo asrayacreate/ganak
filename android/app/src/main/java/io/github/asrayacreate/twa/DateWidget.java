@@ -19,6 +19,7 @@ import android.widget.RemoteViews;
  *  Tapping the widget opens Ganak's पात्रो. */
 public class DateWidget extends AppWidgetProvider {
     static final String TICK = "io.github.asrayacreate.twa.WIDGET_TICK";
+    static final String REPOST = "io.github.asrayacreate.twa.DATEBAR_REPOST";
     static final String PATRO_URL = "https://asrayacreate.github.io/ganak/index.html#patro";
 
     @Override
@@ -37,6 +38,7 @@ public class DateWidget extends AppWidgetProvider {
         String a = i.getAction();
         if (TICK.equals(a) || Intent.ACTION_TIME_CHANGED.equals(a) || Intent.ACTION_TIMEZONE_CHANGED.equals(a)
                 || Intent.ACTION_BOOT_COMPLETED.equals(a) || Intent.ACTION_MY_PACKAGE_REPLACED.equals(a)) refreshAll(c);
+        else if (REPOST.equals(a)) DateBar.post(c, Today.now());   /* the status-bar date was swiped away: put it back (only while on) */
     }
 
     @Override
@@ -83,6 +85,11 @@ public class DateWidget extends AppWidgetProvider {
         open.setClass(c, LauncherActivity.class);
         open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return PendingIntent.getActivity(c, 0, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    static PendingIntent repostIntent(Context c) {
+        Intent t = new Intent(c, DateWidget.class).setAction(REPOST);
+        return PendingIntent.getBroadcast(c, 2, t, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     static PendingIntent tickIntent(Context c) {

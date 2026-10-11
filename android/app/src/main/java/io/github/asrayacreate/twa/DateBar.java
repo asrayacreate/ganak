@@ -17,7 +17,8 @@ import android.os.Build;
 
 /** The date always at the top of the phone: an ongoing notification whose status-bar icon is today's
  *  Nepali day number (२५), with "आज असोज २५ · आइतबार" and the tithi / festival when pulled down.
- *  Quiet (no sound, no vibration, no pop-up); switched on from the app's 📲 button (DateBarActivity). */
+ *  Quiet (no sound, no vibration, no pop-up); switched on and off only from the app's 📲 button
+ *  (DateBarActivity) — swiped away (Android 14+ allows that even for ongoing ones), it comes back at once. */
 final class DateBar {
     private DateBar() {}
     static final String PREFS = "ganak", KEY = "datebar", CHANNEL = "date_bar";
@@ -72,6 +73,7 @@ final class DateBar {
           .setOnlyAlertOnce(true)
           .setShowWhen(false)
           .setContentIntent(DateWidget.openPatro(c))
+          .setDeleteIntent(DateWidget.repostIntent(c))
           .setLargeIcon(tile(c, t));
         if (Build.VERSION.SDK_INT >= 21) nb.setVisibility(Notification.VISIBILITY_PUBLIC).setCategory(Notification.CATEGORY_STATUS);
         if (Build.VERSION.SDK_INT >= 23) nb.setSmallIcon(Icon.createWithBitmap(dayIcon(c, t.day())));
