@@ -1076,6 +1076,12 @@ body[data-theme="dark"] .htd-e{color:#FF8A80}
 .u3i{text-align:center;font-size:12px;color:var(--mute);margin-top:3px;min-height:1.4em}
 .u3pl{align-self:center;font-size:12px;font-weight:800;color:var(--ink2)}
 .u3go{display:block;margin:10px auto 0}
+.u3 .chips[hidden],.u3 .chip[hidden]{display:none}
+.vsv{padding:12px 14px;font-size:14.5px;font-weight:800;line-height:1.35}
+.vsv.s{background:rgba(22,163,74,.13);color:#15803D}.vsv.a{background:rgba(220,38,38,.12);color:#B91C1C}.vsv.n{background:rgba(245,179,1,.14);color:#92400E}
+body[data-theme="dark"] .vsv.s{color:#86EFAC}body[data-theme="dark"] .vsv.a{color:#FCA5A5}body[data-theme="dark"] .vsv.n{color:#FCD34D}
+.sg{font-style:normal;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:7px;vertical-align:1px;white-space:nowrap}
+.sg.s{background:#DCFCE7;color:#166534}.sg.a{background:#FEE2E2;color:#991B1B}.sg.n{background:#FEF3C7;color:#92400E}
 .vgr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--ol)}
 .vgd{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font:800 12px var(--fs);color:#111827;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 2px 6px rgba(0,0,0,.25)}
 .vgn b,.vgp b{display:block;font-size:13.5px;color:var(--ink)}
@@ -3485,17 +3491,19 @@ var TOOLS = [
       + '<div class="wcwrap"><div class="wc vd" id="vdDial"><div class="wc-face">'+vdDialSvg()+'<div class="wc-glass"></div></div></div>'
       + '<div class="wc-read"><div class="wc-zone" id="vdMu"></div><div class="wc-time" id="vdT"></div>'
       + '<div class="vd-u">'+L("मुहूर्त : कला : काष्ठा","muhurta : kala : kashtha")+'</div><div class="wc-sub" id="vdG"></div></div>'
-      + '<div class="vdnow" id="vdNow"></div></div>'
+      + '<div class="vdnow" id="vdNow"></div><button class="chip u3go" id="u3sky">🌅 '+L("यो घडी ३D आकाशमा हेर्नुहोस्","See this clock as the 3D sky")+'</button></div>'
+      + '<div class="eyebrow" style="margin-top:16px">'+L("अहिले के भन्छ? · शुभाशुभ","What it says now · good or not")+'</div><div class="vdx" id="vdSay"></div>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("आजको पञ्चाङ्ग","Today's panchang")+'</div><div class="vdx" id="vdPan"></div>'
       + '<button class="chip u3go" id="u3go">🪔 '+L("यो पञ्चाङ्ग ३D / ५D मा हेर्नुहोस्","See this panchang in 3D / 5D")+'</button>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("ग्रह-नक्षत्र चक्र (भचक्र)","Graha-nakshatra wheel (Bhachakra)")+'</div>'
       + '<div class="chips u3tab" id="u3v"><button class="chip" data-u3v="3" aria-pressed="'+(U3.v === 3)+'">🌍 '+L("३D ब्रह्माण्ड","3D view")+'</button>'
+      + '<button class="chip" data-u3v="4" aria-pressed="'+(U3.v === 4)+'">🌅 '+L("आकाश","Sky")+'</button>'
       + '<button class="chip" data-u3v="2" aria-pressed="'+(U3.v === 2)+'">☸ '+L("भचक्र","Wheel")+'</button></div>' + u3Html()
-      + '<div class="bcwrap" id="bcw"'+(U3.v === 3 ? ' hidden' : '')+'><div class="bc" id="vdChakra"></div></div><div class="bcaya" id="vdAya"></div>'
+      + '<div class="bcwrap" id="bcw"'+(U3.v !== 2 ? ' hidden' : '')+'><div class="bc" id="vdChakra"></div></div><div class="bcaya" id="vdAya"></div>'
       + '<div class="vdx" id="vdGr"></div>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("दिनका समय","Times of the day")+'</div><div class="vdx" id="vdDay"></div>'
-      + '<div class="note" style="margin-top:10px">ℹ️ '+L("वैदिक समय: एक दिन सूर्योदयदेखि अर्को सूर्योदयसम्म — दिनका १५ र रातका १५ मुहूर्त (३० मुहूर्त = अहोरात्र; १ मुहूर्त = ३० कला, १ कला = ३० काष्ठा — मनुस्मृति १.६४; उज्जैनको विक्रमादित्य वैदिक घडीले पनि ३० मुहूर्त गन्छ)। इष्टकाल: ६० घडी = एक दिन (१ घडी ≈ २४ मिनेट, १ पला ≈ २४ सेकेन्ड)। मुहूर्तका नाम परम्परागत सूचीअनुसार (ग्रन्थअनुसार केही फरक छन्)। ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात; सूर्योदय: NOAA सूत्र (±१ मिनेट)। ३D: बीचमा पृथ्वी आफ्नो २३.४° झुकेको अक्षमा नाक्षत्र समयअनुसार घुम्छ (सूर्यतिरको आधा दिन, रातो थोप्लो = छानिएको स्थान); वरिपरि ग्रहहरू परम्परागत भूकेन्द्रीय कक्षा-क्रममा (चन्द्र, बुध, शुक्र, सूर्य, मङ्गल, गुरु, शनि, अनि नक्षत्र मण्डल) आफ्नो वास्तविक राशि-अंशमा — दूरी र आकार नापअनुसार होइनन्; चन्द्रको कक्षा ५.१° झुकेको (देखिने गरी २.५ गुणा बढाइएको), राहु–केतु त्यसका पात। पञ्चाङ्ग ५D: पाँचै अङ्ग कोणबाट — तिथि = (चन्द्र − सूर्य) ÷ १२°, करण = त्यसको आधा (÷ ६°), नक्षत्र = चन्द्र ÷ १३°२०′, योग = (सूर्य + चन्द्र) ÷ १३°२०′, वार = सूर्योदयदेखि सूर्योदयसम्म (वारेश ग्रह)। होरा: वारको स्वामीबाट शनि–गुरु–मङ्गल–सूर्य–शुक्र–बुध–चन्द्र क्रम; राहुकाल, यमगण्ड, गुलिक: दिनको आठ भागमध्ये वारअनुसारको भाग। स्थानीय पात्रोसँग केही मिनेट फरक पर्न सक्छ — धार्मिक साइतका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
-          "Vedic time: a day runs from sunrise to the next sunrise — 15 day and 15 night muhurtas (30 muhurtas = one day-night; 1 muhurta = 30 kala, 1 kala = 30 kashtha — Manusmriti 1.64; Ujjain's Vikramaditya Vedic Clock also counts 30 muhurtas). Ishtakaal: 60 ghati = one day (1 ghati ≈ 24 min, 1 pala ≈ 24 s). Muhurta names follow the traditional list (texts differ a little). Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node; sunrise: NOAA equations (±1 min). 3D: the Earth in the middle turns on its 23.4° axis by sidereal time (the half facing the Sun is day; the red dot is the chosen place); around it the grahas sit in the traditional geocentric order of spheres (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn, then the nakshatra mandala) at their real sidereal longitudes — distances and sizes are not to scale; the Moon's orbit is tilted 5.1° (drawn 2.5× for visibility) with Rahu and Ketu at its nodes. Panchang 5D: all five limbs from the angles — tithi = (Moon − Sun) ÷ 12°, karana = half of it (÷ 6°), nakshatra = Moon ÷ 13°20′, yoga = (Sun + Moon) ÷ 13°20′, vaar = sunrise to sunrise (its lord graha). Hora: from the weekday's lord in the order Saturn–Jupiter–Mars–Sun–Venus–Mercury–Moon; Rahu kaal, Yamaganda, Gulika: the weekday's eighth of the daytime. A local panchang may differ by a few minutes — confirm religious muhurtas with an astrologer.")+'</div>';
+      + '<div class="note" style="margin-top:10px">ℹ️ '+L("वैदिक समय: एक दिन सूर्योदयदेखि अर्को सूर्योदयसम्म — दिनका १५ र रातका १५ मुहूर्त (३० मुहूर्त = अहोरात्र; १ मुहूर्त = ३० कला, १ कला = ३० काष्ठा — मनुस्मृति १.६४; उज्जैनको विक्रमादित्य वैदिक घडीले पनि ३० मुहूर्त गन्छ)। इष्टकाल: ६० घडी = एक दिन (१ घडी ≈ २४ मिनेट, १ पला ≈ २४ सेकेन्ड)। मुहूर्तका नाम परम्परागत सूचीअनुसार (ग्रन्थअनुसार केही फरक छन्)। ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात; सूर्योदय: NOAA सूत्र (±१ मिनेट)। ३D: बीचमा पृथ्वी आफ्नो २३.४° झुकेको अक्षमा नाक्षत्र समयअनुसार घुम्छ (सूर्यतिरको आधा दिन, रातो थोप्लो = छानिएको स्थान); वरिपरि ग्रहहरू परम्परागत भूकेन्द्रीय कक्षा-क्रममा (चन्द्र, बुध, शुक्र, सूर्य, मङ्गल, गुरु, शनि, अनि नक्षत्र मण्डल) आफ्नो वास्तविक राशि-अंशमा — दूरी र आकार नापअनुसार होइनन्; चन्द्रको कक्षा ५.१° झुकेको (देखिने गरी २.५ गुणा बढाइएको), राहु–केतु त्यसका पात। पञ्चाङ्ग ५D: पाँचै अङ्ग कोणबाट — तिथि = (चन्द्र − सूर्य) ÷ १२°, करण = त्यसको आधा (÷ ६°), नक्षत्र = चन्द्र ÷ १३°२०′, योग = (सूर्य + चन्द्र) ÷ १३°२०′, वार = सूर्योदयदेखि सूर्योदयसम्म (वारेश ग्रह)। ३D आकाश: छानिएको स्थानको आकाशमा आजको सूर्यको बाटो — दिनका १५ मुहूर्त क्षितिजमाथि, रातका १५ मुनि (घडीमा जस्तै), शङ्कुको छाया, र पूर्वी क्षितिजमा उदाउँदै गरेको राशि = लग्न (tan λ = cos θ ÷ −(sin θ cos ε + tan φ sin ε), θ = स्थानीय नाक्षत्र समय)। शुभाशुभ: मुहूर्त — बी. भी. रमणको ‘मुहूर्त’ (दिनका १, २, ४, १०, ११, १२, १५ अशुभ; विधि सोम/शुक्रबार र अर्यमा आइतबार अशुभ) र प्रचलित तालिका (रातका गिरीश, अजपाद, यम अशुभ; बाँकी केहीको नियम नभेटिएकाले ‘सामान्य’); चौघडिया — दिनका ८ र रातका ८ भाग, Drik Panchang को तालिकाजस्तै (अमृत, शुभ, लाभ शुभ; चर सामान्य; उद्वेग, रोग, काल अशुभ); होरा — बृहत्पाराशर होराशास्त्र ३.११ अनुसार सौम्य (गुरु, शुक्र, बुध, शुक्ल पक्षको चन्द्र) वा क्रूर ग्रह; राहुकाल, यमगण्ड, गुलिक चलिरहेको बेला अशुभ। यो परम्परागत नियमको सामान्य जानकारी मात्र हो। होरा: वारको स्वामीबाट शनि–गुरु–मङ्गल–सूर्य–शुक्र–बुध–चन्द्र क्रम; राहुकाल, यमगण्ड, गुलिक: दिनको आठ भागमध्ये वारअनुसारको भाग। स्थानीय पात्रोसँग केही मिनेट फरक पर्न सक्छ — धार्मिक साइतका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
+          "Vedic time: a day runs from sunrise to the next sunrise — 15 day and 15 night muhurtas (30 muhurtas = one day-night; 1 muhurta = 30 kala, 1 kala = 30 kashtha — Manusmriti 1.64; Ujjain's Vikramaditya Vedic Clock also counts 30 muhurtas). Ishtakaal: 60 ghati = one day (1 ghati ≈ 24 min, 1 pala ≈ 24 s). Muhurta names follow the traditional list (texts differ a little). Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node; sunrise: NOAA equations (±1 min). 3D: the Earth in the middle turns on its 23.4° axis by sidereal time (the half facing the Sun is day; the red dot is the chosen place); around it the grahas sit in the traditional geocentric order of spheres (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn, then the nakshatra mandala) at their real sidereal longitudes — distances and sizes are not to scale; the Moon's orbit is tilted 5.1° (drawn 2.5× for visibility) with Rahu and Ketu at its nodes. Panchang 5D: all five limbs from the angles — tithi = (Moon − Sun) ÷ 12°, karana = half of it (÷ 6°), nakshatra = Moon ÷ 13°20′, yoga = (Sun + Moon) ÷ 13°20′, vaar = sunrise to sunrise (its lord graha). 3D sky: today's path of the Sun over the chosen place — the 15 day muhurtas above the horizon and the 15 night ones below it (as on the dial), a gnomon's shadow, and the sign rising on the eastern horizon = lagna (tan λ = cos θ ÷ −(sin θ cos ε + tan φ sin ε), θ = local sidereal time). Good or not: muhurta — B. V. Raman, ‘Muhurtha’ (day muhurtas 1, 2, 4, 10, 11, 12, 15 inauspicious; Vidhi on Monday/Friday and Aryama on Sunday inauspicious) and the common table (at night Girisha, Ajapada, Yama inauspicious; a few with no rule found are shown as ‘neutral’); choghadiya — 8 parts of the day and 8 of the night, as in Drik Panchang's tables (Amrit, Shubh, Labh good; Char neutral; Udveg, Rog, Kaal avoid); hora — benefic (Jupiter, Venus, Mercury, waxing Moon) or malefic lord as in Brihat Parashara Hora Shastra 3.11; Rahu kaal, Yamaganda and Gulika avoided while running. General traditional guidance only. Hora: from the weekday's lord in the order Saturn–Jupiter–Mars–Sun–Venus–Mercury–Moon; Rahu kaal, Yamaganda, Gulika: the weekday's eighth of the daytime. A local panchang may differ by a few minutes — confirm religious muhurtas with an astrologer.")+'</div>';
   },
   init:function(){
     VD.V = null; vdTick(Date.now());
@@ -3503,9 +3511,10 @@ var TOOLS = [
       VD.loc = +e.target.value; try{ localStorage.setItem("ganak_vloc", String(VD.loc)); }catch(err){}
       VD.V = null; vdTick(Date.now());
     });
-    $("#u3go").addEventListener("click", function(){
-      U3.v = 3; try{ localStorage.setItem("ganak_u3v", "3"); }catch(err){} u3View(); u3SetPa("all");
-      $("#u3").scrollIntoView({behavior:"smooth", block:"center"}); });
+    function go3(v, pa){ U3.v = v; try{ localStorage.setItem("ganak_u3v", String(v)); }catch(err){} u3View(); if(v === 3) u3SetPa(pa);
+      $("#u3").scrollIntoView({behavior:"smooth", block:"center"}); }
+    $("#u3go").addEventListener("click", function(){ go3(3, "all"); });
+    $("#u3sky").addEventListener("click", function(){ go3(4); });
     wcTilt($("#vdDial")); u3Init(); clockStart();
   },
   share:function(){
@@ -3841,7 +3850,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v9.9 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v10.0 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -5003,6 +5012,54 @@ function angas(G){   /* four of the five limbs straight from the Sun and Moon: t
   return {ph:ph, yo:yo, kn:kn, ti:Math.floor(ph/12), nk:Math.floor(s.mo/N), pada:Math.floor((s.mo % N)/(N/4)), yg:Math.floor(yo/N),
     kr:kn === 0 ? 10 : kn >= 57 ? kn - 50 : (kn - 1) % 7};
 }
+/* ---- अहिले के भन्छ? (शुभाशुभ) — मुहूर्त: B. V. Raman, Muhurtha — day muhurtas 1, 2, 4, 10, 11, 12, 15 inauspicious; Vidhi
+   not on Monday/Friday, Aryama not on Sunday; at night Girisha, Ajapada and Yama inauspicious, Ahirbudhnya, Pushya, Ashvini,
+   Agni, Vidhatri, Kanda, Jiva (Amrita) and Brahma auspicious, the rest given no rule. चौघडिया: 8 parts of the day and of the
+   night — the day from the weekday's own, then every 5th weekday's; the night from the 5th weekday's, then every 4th (as Drik
+   Panchang's tables). होरा: natural benefic or malefic lord (BPHS 3.11 — the Moon benefic only while waxing). लग्न: the rising
+   rashi. ---- */
+var MU_Q = "aasasssssaaassaaasssasssnsnnsn";   /* per muhurta: s शुभ, a अशुभ, n no rule */
+var CHOG = [["उद्वेग","Udveg",0],["अमृत","Amrit",2],["रोग","Rog",0],["लाभ","Labh",2],["शुभ","Shubh",2],["चर","Char",1],["काल","Kaal",0]];   /* by its lord's weekday, Sun → Sat */
+var RASHI_LORD = ["ma","ve","me","mo","su","me","ve","ma","ju","sa","sa","ju"];
+function muQ(mu, wd){ return (mu === 7 && (wd === 1 || wd === 5)) || (mu === 13 && wd === 0) ? "a" : MU_Q.charAt(mu); }
+function chogAt(t, V){   /* the choghadiya at time t: its index in CHOG and its start/end */
+  var day = t < V.set, a = day ? V.rise : V.set, l = ((day ? V.set : V.next) - a)/8, k = Math.max(0, Math.min(7, Math.floor((t - a)/l)));
+  return {c:day ? (V.wd + 5*k) % 7 : (V.wd + 4 + 4*k) % 7, s:a + k*l, e:a + (k + 1)*l};
+}
+function badAt(t, V){   /* राहुकाल, यमगण्ड or गुलिक running at t: [name, end] */
+  var l = (V.set - V.rise)/8, r = null;
+  [[RAHU8,"राहुकाल","Rahu kaal"],[YAMA8,"यमगण्ड","Yamaganda"],[GULI8,"गुलिक काल","Gulika kaal"]].forEach(function(w){
+    var a = V.rise + (w[0][V.wd] - 1)*l; if(!r && t >= a && t < a + l) r = [L(w[1], w[2]), a + l]; });
+  return r;
+}
+function lagnaTrop(ms, lat, lon){   /* the ecliptic point rising in the east: tan λ = cos θ / −(sin θ cos ε + tan φ sin ε), θ = local sidereal time */
+  var r = Math.PI/180, th = (gmst(ms) + lon)*r, e = 23.4393*r;
+  return grRev(Math.atan2(Math.cos(th), -(Math.sin(th)*Math.cos(e) + Math.tan(lat*r)*Math.sin(e)))/r);
+}
+function lagna(ms, lat, lon){ return grRev(lagnaTrop(ms, lat, lon) - ayanamsa(ms)); }
+function vdSay(now){   /* each factor with its शुभ/अशुभ mark, a plain verdict, and the next good time */
+  var V = VD.V, loc = VLOC[VD.loc], T = vedTime(now, V), q = muQ(T.mu, V.wd), C = chogAt(now, V), ch = CHOG[C.c], bad = badAt(now, V);
+  var wax = angas(VD.P.G).ti < 15, hq = /ju|ve|me/.test(T.horaLord) || (T.horaLord === "mo" && wax) ? "s" : "a";
+  var lg = lagna(now, loc[2], loc[3]), lr = Math.floor(lg/30), le = now, i;
+  for(i = 0; i < 120 && Math.floor(lagna(le, loc[2], loc[3])/30) === lr; i++) le += 12e4;   /* till the next rashi rises (about 2 h) */
+  function ok(t, W){ return !badAt(t, W) && muQ(vedTime(t, W).mu, W.wd) !== "a" && CHOG[chogAt(t, W).c][2] === 2; }
+  function scan(t, want){ var W = V; for(var k = 0; k < 360; k++, t += 24e4){ if(t >= W.next) W = vedDay(t, loc); if(ok(t, W) === want) return t; } return 0; }
+  var good = ok(now, V), nx = good ? scan(now, false) : scan(now, true);
+  function b(k, t){ return '<i class="sg '+k+'">'+t+'</i>'; }
+  var Q = {s:b("s", L("शुभ","good")), a:b("a", L("अशुभ","avoid")), n:b("n", L("सामान्य","neutral"))};
+  var v = bad ? ["a", "⚠️ "+L("अहिले "+bad[0]+" ("+npTime(bad[1])+" सम्म) — नयाँ शुभ काम नथाल्नु राम्रो", "Now "+bad[0]+" (till "+npTime(bad[1])+") — better not to start new auspicious work")]
+    : good ? ["s", "✓ "+L("अहिले शुभ समय","A good time now")+(T.mu === 7 ? L(" — अभिजित् मुहूर्त ✨"," — Abhijit muhurta ✨") : "")]
+    : q === "a" && ch[2] === 0 ? ["a", "✗ "+L("अशुभ समय — मुहूर्त र चौघडिया दुवै अशुभ","Not a good time — muhurta and choghadiya both inauspicious")]
+    : ["n", "◐ "+L("सामान्य समय","An ordinary time")+(T.mu === 28 ? L(" — ब्राह्म मुहूर्त 🙏 (ध्यान, पूजा, अध्ययन)"," — Brahma muhurta 🙏 (meditation, prayer, study)") : "")];
+  return '<div class="vsv '+v[0]+'">'+v[1]+'</div>'
+    + vdRow(L("मुहूर्त","Muhurta"), npd(T.mu + 1)+" · "+esc(L(MUHURTA[T.mu][0], MUHURTA[T.mu][1]))+Q[q])
+    + vdRow(L("चौघडिया","Choghadiya"), esc(L(ch[0], ch[1]))+Q[["a","n","s"][ch[2]]], npTime(C.s)+" – "+npTime(C.e))
+    + vdRow(L("होरा","Hora"), esc(L(GRN[T.horaLord][0], GRN[T.horaLord][1]))+Q[hq], hq === "s" ? L("सौम्य ग्रह","benefic lord") : L("क्रूर ग्रह","malefic lord"))
+    + vdRow(L("लग्न (उदाउँदो राशि)","Lagna (rising sign)"), esc(L(RASHI[lr][0], RASHI[lr][1].split(" ")[0]))+" "+degTxt(lg),
+        L("स्वामी ","lord ")+esc(L(GRN[RASHI_LORD[lr]][0], GRN[RASHI_LORD[lr]][1]))+" · "+L(npTime(le)+" सम्म", "till "+npTime(le)))
+    + vdRow(L("राहुकाल · यमगण्ड · गुलिक","Rahu · Yama · Gulika"), bad ? esc(bad[0])+Q.a : L("अहिले छैन","not now")+" ✓")
+    + (nx ? vdRow(good ? L("शुभ समय सकिने","Good time ends") : L("अर्को शुभ समय","Next good time"), npTime(nx), good ? "" : L("चौघडिया र मुहूर्त दुवै शुभ हुँदा","when choghadiya and muhurta are both good")) : "");
+}
 function panchang(now){
   var G = grahas(now), s = G.sid, A = angas(G), ph = A.ph, yo = A.yo, kn = A.kn, N = 360/27;
   function moonSid(t){ return grahas(t, true).sid.mo; }
@@ -5103,20 +5160,23 @@ function u3Land(){   /* 2°×2° land mask (rows lat 90→-90, columns lon -180�
   return m;
 }
 var U3 = {v:3, pa:"", A:null, V:null, Vl:-1, az:-2.3, el:.5, sp:1, t:0, w:0, gm:0, G:null, Gt:0, auto:true, idle:0, drag:null, pick:"", hit:[], it:0, tt:"", land:null, bk:{}, n:0, stars:null, vis:true, cam:null, f:""};
-try{ U3.v = localStorage.getItem("ganak_u3v") === "2" ? 2 : 3; }catch(e){}
+try{ U3.v = +localStorage.getItem("ganak_u3v") || 3; if(U3.v < 2 || U3.v > 4) U3.v = 3; }catch(e){}   /* 3 space, 4 sky, 2 flat wheel */
 var U3_K = {mo:[.34,.036], me:[.43,.022], ve:[.52,.028], su:[.62,.065], ma:[.71,.025], ju:[.8,.044], sa:[.89,.036], ra:[.34,.02], ke:[.34,.02]};   /* sphere radius, ball size (the ring is 1) */
 var U3_PA = [["all","५ अङ्ग","All 5"],["ti","तिथि","Tithi"],["va","वार","Vaar"],["nk","नक्षत्र","Nakshatra"],["yo","योग","Yoga"],["ka","करण","Karana"]];   /* पञ्चाङ्ग ५D */
 var U3_SP = [[1,"● अहिले","● Now"],[3600,"⏩ १ घण्टा/से","⏩ 1 h/s"],[86400,"⏩ १ दिन/से","⏩ 1 day/s"],[2592000,"⏩ १ महिना/से","⏩ 1 month/s"],[0,"⏸","⏸"]];
 function gmst(ms){ return grRev(280.46061837 + 360.98564736629*(ms/864e5 - 10957.5)); }   /* Greenwich mean sidereal time, degrees (Meeus 12.4, leading terms) */
 function u3Html(){
-  return '<div class="u3" id="u3"'+(U3.v === 3 ? '' : ' hidden')+'><canvas id="u3c" role="img" aria-label="'+L("३D: बीचमा घुम्ने पृथ्वी र वरिपरि नवग्रह","3D: the Earth turning in the middle, the nine grahas around it")+'"></canvas>'
+  return '<div class="u3" id="u3"'+(U3.v !== 2 ? '' : ' hidden')+'><canvas id="u3c" role="img" aria-label="'+L("३D: बीचमा घुम्ने पृथ्वी र वरिपरि नवग्रह","3D: the Earth turning in the middle, the nine grahas around it")+'"></canvas>'
     + '<div class="chips" id="u3s">'+U3_SP.map(function(s){ return '<button class="chip" data-u3s="'+s[0]+'" aria-pressed="'+(s[0] === U3.sp)+'">'+L(s[1], s[2])+'</button>'; }).join("")+'</div>'
-    + '<div class="chips" id="u3p"><span class="u3pl">🪔 '+L("पञ्चाङ्ग ५D","Panchang 5D")+'</span>'
+    + '<div class="chips" id="u3p"'+(U3.v === 4 ? ' hidden' : '')+'><span class="u3pl">🪔 '+L("पञ्चाङ्ग ५D","Panchang 5D")+'</span>'
     + U3_PA.map(function(a){ return '<button class="chip" data-u3p="'+a[0]+'" aria-pressed="'+(a[0] === U3.pa)+'">'+L(a[1], a[2])+'</button>'; }).join("")+'</div>'
     + '<div class="u3t" id="u3t"></div><div class="u3i" id="u3i"></div></div>';
 }
-function u3View(){   /* 3D view or the flat wheel */
-  $("#u3").hidden = U3.v !== 3; $("#bcw").hidden = U3.v === 3;
+function u3View(){   /* the 3D space, the 3D sky, or the flat wheel */
+  $("#u3").hidden = U3.v === 2; $("#bcw").hidden = U3.v !== 2; $("#u3p").hidden = U3.v === 4;
+  var mo = $('[data-u3s="2592000"]'); mo.hidden = U3.v === 4;   /* a month a second would only make the sky flicker */
+  if(U3.v === 4 && U3.sp > 86400) $('[data-u3s="86400"]').click();
+  U3.pick = ""; U3.it = 0;
   [].forEach.call($("#u3v").children, function(c){ c.setAttribute("aria-pressed", String(+c.dataset.u3v === U3.v)); });
   clockStart();
 }
@@ -5191,12 +5251,11 @@ function u3Frame(now){
     [ly, ly2, ly + h, ly2 - h].some(function(c){ if(!hit(c)){ y = c; return true; } });
     LB.push([lx, y, w]); x.fillStyle = col; x.shadowColor = "rgba(0,0,0,.9)"; x.shadowBlur = 3*dpr; x.fillText(t, lx, y); x.shadowBlur = 0;
   }
-  /* space and stars (on a far sphere, so they turn with the view) */
+  if(U3.v === 4) return u3Sky(x, P, lab, dpr, f, W, H, T, G, now);
+  /* space and stars */
   var bg = x.createRadialGradient(cx, cy, 0, cx, cy, W*.75); bg.addColorStop(0, "#14204A"); bg.addColorStop(1, "#03050F");
   x.fillStyle = bg; x.fillRect(0, 0, W, H);
-  if(!U3.stars){ U3.stars = []; var sd = 7; for(i = 0; i < 170; i++){ sd = (sd*16807) % 2147483647; var u1 = sd/2147483647; sd = (sd*16807) % 2147483647; var u2 = sd/2147483647;
-    var zz = 2*u1 - 1, th = 2*Math.PI*u2, rr = Math.sqrt(1 - zz*zz); U3.stars.push([7*rr*Math.cos(th), 7*rr*Math.sin(th), 7*zz, .3 + (i % 5)/6]); } }
-  U3.stars.forEach(function(s){ var p = P(s[0], s[1], s[2]); if(p[2] > .5 && p[0] > 0 && p[0] < W && p[1] > 0 && p[1] < H){ x.fillStyle = "rgba(255,255,255,"+s[3]+")"; x.fillRect(p[0], p[1], dpr*(s[3] > .8 ? 1.6 : 1), dpr*(s[3] > .8 ? 1.6 : 1)); } });
+  u3Stars(x, P, W, H, dpr, 1);
   /* the nakshatra mandala: 12 rashi in a band (gold, alternate shades), 27 nakshatra ticks, the Moon's nakshatra lit */
   var nkOn = Math.floor(G.sid.mo/(360/27));
   for(i = 0; i < 72; i++) (function(i){
@@ -5307,10 +5366,98 @@ function u3Frame(now){
   items.sort(function(a, b){ return b[0] - a[0]; }).forEach(function(it){ it[1](); });
   lab(L("पृथ्वी","Earth"), E[0], E[1] + er + 12*dpr, E[1] - er - 10*dpr, U3.pick === "earth" ? "#FFD54A" : "#BFDBFE");   /* last, so the Moon never hides it */
   late.forEach(function(fn){ fn(); });
-  /* the time shown and the tapped graha */
+  u3Text(now, T, function(){ return u3Info(T, Q, SUN); });
+}
+function u3Text(now, T, info){   /* the time shown, and (twice a second) the line about the tapped thing */
   var tt = (U3.sp === 1 ? L("● अहिले · ","● Now · ") : "") + u3When(T);
   if(tt !== U3.tt){ U3.tt = tt; $("#u3t").textContent = tt; }
-  if(now - U3.it > 500){ U3.it = now; $("#u3i").textContent = u3Info(T, Q, SUN); }
+  if(now - U3.it > 500){ U3.it = now; $("#u3i").textContent = info(); }
+}
+function u3Stars(x, P, W, H, dpr, k){   /* stars on a far sphere, so they turn with the view; k = how dark the sky is */
+  if(!U3.stars){ U3.stars = []; for(var i = 0, sd = 7; i < 170; i++){ sd = (sd*16807) % 2147483647; var u1 = sd/2147483647; sd = (sd*16807) % 2147483647; var u2 = sd/2147483647;
+    var zz = 2*u1 - 1, th = 2*Math.PI*u2, rr = Math.sqrt(1 - zz*zz); U3.stars.push([7*rr*Math.cos(th), 7*rr*Math.sin(th), 7*zz, .3 + (i % 5)/6]); } }
+  U3.stars.forEach(function(s){ var p = P(s[0], s[1], s[2]); if(p[2] > .5 && p[0] > 0 && p[0] < W && p[1] > 0 && p[1] < H){ x.fillStyle = "rgba(255,255,255,"+s[3]*k+")"; x.fillRect(p[0], p[1], dpr*(s[3] > .8 ? 1.6 : 1), dpr*(s[3] > .8 ? 1.6 : 1)); } });
+}
+function u3Mix(a, b, k){ return "rgb("+[1, 3, 5].map(function(i){ return Math.round(parseInt(a.substr(i, 2), 16)*(1 - k) + parseInt(b.substr(i, 2), 16)*k); }).join(",")+")"; }
+var DIR8 = [["उत्तर","north"],["उत्तर-पूर्व","north-east"],["पूर्व","east"],["दक्षिण-पूर्व","south-east"],["दक्षिण","south"],["दक्षिण-पश्चिम","south-west"],["पश्चिम","west"],["उत्तर-पश्चिम","north-west"]];
+/* ---- ३D आकाश — the muhurta dial as the real sky over the chosen place: the Sun's circle for today cut into the same 15 day
+   + 15 night muhurtas (the day ones above the horizon, the night ones below it), the Sun on it, a शङ्कु (gnomon) and its
+   shadow, the ecliptic with the rashi now rising in the east — the लग्न — and the Moon. x east, y north, z up. ---- */
+function u3Sky(x, P, lab, dpr, f, W, H, T, G, now){
+  function Q(a, b, c){ return P(a*.8, b*.8, c*.8 - .2); }   /* the sky a little smaller and lower than space, so dome and ground fit */
+  var rd = Math.PI/180, loc = VLOC[VD.loc], la = loc[2]*rd, sl = Math.sin(la), cl = Math.cos(la), e = 23.4393*rd, th = (gmst(T) + loc[3])*rd, i, j;
+  if(!U3.V || T < U3.V.rise || T >= U3.V.next || U3.Vl !== VD.loc){ U3.V = vedDay(T, loc); U3.Vl = VD.loc; }
+  var V = U3.V, M = vedTime(T, V), up = [], down = [], late = [];
+  function rade(l){ l *= rd; return [Math.atan2(Math.sin(l)*Math.cos(e), Math.cos(l)), Math.asin(Math.sin(l)*Math.sin(e))]; }   /* ecliptic longitude → RA, dec */
+  function hor(h, dec, r){ var sd = Math.sin(dec), cd = Math.cos(dec); r = r || 1; return [-cd*Math.sin(h)*r, (cl*sd - sl*cd*Math.cos(h))*r, (sl*sd + cl*cd*Math.cos(h))*r]; }
+  function at(lon, r){ var q = rade(lon); return hor(th - q[0], q[1], r); }
+  function add(z, dep, fn){ (z < 0 ? down : up).push([dep, fn]); }   /* below or above the horizon; drawn far to near */
+  var su = rade(G.trop.su), S = hor(th - su[0], su[1]), alt = Math.asin(S[2])/rd, dk = Math.max(0, Math.min(1, (alt + 8)/14));
+  var bg = x.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, u3Mix("#050A24", "#2F7FD0", dk)); bg.addColorStop(1, u3Mix("#1A2456", "#CFE9FF", dk));
+  x.fillStyle = bg; x.fillRect(0, 0, W, H); u3Stars(x, P, W, H, dpr, 1 - dk);
+  /* the Sun's circle: muhurta j runs over equal times of the day (or the night), as on the dial */
+  var hn = th - su[0];
+  function hT(t){ return hn + (t - T)/864e5*2*Math.PI; }
+  for(j = 0; j < 30; j++) (function(j){
+    var d = j < 15, a = d ? V.rise + j*(V.set - V.rise)/15 : V.set + (j - 15)*(V.next - V.set)/15, b = a + (d ? V.set - V.rise : V.next - V.set)/15, on = j === M.mu;
+    for(var k = 0; k < 3; k++) (function(k){
+      var h0 = hT(a + (b - a)*k/3), h1 = hT(a + (b - a)*(k + 1)/3), q = [Q.apply(0, hor(h0, su[1], .86)), Q.apply(0, hor(h1, su[1], .86)), Q.apply(0, hor(h1, su[1], 1)), Q.apply(0, hor(h0, su[1], 1))];
+      var zc = hor((h0 + h1)/2, su[1])[2];
+      add(zc, (q[0][2] + q[2][2])/2, function(){ x.beginPath(); x.moveTo(q[0][0], q[0][1]); for(var t = 1; t < 4; t++) x.lineTo(q[t][0], q[t][1]); x.closePath();
+        x.fillStyle = on ? (d ? "#B3261E" : "#C79A4B") : d ? (j % 2 ? "rgba(235,212,156,.92)" : "rgba(222,196,130,.92)") : (j % 2 ? "rgba(40,52,110,.85)" : "rgba(58,74,146,.85)"); x.fill();
+        if(k === 0){ x.strokeStyle = d ? "rgba(108,74,24,.8)" : "rgba(217,185,112,.7)"; x.lineWidth = dpr; x.beginPath(); x.moveTo(q[0][0], q[0][1]); x.lineTo(q[3][0], q[3][1]); x.stroke(); } });
+    })(k);
+    var m = Q.apply(0, hor(hT((a + b)/2), su[1], .93));
+    add(hor(hT((a + b)/2), su[1])[2], m[2] - .01, function(){ x.font = "800 "+Math.round(10*dpr*m[3]/Q(0, 0, 0)[3])+"px "+f; x.textAlign = "center"; x.textBaseline = "middle";
+      x.fillStyle = on ? "#fff" : d ? "#3B2508" : "#F1D795"; x.fillText(npd(j + 1), m[0], m[1]); x.textBaseline = "alphabetic"; });
+  })(j);
+  /* the ecliptic and the rising rashi (लग्न) */
+  var asc = lagnaTrop(T, loc[2], loc[3]), lr = Math.floor(grRev(asc - G.aya)/30);
+  for(i = 0; i < 120; i++) (function(i){
+    var l0 = i*3, p0 = Q.apply(0, at(l0 + G.aya, 1.05)), p1 = Q.apply(0, at(l0 + 3 + G.aya, 1.05)), on = Math.floor(l0/30) === lr;
+    add(at(l0 + 1.5 + G.aya)[2], (p0[2] + p1[2])/2, function(){ x.strokeStyle = on ? "#FFD54A" : "rgba(196,181,253,.75)"; x.lineWidth = (on ? 3.5 : 1.5)*dpr; x.beginPath(); x.moveTo(p0[0], p0[1]); x.lineTo(p1[0], p1[1]); x.stroke(); });
+  })(i);
+  for(i = 0; i < 12; i++){ var rp = at(i*30 + 15 + G.aya, 1.13); if(rp[2] > -.05) (function(i, q){ late.push(function(){ lab(L(RASHI[i][0], RASHI[i][1].split(" ")[0]), q[0], q[1], q[1] - 12*dpr, i === lr ? "#FFD54A" : "rgba(221,214,254,.95)"); }); })(i, Q.apply(0, rp)); }
+  var A = Q.apply(0, at(asc, 1.05));
+  late.push(function(){ x.fillStyle = "#FFD54A"; x.beginPath(); x.arc(A[0], A[1], 4*dpr, 0, 7); x.fill();
+    lab("⬆ "+L("लग्न: ","Lagna: ")+L(RASHI[lr][0], RASHI[lr][1].split(" ")[0]), A[0], A[1] - 10*dpr, A[1] + 18*dpr, "#FFE082"); });
+  /* the ground: horizon, directions, a शङ्कु and its shadow */
+  var gr = [];
+  for(i = 0; i <= 72; i++) gr.push(Q(1.08*Math.cos(i*5*rd), 1.08*Math.sin(i*5*rd), 0));
+  var tip = Q(0, 0, .16), base = Q(0, 0, 0), sh = null;
+  if(alt > .5){ var sh2 = Math.hypot(S[0], S[1]) || 1, ln = Math.min(1, .16/Math.tan(alt*rd)); sh = Q(-S[0]/sh2*ln, -S[1]/sh2*ln, 0); }
+  /* the Sun and the Moon on the sky */
+  var Sp = Q(S[0]*.93, S[1]*.93, S[2]*.93), sr = .055*Sp[3];
+  add(S[2], Sp[2], function(){ var g = x.createRadialGradient(Sp[0], Sp[1], sr*.3, Sp[0], Sp[1], sr*4); g.addColorStop(0, "rgba(255,210,80,.6)"); g.addColorStop(1, "rgba(255,170,0,0)");
+    x.fillStyle = g; x.beginPath(); x.arc(Sp[0], Sp[1], sr*4, 0, 7); x.fill();
+    g = x.createRadialGradient(Sp[0] - sr*.3, Sp[1] - sr*.3, 0, Sp[0], Sp[1], sr); g.addColorStop(0, "#FFF8DC"); g.addColorStop(.5, "#FDB813"); g.addColorStop(1, "#F08C00");
+    x.fillStyle = g; x.beginPath(); x.arc(Sp[0], Sp[1], sr, 0, 7); x.fill(); lab(L("सूर्य","Sun"), Sp[0], Sp[1] + sr + 11*dpr, Sp[1] - sr - 5*dpr, "#FFF3C4"); });
+  var Mo = at(G.trop.mo, .93), Mp = Q.apply(0, Mo), mr = .04*Mp[3];
+  add(Mo[2], Mp[2], function(){ u3Ball(x, Mp[0], Mp[1], mr, function(a, b, c){ var l = a*S[0] + b*S[1] + c*S[2], v = l > 0 ? 40 + 190*l : 40; U3.c[0] = v; U3.c[1] = v; U3.c[2] = v + 8; });
+    lab(L("चन्द्र","Moon"), Mp[0], Mp[1] + mr + 11*dpr, Mp[1] - mr - 5*dpr, "#E2E8F0"); });
+  U3.hit = [["su", Sp[0], Sp[1], sr], ["mo", Mp[0], Mp[1], mr], ["lg", A[0], A[1], 6*dpr]];
+  /* draw: below the horizon, the ground (half see-through, so the night half shows under it), above */
+  down.sort(function(a, b){ return b[0] - a[0]; }).forEach(function(it){ it[1](); });
+  x.beginPath(); gr.forEach(function(q, k){ k ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); }); x.closePath();
+  x.fillStyle = u3Mix("#0E1A10", "#5E8C4A", dk).replace("rgb", "rgba").replace(")", ","+(.32 + .3*dk)+")");   /* clearer at night, when the night muhurtas below it matter */ x.fill(); x.strokeStyle = "rgba(255,255,255,.55)"; x.lineWidth = 1.2*dpr; x.stroke();
+  DIR8.forEach(function(dn, k){ if(k % 2) return; var a = (90 - k*45)*rd, q = Q(1.17*Math.cos(a), 1.17*Math.sin(a), 0); late.push(function(){ lab(L(dn[0], dn[1].charAt(0).toUpperCase()), q[0], q[1] + 4*dpr, q[1] - 10*dpr, "#FFFFFF"); }); });
+  if(sh){ x.strokeStyle = "rgba(0,0,0,.55)"; x.lineWidth = 3*dpr; x.beginPath(); x.moveTo(base[0], base[1]); x.lineTo(sh[0], sh[1]); x.stroke(); }
+  x.strokeStyle = "#E8D5A8"; x.lineWidth = 2.5*dpr; x.beginPath(); x.moveTo(base[0], base[1]); x.lineTo(tip[0], tip[1]); x.stroke();
+  lab("📍 "+L(loc[0], loc[1]), base[0], base[1] + 14*dpr, base[1] + 26*dpr, "#FFFFFF");
+  up.sort(function(a, b){ return b[0] - a[0]; }).forEach(function(it){ it[1](); });
+  late.forEach(function(fn){ fn(); });
+  u3Text(now, T, function(){ return u3SkyInfo(T, S, alt, Mo, lr, M, V); });
+}
+function u3SkyInfo(T, S, alt, Mo, lr, M, V){
+  function dir(v){ return DIR8[Math.round(grRev(Math.atan2(v[0], v[1])/(Math.PI/180))/45) % 8]; }
+  function deg(v){ return npd(Math.round(Math.asin(Math.max(-1, Math.min(1, v[2])))*180/Math.PI))+"°"; }
+  var k = U3.pick, q = muQ(M.mu, V.wd);
+  if(k === "su") return L("सूर्य — ","Sun — ")+(alt > 0 ? L("क्षितिजभन्दा ","")+deg(S)+L(" माथि"," above the horizon") : L("क्षितिजभन्दा ","")+npd(Math.round(-alt))+"°"+L(" मुनि (रात)"," below the horizon (night)"))+" · "+L(dir(S)[0], dir(S)[1]);
+  if(k === "mo") return L("चन्द्र — ","Moon — ")+(Mo[2] > 0 ? deg(Mo)+L(" माथि"," up") : L("क्षितिजमुनि","below the horizon"))+" · "+L(dir(Mo)[0], dir(Mo)[1]);
+  if(k === "lg") return L("लग्न — पूर्वी क्षितिजमा अहिले उदाउँदै गरेको राशि: ","Lagna — the sign rising on the eastern horizon now: ")+L(RASHI[lr][0], RASHI[lr][1].split(" ")[0])
+    +" ("+L("स्वामी ","lord ")+L(GRN[RASHI_LORD[lr]][0], GRN[RASHI_LORD[lr]][1])+")"+L(" · करिब २ घण्टामा अर्को राशि"," · the next sign in about 2 h");
+  return L("मुहूर्त ","Muhurta ")+npd(M.mu + 1)+" "+L(MUHURTA[M.mu][0], MUHURTA[M.mu][1])+" ("+(q === "s" ? L("शुभ","good") : q === "a" ? L("अशुभ","avoid") : L("सामान्य","neutral"))+") · "
+    +L("लग्न ","Lagna ")+L(RASHI[lr][0], RASHI[lr][1].split(" ")[0])+" · "+L("सूर्य ","Sun ")+(alt > 0 ? deg(S)+L(" माथि"," up") : npd(Math.round(-alt))+"°"+L(" मुनि"," down"));
 }
 function u3When(T){ var p = tzParts("Asia/Kathmandu", T), b = p && adToBs(p.y, p.m, p.d);
   return (b ? L("वि.सं. ","BS ")+npd(b.y)+" "+bsM(b.m-1)+" "+npd(b.d) : p ? p.y+"-"+pad2(p.m)+"-"+pad2(p.d) : "") + " · " + npTime(T); }
@@ -5334,7 +5481,7 @@ function u3PaText(){   /* how the chosen limb comes out of the angles */
   return U3.pa !== "all" ? t[U3.pa] : [L("तिथि ","Tithi ")+L(tn[0], tn[1]), L("वार ","Vaar ")+L(WDN[V.wd], WDNE[V.wd]), L("नक्षत्र ","Nakshatra ")+L(NAK[A.nk][0], NAK[A.nk][1]),
     L("योग ","Yoga ")+L(YOGA[A.yg][0], YOGA[A.yg][1]), L("करण ","Karana ")+L(KARANA[A.kr][0], KARANA[A.kr][1])].join(" · ");
 }
-var VD = {loc:0, last:0, P:null, V:null};
+var VD = {loc:0, last:0, P:null, V:null, say:0, smu:-1};
 try{ VD.loc = Math.min(VLOC.length - 1, Math.max(0, parseInt(localStorage.getItem("ganak_vloc") || "0", 10) || 0)); }catch(e){}
 function vdRow(l, v, sub){ return '<div class="vdr"><span>'+l+'</span><b>'+v+'</b>'+(sub ? '<em>'+sub+'</em>' : '')+'</div>'; }
 function vdRefresh(now){   /* the slow parts (panchang, grahas, day times) — on open and once a minute */
@@ -5369,6 +5516,7 @@ function vdRefresh(now){   /* the slow parts (panchang, grahas, day times) — o
       + '<span class="vgp"><b>'+esc(L(RASHI[Math.floor(lon/30)][0], RASHI[Math.floor(lon/30)][1].split(" ")[0]))+' '+degTxt(lon)+'</b>'
       + '<em>'+esc(L(NAK[n][0], NAK[n][1]))+' · '+L("पद ","pada ")+npd(Math.floor((lon % (360/27))/(360/108))+1)+'</em></span></div>'; }).join("");
   $("#vdChakra").innerHTML = chakraSvg(G, rv, P.nk);
+  VD.say = 0;
   $("#vdAya").textContent = L("अयनांश (लाहिरी) ","Ayanamsa (Lahiri) ")+npd(Math.floor(G.aya))+"°"+npd(pad2(Math.floor((G.aya % 1)*60)))+"′";
   VD.last = now;
 }
@@ -5383,6 +5531,7 @@ function vdTick(now){   /* every second: the hand, muhurta, kala, kashtha, ghati
   var T = vedTime(now, VD.V), M = MUHURTA[T.mu];
   vdDialSet(document.getElementById("vdDial"), T);
   $("#vdMu").textContent = L(M[0], M[1]) + (T.mu === 7 ? " ✨" : T.mu === 28 ? " 🙏" : "");
+  if(now - VD.say > 30000 || T.mu !== VD.smu){ VD.say = now; VD.smu = T.mu; $("#vdSay").innerHTML = vdSay(now); }
   $("#vdT").textContent = npd(pad2(T.mu + 1))+" : "+npd(pad2(T.kala))+" : "+npd(pad2(T.kashtha));
   $("#vdG").textContent = L("इष्टकाल ","Ishtakaal ")+npd(T.gh)+L(" घडी "," ghati ")+npd(T.pa)+L(" पला "," pala ")+npd(T.vi)+L(" विपला"," vipala");
   $("#vdNow").innerHTML = '<span>'+(T.day ? "☀️ "+L("दिनको ","Day ") : "🌙 "+L("रातको ","Night "))+L(npd(T.prahar)+" प्रहर", "prahar "+T.prahar)+'</span>'
