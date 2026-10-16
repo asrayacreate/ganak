@@ -978,6 +978,9 @@ body[data-theme="dark"] .hcl-all{color:#8CC4F5}
 .hcl-t{font-family:var(--fm);font-size:clamp(17px,5vw,22px);font-weight:800;line-height:1.15;color:var(--ink)}
 .hcl-d{font-size:13px;font-weight:700;color:var(--ink)}
 .hcl-n{font-size:12px;line-height:1.35;color:var(--ink2)}
+.hcl-s{align-self:flex-start;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px;margin-top:3px}
+.hcl-s.s{background:rgba(22,163,74,.14);color:#15803D}.hcl-s.a{background:rgba(220,38,38,.13);color:#B91C1C}.hcl-s.n{background:rgba(245,179,1,.16);color:#92400E}
+body[data-theme="dark"] .hcl-s.s{color:#86EFAC}body[data-theme="dark"] .hcl-s.a{color:#FCA5A5}body[data-theme="dark"] .hcl-s.n{color:#FCD34D}
 .wc-read{text-align:center;margin-top:18px}
 .wc-zone{font-size:13px;font-weight:700;color:var(--mute)}
 .wc-time{margin-top:2px;font-family:var(--fm);font-size:clamp(25px,7.6vw,34px);font-weight:800;color:var(--ink);letter-spacing:.3px}
@@ -1082,6 +1085,14 @@ body[data-theme="dark"] .htd-e{color:#FF8A80}
 body[data-theme="dark"] .vsv.s{color:#86EFAC}body[data-theme="dark"] .vsv.a{color:#FCA5A5}body[data-theme="dark"] .vsv.n{color:#FCD34D}
 .sg{font-style:normal;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:7px;vertical-align:1px;white-space:nowrap}
 .sg.s{background:#DCFCE7;color:#166534}.sg.a{background:#FEE2E2;color:#991B1B}.sg.n{background:#FEF3C7;color:#92400E}
+.vbar{padding:12px 14px 13px;border-top:1px solid var(--ol)}
+.vbar-t{position:relative;display:flex;height:16px;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.vbar-t b{height:100%}.vbar-t b.s{background:#22C55E}.vbar-t b.n{background:#FBBF24}.vbar-t b.a{background:#EF4444}
+.vbar-now{position:absolute;top:-3px;bottom:-3px;width:3px;margin-left:-1.5px;background:var(--ink);border-radius:2px;box-shadow:0 0 0 1.5px var(--card)}
+.vbar-l{position:relative;height:16px;margin-top:4px;font-size:10.5px;color:var(--mute)}
+.vbar-l span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}.vbar-l span:first-child{left:0;transform:none}.vbar-l span.r{right:0;left:auto;transform:none}
+.vbar-k{display:flex;gap:4px;margin-top:4px}.vbar-k .sg{margin-left:0}
+.vbar-g{margin-top:7px;font-size:12px;font-weight:700;color:var(--ink);line-height:1.5}
 .vgr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--ol)}
 .vgd{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font:800 12px var(--fs);color:#111827;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 2px 6px rgba(0,0,0,.25)}
 .vgn b,.vgp b{display:block;font-size:13.5px;color:var(--ink)}
@@ -3850,7 +3861,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v10.0 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v10.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4851,7 +4862,7 @@ function homeClockHtml(){
     + '<button data-hck="w"'+(HCLK === "w" ? ' class="on"' : '')+'>🌍 '+L("देश","World")+'</button></span></div>';
   if(HCLK === "v") return '<div class="hclock"><div data-go="vedic" role="button" aria-label="'+L("वैदिक घडी खोल्नुहोस्","Open the Vedic clock")+'">'
     + '<div class="wc vd" id="hvDial"><div class="wc-face">'+vdDialSvg()+'<div class="wc-glass"></div></div></div></div>'
-    + '<div class="hcl-i">'+tabs+'<div class="hcl-t" id="hvT"></div><div class="hcl-d" id="hvMu"></div><div class="hcl-n" id="hvP"></div>'
+    + '<div class="hcl-i">'+tabs+'<div class="hcl-t" id="hvT"></div><div class="hcl-d" id="hvMu"></div><div class="hcl-n" id="hvP"></div><div class="hcl-s" id="hvS"></div>'
     + '<button class="hcl-all" data-go="vedic">'+L("पूरा पञ्चाङ्ग →","Full panchang →")+'</button></div></div>';
   return '<div class="hclock"><div data-go="wclock" role="button" aria-label="'+L("विश्व घडी खोल्नुहोस्","Open the world clock")+'">'+watchHtml("hwWatch")+'</div>'
     + '<div class="hcl-i">'+tabs
@@ -4859,7 +4870,7 @@ function homeClockHtml(){
     + '<div class="hcl-t" id="hwTime"></div><div class="hcl-d" id="hwDay"></div><div class="hcl-n" id="hwNp"></div>'
     + '<button class="hcl-all" data-go="wclock">'+L("सबै देश →","All countries →")+'</button></div></div>';
 }
-var HV = {V:null, at:0, txt:""};
+var HV = {V:null, at:0, txt:"", sat:0};
 function hvTick(now){   /* Home's Vedic clock: muhurta : kala : kashtha, its name, tithi + nakshatra (refreshed each minute) */
   var w = document.getElementById("hvDial"); if(!w) return;
   if(!HV.V || now >= HV.V.next || now - HV.at > 60000){
@@ -4871,6 +4882,13 @@ function hvTick(now){   /* Home's Vedic clock: muhurta : kala : kashtha, its nam
   document.getElementById("hvT").textContent = npd(pad2(T.mu + 1))+":"+npd(pad2(T.kala))+":"+npd(pad2(T.kashtha));
   document.getElementById("hvMu").textContent = (T.day ? "☀️ " : "🌙 ") + L("मुहूर्त ","Muhurta ") + npd(T.mu + 1) + " · " + L(M[0], M[1]).replace(/ \(.+\)/, "") + (T.mu === 7 ? " ✨" : T.mu === 28 ? " 🙏" : "");
   document.getElementById("hvP").textContent = HV.txt + " · " + L(WDN[HV.V.wd], WDNE[HV.V.wd]);
+  var e = document.getElementById("hvS");
+  if(now - HV.sat > 30000 || !e.firstChild){ HV.sat = now;   /* what it says now, as on the Vedic clock's card (also after Home is redrawn) */
+    var k = judge(now, HV.V), bad = badAt(now, HV.V), ch = CHOG[chogAt(now, HV.V).c];
+    e.className = "hcl-s " + k;
+    e.textContent = k === "a" ? "⚠️ " + (bad ? bad[0] + L(" · "+npTime(bad[1])+" सम्म", " · till "+npTime(bad[1])) : L("अशुभ समय","Not a good time"))
+      : (k === "s" ? "✓ " + L("शुभ समय","Good time") : "◐ " + L("सामान्य समय","Ordinary time")) + " · " + L(ch[0], ch[1]) + L(" चौघडिया"," choghadiya");
+  }
 }
 function hwText(T){
   var w = document.getElementById("hwWatch"); if(!w) return;
@@ -5037,13 +5055,36 @@ function lagnaTrop(ms, lat, lon){   /* the ecliptic point rising in the east: ta
   return grRev(Math.atan2(Math.cos(th), -(Math.sin(th)*Math.cos(e) + Math.tan(lat*r)*Math.sin(e)))/r);
 }
 function lagna(ms, lat, lon){ return grRev(lagnaTrop(ms, lat, lon) - ayanamsa(ms)); }
+function judge(t, W){   /* the plain verdict at t (W = its Vedic day): "a" avoid — Rahu/Yama/Gulika, or muhurta and choghadiya both bad;
+                           "s" good — neither, muhurta not bad and choghadiya Amrit/Shubh/Labh; "n" ordinary otherwise */
+  var bad = badAt(t, W), q = muQ(vedTime(t, W).mu, W.wd), c = CHOG[chogAt(t, W).c][2];
+  return bad || (q === "a" && c === 0) ? "a" : q !== "a" && c === 2 ? "s" : "n";
+}
+function judgeEdge(a, b, W){   /* where judge() changes between a and b (2 min apart): halve 12 times, to about 30 ms */
+  var k = judge(a, W); for(var i = 0; i < 12; i++){ var m = (a + b)/2; if(judge(m, W) === k) a = m; else b = m; } return b;
+}
+function dayBar(now){   /* the whole Vedic day, sunrise to sunrise, coloured by judge() every 2 min, with "now" marked */
+  var V = VD.V, key = V.rise + "|" + VD.loc, span = V.next - V.rise, i;
+  if(!VD.tl || VD.tl.k !== key){ var runs = [], t, k;
+    for(t = V.rise; t < V.next; t += 12e4){ k = judge(t, V);
+      if(runs.length && runs[runs.length - 1][0] === k) runs[runs.length - 1][2] = t + 12e4;
+      else { var c = runs.length ? judgeEdge(t - 12e4, t, V) : t; if(runs.length) runs[runs.length - 1][2] = c; runs.push([k, c, t + 12e4]); } }
+    runs[runs.length - 1][2] = V.next; VD.tl = {k:key, runs:runs}; }
+  function pc(t){ return ((t - V.rise)/span*100).toFixed(2)+"%"; }
+  var good = VD.tl.runs.filter(function(r){ return r[0] === "s" && r[2] - r[1] >= 6e5; }).map(function(r){ return npTime(r[1])+"–"+npTime(r[2]); });
+  return '<div class="vbar"><div class="vbar-t">'+VD.tl.runs.map(function(r){ return '<b class="'+r[0]+'" style="width:'+((r[2] - r[1])/span*100).toFixed(2)+'%"></b>'; }).join("")
+    + '<i class="vbar-now" style="left:'+pc(now)+'"></i></div>'
+    + '<div class="vbar-l"><span>🌅 '+npTime(V.rise)+'</span><span style="left:'+pc(V.set)+'">🌇 '+npTime(V.set)+'</span><span class="r">🌅 '+npTime(V.next)+'</span></div>'
+    + '<div class="vbar-k"><i class="sg s">'+L("शुभ","good")+'</i><i class="sg n">'+L("सामान्य","neutral")+'</i><i class="sg a">'+L("अशुभ","avoid")+'</i></div>'
+    + (good.length ? '<div class="vbar-g">✓ '+L("आजका शुभ समय: ","Good times today: ")+good.join(" · ")+'</div>' : '')+'</div>';
+}
 function vdSay(now){   /* each factor with its शुभ/अशुभ mark, a plain verdict, and the next good time */
   var V = VD.V, loc = VLOC[VD.loc], T = vedTime(now, V), q = muQ(T.mu, V.wd), C = chogAt(now, V), ch = CHOG[C.c], bad = badAt(now, V);
   var wax = angas(VD.P.G).ti < 15, hq = /ju|ve|me/.test(T.horaLord) || (T.horaLord === "mo" && wax) ? "s" : "a";
   var lg = lagna(now, loc[2], loc[3]), lr = Math.floor(lg/30), le = now, i;
   for(i = 0; i < 120 && Math.floor(lagna(le, loc[2], loc[3])/30) === lr; i++) le += 12e4;   /* till the next rashi rises (about 2 h) */
-  function ok(t, W){ return !badAt(t, W) && muQ(vedTime(t, W).mu, W.wd) !== "a" && CHOG[chogAt(t, W).c][2] === 2; }
-  function scan(t, want){ var W = V; for(var k = 0; k < 360; k++, t += 24e4){ if(t >= W.next) W = vedDay(t, loc); if(ok(t, W) === want) return t; } return 0; }
+  function ok(t, W){ return judge(t, W) === "s"; }
+  function scan(t, want){ var W = V; for(var k = 0; k < 720; k++, t += 12e4){ if(t >= W.next) W = vedDay(t, loc); if(ok(t, W) === want) return k ? judgeEdge(t - 12e4, t, W) : t; } return 0; }
   var good = ok(now, V), nx = good ? scan(now, false) : scan(now, true);
   function b(k, t){ return '<i class="sg '+k+'">'+t+'</i>'; }
   var Q = {s:b("s", L("शुभ","good")), a:b("a", L("अशुभ","avoid")), n:b("n", L("सामान्य","neutral"))};
@@ -5058,7 +5099,8 @@ function vdSay(now){   /* each factor with its शुभ/अशुभ mark, a pl
     + vdRow(L("लग्न (उदाउँदो राशि)","Lagna (rising sign)"), esc(L(RASHI[lr][0], RASHI[lr][1].split(" ")[0]))+" "+degTxt(lg),
         L("स्वामी ","lord ")+esc(L(GRN[RASHI_LORD[lr]][0], GRN[RASHI_LORD[lr]][1]))+" · "+L(npTime(le)+" सम्म", "till "+npTime(le)))
     + vdRow(L("राहुकाल · यमगण्ड · गुलिक","Rahu · Yama · Gulika"), bad ? esc(bad[0])+Q.a : L("अहिले छैन","not now")+" ✓")
-    + (nx ? vdRow(good ? L("शुभ समय सकिने","Good time ends") : L("अर्को शुभ समय","Next good time"), npTime(nx), good ? "" : L("चौघडिया र मुहूर्त दुवै शुभ हुँदा","when choghadiya and muhurta are both good")) : "");
+    + (nx ? vdRow(good ? L("शुभ समय सकिने","Good time ends") : L("अर्को शुभ समय","Next good time"), npTime(nx), good ? "" : L("चौघडिया र मुहूर्त दुवै शुभ हुँदा","when choghadiya and muhurta are both good")) : "")
+    + dayBar(now);
 }
 function panchang(now){
   var G = grahas(now), s = G.sid, A = angas(G), ph = A.ph, yo = A.yo, kn = A.kn, N = 360/27;
