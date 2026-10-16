@@ -1065,7 +1065,15 @@ body[data-theme="dark"] .htd-e{color:#FF8A80}
 .bcl{stroke-width:.8;opacity:.6;stroke-dasharray:2 2}
 .bcg{stroke:#fff;stroke-width:1.2}.bcg.rv{stroke-dasharray:3 2}
 .bcgt{font:800 8.5px var(--fs);fill:#111827;text-anchor:middle;pointer-events:none}
-.bcaya{margin-top:8px;font-size:11.5px;color:var(--mute)}
+.bcaya{margin-top:8px;font-size:11.5px;color:var(--mute);text-align:center}
+.bcwrap[hidden],.u3[hidden]{display:none}
+.u3tab{justify-content:center;padding-top:2px}
+.u3{margin:2px auto 4px;width:min(94vw,420px)}
+.u3 canvas{display:block;width:100%;height:calc(min(94vw,420px)*.72);border-radius:22px;touch-action:pan-y;cursor:grab;background:#050816;
+  box-shadow:0 0 0 3px rgba(245,179,1,.35),0 18px 34px -14px rgba(10,20,50,.6)}
+.u3 .chips{justify-content:center;flex-wrap:wrap;padding-top:9px}
+.u3t{text-align:center;font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:6px}
+.u3i{text-align:center;font-size:12px;color:var(--mute);margin-top:3px;min-height:1.4em}
 .vgr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--ol)}
 .vgd{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font:800 12px var(--fs);color:#111827;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 2px 6px rgba(0,0,0,.25)}
 .vgn b,.vgp b{display:block;font-size:13.5px;color:var(--ink)}
@@ -3467,7 +3475,7 @@ var TOOLS = [
 { id:"vedic", cat:"np", ic:"🕉️", neu:true, custom:true,
   nm:["वैदिक घडी · पञ्चाङ्ग","Vedic Clock · Panchang"],
   sb:["मुहूर्त, घडी–पला, तिथि, नक्षत्र र नवग्रह","Muhurta, ghati–pala, tithi, nakshatra & nine grahas"],
-  kw:"vedic clock vaidik ghadi muhurta muhurat ghati pala vipala panchang panchanga tithi nakshatra yoga karana graha navagraha rashi rahu kaal hora prahar sunrise kundali chakra sanatan",
+  kw:"vedic clock vaidik ghadi 3d earth prithvi brahmand muhurta muhurat ghati pala vipala panchang panchanga tithi nakshatra yoga karana graha navagraha rashi rahu kaal hora prahar sunrise kundali chakra sanatan",
   ex:["अहिले कुन मुहूर्त, होरा र राहुकाल? ग्रहहरू कुन राशिमा?","Which muhurta, hora and Rahu kaal now? Where are the grahas?"],
   html:function(){
     return '<div class="vdtop"><select class="hcl-sel" id="vdLoc" aria-label="'+L("स्थान","Place")+'">'
@@ -3478,11 +3486,13 @@ var TOOLS = [
       + '<div class="vdnow" id="vdNow"></div></div>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("आजको पञ्चाङ्ग","Today's panchang")+'</div><div class="vdx" id="vdPan"></div>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("ग्रह-नक्षत्र चक्र (भचक्र)","Graha-nakshatra wheel (Bhachakra)")+'</div>'
-      + '<div class="bcwrap"><div class="bc" id="vdChakra"></div><div class="bcaya" id="vdAya"></div></div>'
+      + '<div class="chips u3tab" id="u3v"><button class="chip" data-u3v="3" aria-pressed="'+(U3.v === 3)+'">🌍 '+L("३D ब्रह्माण्ड","3D view")+'</button>'
+      + '<button class="chip" data-u3v="2" aria-pressed="'+(U3.v === 2)+'">☸ '+L("भचक्र","Wheel")+'</button></div>' + u3Html()
+      + '<div class="bcwrap" id="bcw"'+(U3.v === 3 ? ' hidden' : '')+'><div class="bc" id="vdChakra"></div></div><div class="bcaya" id="vdAya"></div>'
       + '<div class="vdx" id="vdGr"></div>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("दिनका समय","Times of the day")+'</div><div class="vdx" id="vdDay"></div>'
-      + '<div class="note" style="margin-top:10px">ℹ️ '+L("वैदिक समय: एक दिन सूर्योदयदेखि अर्को सूर्योदयसम्म — दिनका १५ र रातका १५ मुहूर्त (३० मुहूर्त = अहोरात्र; १ मुहूर्त = ३० कला, १ कला = ३० काष्ठा — मनुस्मृति १.६४; उज्जैनको विक्रमादित्य वैदिक घडीले पनि ३० मुहूर्त गन्छ)। इष्टकाल: ६० घडी = एक दिन (१ घडी ≈ २४ मिनेट, १ पला ≈ २४ सेकेन्ड)। मुहूर्तका नाम परम्परागत सूचीअनुसार (ग्रन्थअनुसार केही फरक छन्)। ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात; सूर्योदय: NOAA सूत्र (±१ मिनेट)। होरा: वारको स्वामीबाट शनि–गुरु–मङ्गल–सूर्य–शुक्र–बुध–चन्द्र क्रम; राहुकाल, यमगण्ड, गुलिक: दिनको आठ भागमध्ये वारअनुसारको भाग। स्थानीय पात्रोसँग केही मिनेट फरक पर्न सक्छ — धार्मिक साइतका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
-          "Vedic time: a day runs from sunrise to the next sunrise — 15 day and 15 night muhurtas (30 muhurtas = one day-night; 1 muhurta = 30 kala, 1 kala = 30 kashtha — Manusmriti 1.64; Ujjain's Vikramaditya Vedic Clock also counts 30 muhurtas). Ishtakaal: 60 ghati = one day (1 ghati ≈ 24 min, 1 pala ≈ 24 s). Muhurta names follow the traditional list (texts differ a little). Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node; sunrise: NOAA equations (±1 min). Hora: from the weekday's lord in the order Saturn–Jupiter–Mars–Sun–Venus–Mercury–Moon; Rahu kaal, Yamaganda, Gulika: the weekday's eighth of the daytime. A local panchang may differ by a few minutes — confirm religious muhurtas with an astrologer.")+'</div>';
+      + '<div class="note" style="margin-top:10px">ℹ️ '+L("वैदिक समय: एक दिन सूर्योदयदेखि अर्को सूर्योदयसम्म — दिनका १५ र रातका १५ मुहूर्त (३० मुहूर्त = अहोरात्र; १ मुहूर्त = ३० कला, १ कला = ३० काष्ठा — मनुस्मृति १.६४; उज्जैनको विक्रमादित्य वैदिक घडीले पनि ३० मुहूर्त गन्छ)। इष्टकाल: ६० घडी = एक दिन (१ घडी ≈ २४ मिनेट, १ पला ≈ २४ सेकेन्ड)। मुहूर्तका नाम परम्परागत सूचीअनुसार (ग्रन्थअनुसार केही फरक छन्)। ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात; सूर्योदय: NOAA सूत्र (±१ मिनेट)। ३D: बीचमा पृथ्वी आफ्नो २३.४° झुकेको अक्षमा नाक्षत्र समयअनुसार घुम्छ (सूर्यतिरको आधा दिन, रातो थोप्लो = छानिएको स्थान); वरिपरि ग्रहहरू परम्परागत भूकेन्द्रीय कक्षा-क्रममा (चन्द्र, बुध, शुक्र, सूर्य, मङ्गल, गुरु, शनि, अनि नक्षत्र मण्डल) आफ्नो वास्तविक राशि-अंशमा — दूरी र आकार नापअनुसार होइनन्; चन्द्रको कक्षा ५.१° झुकेको (देखिने गरी २.५ गुणा बढाइएको), राहु–केतु त्यसका पात। होरा: वारको स्वामीबाट शनि–गुरु–मङ्गल–सूर्य–शुक्र–बुध–चन्द्र क्रम; राहुकाल, यमगण्ड, गुलिक: दिनको आठ भागमध्ये वारअनुसारको भाग। स्थानीय पात्रोसँग केही मिनेट फरक पर्न सक्छ — धार्मिक साइतका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
+          "Vedic time: a day runs from sunrise to the next sunrise — 15 day and 15 night muhurtas (30 muhurtas = one day-night; 1 muhurta = 30 kala, 1 kala = 30 kashtha — Manusmriti 1.64; Ujjain's Vikramaditya Vedic Clock also counts 30 muhurtas). Ishtakaal: 60 ghati = one day (1 ghati ≈ 24 min, 1 pala ≈ 24 s). Muhurta names follow the traditional list (texts differ a little). Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node; sunrise: NOAA equations (±1 min). 3D: the Earth in the middle turns on its 23.4° axis by sidereal time (the half facing the Sun is day; the red dot is the chosen place); around it the grahas sit in the traditional geocentric order of spheres (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn, then the nakshatra mandala) at their real sidereal longitudes — distances and sizes are not to scale; the Moon's orbit is tilted 5.1° (drawn 2.5× for visibility) with Rahu and Ketu at its nodes. Hora: from the weekday's lord in the order Saturn–Jupiter–Mars–Sun–Venus–Mercury–Moon; Rahu kaal, Yamaganda, Gulika: the weekday's eighth of the daytime. A local panchang may differ by a few minutes — confirm religious muhurtas with an astrologer.")+'</div>';
   },
   init:function(){
     VD.V = null; vdTick(Date.now());
@@ -3490,7 +3500,7 @@ var TOOLS = [
       VD.loc = +e.target.value; try{ localStorage.setItem("ganak_vloc", String(VD.loc)); }catch(err){}
       VD.V = null; vdTick(Date.now());
     });
-    wcTilt($("#vdDial")); clockStart();
+    wcTilt($("#vdDial")); u3Init(); clockStart();
   },
   share:function(){
     var now = Date.now(), loc = VLOC[VD.loc], V = vedDay(now, loc), T = vedTime(now, V), P = VD.P || panchang(now), G = P.G, tn = tithiName(P.ti);
@@ -3825,7 +3835,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v9.7 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v9.8 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4873,6 +4883,7 @@ function clockTick(){
   if(hw && hw.offsetParent){ any = true; p = zoneNow(WC.z, now); handsTo(hw, p.h, p.mi, p.s); if(tick) hwText(now); }
   var hv = document.getElementById("hvDial"); if(hv && hv.offsetParent){ any = true; if(tick) hvTick(now); }
   var vd = document.getElementById("vdDial"); if(vd && vd.offsetParent){ any = true; if(tick) vdTick(now); }
+  var u3 = document.getElementById("u3c"); if(u3 && u3.offsetParent && U3.vis){ any = true; u3Frame(now); }
   CLK.sec = sec; CLK.raf = any ? requestAnimationFrame(clockTick) : 0;
 }
 
@@ -5046,6 +5057,219 @@ function chakraSvg(G, rv, nkOn){   /* भचक्र: 27 nakshatra + 12 rashi r
       + '<text class="bcgt" x="'+p[0]+'" y="'+(+p[1] + 4)+'">'+(LANG ? GRN[k][1].slice(0, 2) : GRN[k][2])+'</text>';
   });
   return h + '</svg>';
+}
+/* ---- ३D भचक्र: the Earth in the middle, turning on its 23.44° axis by sidereal time (the half facing the
+   Sun lit, the chosen place marked), and around it the grahas in the traditional geocentric order of their
+   spheres — Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn, then the nakshatra mandala — each at its sidereal
+   longitude from grahas(); the Moon's orbit tilted 5.1° (drawn ×2.5) with Rahu and Ketu at its nodes.
+   Sizes and distances are not to scale. Canvas only: drag to turn, tap a graha; time can run fast. ---- */
+var U3_LAND = [
+ [-168,65,-163,70,-150,71,-140,70,-128,70,-117,69,-105,68,-95,71,-88,68,-82,66,-80,63,-90,59,-85,55,-79,52,-77,59,-71,61,-65,60,-61,56,-56,52,-60,47,-66,45,-70,42,-75,39,-76,35,-81,31,-80,26,-82,26,-83,29,-89,30,-94,29,-97,26,-97,22,-94,18,-91,19,-90,21,-87,21,-88,16,-84,15,-83,10,-80,9,-77,8,-80,7,-83,8,-86,11,-88,13,-92,14,-96,16,-105,20,-106,23,-109,24,-112,29,-114,31,-114,28,-110,23,-112,24,-115,28,-117,32,-121,35,-124,40,-124,47,-127,50,-131,55,-137,59,-142,60,-148,61,-152,59,-158,57,-164,55,-158,59,-162,60,-166,62],
+ [-125,72,-118,76,-100,79,-90,81,-70,83,-62,82,-75,78,-80,74,-90,72,-102,70,-115,71],
+ [-55,60,-43,60,-38,65,-25,69,-20,75,-18,81,-30,83,-55,82,-70,79,-62,76,-56,73,-53,68,-51,64],
+ [-24,64,-14,64,-13,66,-22,67],
+ [-80,9,-76,11,-72,12,-63,11,-58,7,-52,5,-50,1,-44,-2,-35,-5,-35,-9,-39,-14,-40,-21,-45,-24,-48,-26,-53,-34,-57,-36,-58,-39,-63,-41,-65,-45,-68,-50,-69,-55,-72,-54,-75,-50,-74,-42,-73,-37,-71,-30,-70,-18,-76,-14,-81,-6,-80,-1,-78,2,-78,7],
+ [-17,21,-17,14,-15,11,-12,8,-8,4,-2,5,5,6,9,4,10,-1,12,-5,13,-9,12,-17,15,-27,18,-34,22,-34,27,-33,32,-29,35,-24,36,-18,40,-15,40,-10,39,-5,41,-1,43,1,48,5,51,11,44,11,43,12,39,16,37,21,35,24,34,27,32,31,29,31,25,32,20,31,15,32,10,34,11,37,3,37,-2,35,-6,36,-10,30,-13,27,-16,24],
+ [44,-25,47,-25,50,-15,49,-12,44,-16],
+ [-9,37,-9,43,-2,43,-1,46,-4,48,2,51,5,53,8,54,8,57,10,59,5,58,5,62,10,64,14,67,20,70,28,71,33,69,40,67,44,68,50,68,55,69,60,70,68,73,73,72,80,73,88,75,98,77,105,78,112,75,120,73,130,72,140,72,150,71,160,70,170,70,180,69,180,65,177,62,170,60,163,60,162,56,160,54,156,51,155,57,150,59,142,59,137,55,140,52,141,48,138,45,135,43,131,43,129,40,128,38,129,35,126,35,126,38,124,40,121,40,122,37,119,35,121,32,122,30,120,26,117,23,113,22,110,21,108,21,106,18,109,15,109,12,105,9,104,10,100,13,100,8,102,6,104,1,101,3,98,8,98,13,98,16,94,18,92,21,90,22,87,21,85,19,82,16,80,13,80,10,77,8,76,10,74,15,73,19,72,21,70,23,67,25,62,25,57,26,56,24,59,22,57,19,52,16,45,13,43,15,42,18,39,21,37,25,35,28,34,31,35,33,36,36,32,36,28,37,27,40,26,40,23,38,21,40,19,42,15,44,12,45,13,42,16,41,18,40,16,38,12,38,12,44,8,44,4,43,3,42,1,41,-1,38,-2,37,-5,36],
+ [-6,50,2,51,1,53,-2,56,-2,58,-5,59,-6,57,-5,55,-3,54,-5,52], [-10,52,-6,52,-6,55,-8,55,-10,54],
+ [130,31,132,34,135,34,140,35,141,38,142,40,141,43,145,44,142,46,140,42,139,39,136,37,133,35,130,34], [80,6,82,7,81,9,80,9],
+ [95,5,98,4,104,-2,106,-6,104,-6,101,-3,97,1], [105,-7,115,-8,114,-7,106,-6], [109,2,113,4,117,7,119,5,118,1,116,-4,111,-3,109,-1],
+ [119,-5,121,-1,125,1,122,-4], [120,18,122,18,124,13,126,8,124,6,122,9,121,13], [131,-1,138,-2,141,-3,147,-6,150,-10,143,-9,138,-8,135,-4],
+ [114,-22,117,-20,122,-17,126,-14,130,-12,133,-11,137,-12,136,-15,140,-17,142,-11,144,-14,146,-19,149,-21,153,-25,153,-29,151,-34,150,-37,146,-39,141,-38,138,-35,135,-35,131,-31,125,-33,118,-35,115,-34,115,-29,113,-26],
+ [145,-41,148,-41,147,-43], [172,-34,175,-37,178,-38,175,-41,171,-44,167,-46,169,-46,172,-41,174,-41], [-85,22,-80,23,-74,20,-78,20], [-74,18,-74,20,-69,20,-68,18],
+ [-59,47,-53,47,-53,51,-56,51], [120,22,122,25,121,25], [142,46,144,49,143,54,142,53], [52,71,58,71,68,77,60,76], [11,77,18,77,27,80,16,80], [-68,-66,-57,-63,-60,-66,-62,-70] ];
+function u3Land(){   /* 2°×2° land mask (rows lat 90→-90, columns lon -180→180) from the outlines above; south of 66°S is Antarctica */
+  var m = new Uint8Array(180*90), i, j, k;
+  for(i = 0; i < 90; i++) for(j = 0; j < 180; j++){
+    var lat = 89 - 2*i, lon = -179 + 2*j, c = lat < -66;
+    for(k = 0; k < U3_LAND.length && !c; k++){ var p = U3_LAND[k], n = p.length, a, b;
+      for(a = 0, b = n - 2; a < n; b = a, a += 2)
+        if((p[a+1] > lat) !== (p[b+1] > lat) && lon < (p[b] - p[a])*(lat - p[a+1])/(p[b+1] - p[a+1]) + p[a]) c = !c; }
+    m[i*180 + j] = c ? 1 : 0;
+  }
+  return m;
+}
+var U3 = {v:3, az:-2.3, el:.5, sp:1, t:0, w:0, gm:0, G:null, Gt:0, auto:true, idle:0, drag:null, pick:"", hit:[], it:0, tt:"", land:null, bk:{}, n:0, stars:null, vis:true, cam:null, f:""};
+try{ U3.v = localStorage.getItem("ganak_u3v") === "2" ? 2 : 3; }catch(e){}
+var U3_K = {mo:[.34,.036], me:[.43,.022], ve:[.52,.028], su:[.62,.065], ma:[.71,.025], ju:[.8,.044], sa:[.89,.036], ra:[.34,.02], ke:[.34,.02]};   /* sphere radius, ball size (the ring is 1) */
+var U3_SP = [[1,"● अहिले","● Now"],[3600,"⏩ १ घण्टा/से","⏩ 1 h/s"],[86400,"⏩ १ दिन/से","⏩ 1 day/s"],[2592000,"⏩ १ महिना/से","⏩ 1 month/s"],[0,"⏸","⏸"]];
+function gmst(ms){ return grRev(280.46061837 + 360.98564736629*(ms/864e5 - 10957.5)); }   /* Greenwich mean sidereal time, degrees (Meeus 12.4, leading terms) */
+function u3Html(){
+  return '<div class="u3" id="u3"'+(U3.v === 3 ? '' : ' hidden')+'><canvas id="u3c" role="img" aria-label="'+L("३D: बीचमा घुम्ने पृथ्वी र वरिपरि नवग्रह","3D: the Earth turning in the middle, the nine grahas around it")+'"></canvas>'
+    + '<div class="chips" id="u3s">'+U3_SP.map(function(s){ return '<button class="chip" data-u3s="'+s[0]+'" aria-pressed="'+(s[0] === U3.sp)+'">'+L(s[1], s[2])+'</button>'; }).join("")+'</div>'
+    + '<div class="u3t" id="u3t"></div><div class="u3i" id="u3i"></div></div>';
+}
+function u3View(){   /* 3D view or the flat wheel */
+  $("#u3").hidden = U3.v !== 3; $("#bcw").hidden = U3.v === 3;
+  [].forEach.call($("#u3v").children, function(c){ c.setAttribute("aria-pressed", String(+c.dataset.u3v === U3.v)); });
+  clockStart();
+}
+function u3Init(){
+  var cv = $("#u3c"); U3.w = 0; U3.G = null;
+  $("#u3v").addEventListener("click", function(e){ var b = e.target.closest("[data-u3v]"); if(!b) return;
+    U3.v = +b.dataset.u3v; try{ localStorage.setItem("ganak_u3v", String(U3.v)); }catch(err){} u3View(); });
+  U3.auto = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if(window.IntersectionObserver) new IntersectionObserver(function(e){ U3.vis = e[0].isIntersecting; if(U3.vis) clockStart(); }).observe(cv);
+  $("#u3s").addEventListener("click", function(e){ var b = e.target.closest("[data-u3s]"); if(!b) return;
+    U3.sp = +b.dataset.u3s; if(U3.sp === 1) U3.t = Date.now();
+    [].forEach.call(this.children, function(c){ c.setAttribute("aria-pressed", String(c === b)); }); });
+  cv.addEventListener("pointerdown", function(e){ U3.drag = {x:e.clientX, y:e.clientY, az:U3.az, el:U3.el, m:false}; try{ cv.setPointerCapture(e.pointerId); }catch(err){} });
+  cv.addEventListener("pointermove", function(e){ var d = U3.drag; if(!d) return;
+    var dx = e.clientX - d.x, dy = e.clientY - d.y; if(Math.abs(dx) + Math.abs(dy) > 6) d.m = true;
+    U3.az = d.az - dx*.008; U3.el = Math.max(.2, Math.min(1.45, d.el + dy*.006)); });
+  function up(e){ var d = U3.drag; U3.drag = null; U3.idle = Date.now() + 4000; if(!d || d.m || e.type !== "pointerup") return;
+    var r = cv.getBoundingClientRect(), k = cv.width/r.width, x = (e.clientX - r.left)*k, y = (e.clientY - r.top)*k, best = "", bd = 1e9;
+    U3.hit.forEach(function(h){ var q = Math.hypot(h[1] - x, h[2] - y) - h[3]; if(q < 14*k && q < bd){ bd = q; best = h[0]; } });
+    U3.pick = best === U3.pick ? "" : best; U3.it = 0; }
+  cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+}
+function u3Ball(x, sx, sy, pr, tex){   /* a sphere drawn pixel by pixel: tex(world normal) fills U3.c with r, g, b */
+  var R = Math.ceil(pr) + 1, S = 2*R, cam = U3.cam, c = U3.c || (U3.c = [0, 0, 0]), o = U3.bk[S];
+  if(!o){ if(++U3.n > 12){ U3.bk = {}; U3.n = 1; }   /* one small canvas per size, reused frame to frame */
+    var cc = document.createElement("canvas"); cc.width = cc.height = S; o = U3.bk[S] = {c:cc, x:cc.getContext("2d")}; o.i = o.x.createImageData(S, S); }
+  var d = o.i.data;
+  for(var py = 0; py < S; py++){ var ny = (R - py - .5)/pr;
+    for(var px = 0; px < S; px++){ var nx = (px + .5 - R)/pr, q = nx*nx + ny*ny, i = (py*S + px)*4;
+      if(q >= 1){ d[i+3] = 0; continue; }
+      var nz = Math.sqrt(1 - q);
+      tex(nx*cam.r[0] + ny*cam.u[0] + nz*cam.b[0], nx*cam.r[1] + ny*cam.u[1] + nz*cam.b[1], ny*cam.u[2] + nz*cam.b[2]);
+      d[i] = c[0]; d[i+1] = c[1]; d[i+2] = c[2]; d[i+3] = Math.min(255, (1 - Math.sqrt(q))*pr*255);   /* soft 1-px rim */
+    } }
+  o.x.putImageData(o.i, 0, 0); x.drawImage(o.c, sx - R, sy - R);
+}
+function u3Frame(now){
+  var cv = document.getElementById("u3c"), dpr = Math.min(2, window.devicePixelRatio || 1);
+  var W = Math.round(cv.clientWidth*dpr), H = Math.round(cv.clientHeight*dpr), x = cv.getContext("2d");
+  if(!W || !H) return;
+  if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; }
+  var dt = U3.w ? Math.min(now - U3.w, 100) : 0; U3.w = now;
+  if(U3.sp === 1) U3.t = now; else U3.t += dt*U3.sp;
+  if(!U3.drag && U3.auto && now > U3.idle) U3.az += dt*.00006;   /* the view drifts round once in ~1¾ min */
+  var T = U3.t, rd = Math.PI/180;
+  if(!U3.G || Math.abs(T - U3.Gt) > (U3.sp === 1 ? 6e4 : 0)){ U3.G = grahas(T); U3.Gt = T; }
+  if(!U3.land) U3.land = u3Land();
+  /* faster than a day a second the turning would only flicker, so the Earth is shown turning once a second */
+  U3.gm = U3.sp > 86400 ? grRev(U3.gm + dt*.36) : gmst(T);
+  var G = U3.G, ca = Math.cos(U3.az), sa = Math.sin(U3.az), ce = Math.cos(U3.el), se = Math.sin(U3.el), Dc = 3.3;
+  var C = [Dc*ce*ca, Dc*ce*sa, Dc*se], Rv = [-sa, ca, 0], Fw = [-ce*ca, -ce*sa, -se], Uv = [-se*ca, -se*sa, ce];
+  var foc = W*.45*Dc/1.12, cx = W/2, cy = H*.52, f = U3.f || (U3.f = getComputedStyle(document.documentElement).getPropertyValue("--fs") || "sans-serif");
+  U3.cam = {r:Rv, u:Uv, b:[-Fw[0], -Fw[1], -Fw[2]]};
+  function P(px, py, pz){ var vx = px - C[0], vy = py - C[1], vz = pz - C[2], z = vx*Fw[0] + vy*Fw[1] + vz*Fw[2], s = foc/z;
+    return [cx + (vx*Rv[0] + vy*Rv[1])*s, cy - (vx*Uv[0] + vy*Uv[1] + vz*Uv[2])*s, z, s]; }
+  function pos(k){ var r = U3_K[k][0], l = G.sid[k]*rd, b = k === "mo" ? 5.145*2.5*Math.sin((G.sid.mo - G.sid.ra)*rd)*rd : 0;
+    return [r*Math.cos(b)*Math.cos(l), r*Math.cos(b)*Math.sin(l), r*Math.sin(b)]; }
+  var sl = G.sid.su*rd, SUN = [Math.cos(sl), Math.sin(sl), 0], items = [], LB = [], i, j;
+  function lab(t, lx, ly, ly2, col){   /* a name under a ball, moved above it if it would sit on a nearer one's name */
+    x.font = "700 "+Math.round(10*dpr)+"px "+f; x.textAlign = "center";
+    var w = x.measureText(t).width, h = 11*dpr, y = ly;
+    function hit(yy){ return LB.some(function(b){ return Math.abs(b[0] - lx) < (b[2] + w)/2 && Math.abs(b[1] - yy) < h; }); }
+    [ly, ly2, ly + h, ly2 - h].some(function(c){ if(!hit(c)){ y = c; return true; } });
+    LB.push([lx, y, w]); x.fillStyle = col; x.shadowColor = "rgba(0,0,0,.9)"; x.shadowBlur = 3*dpr; x.fillText(t, lx, y); x.shadowBlur = 0;
+  }
+  /* space and stars (on a far sphere, so they turn with the view) */
+  var bg = x.createRadialGradient(cx, cy, 0, cx, cy, W*.75); bg.addColorStop(0, "#14204A"); bg.addColorStop(1, "#03050F");
+  x.fillStyle = bg; x.fillRect(0, 0, W, H);
+  if(!U3.stars){ U3.stars = []; var sd = 7; for(i = 0; i < 170; i++){ sd = (sd*16807) % 2147483647; var u1 = sd/2147483647; sd = (sd*16807) % 2147483647; var u2 = sd/2147483647;
+    var zz = 2*u1 - 1, th = 2*Math.PI*u2, rr = Math.sqrt(1 - zz*zz); U3.stars.push([7*rr*Math.cos(th), 7*rr*Math.sin(th), 7*zz, .3 + (i % 5)/6]); } }
+  U3.stars.forEach(function(s){ var p = P(s[0], s[1], s[2]); if(p[2] > .5 && p[0] > 0 && p[0] < W && p[1] > 0 && p[1] < H){ x.fillStyle = "rgba(255,255,255,"+s[3]+")"; x.fillRect(p[0], p[1], dpr*(s[3] > .8 ? 1.6 : 1), dpr*(s[3] > .8 ? 1.6 : 1)); } });
+  /* the nakshatra mandala: 12 rashi in a band (gold, alternate shades), 27 nakshatra ticks, the Moon's nakshatra lit */
+  var nkOn = Math.floor(G.sid.mo/(360/27));
+  for(i = 0; i < 72; i++) (function(i){
+    var a0 = i*5*rd, a1 = (i + 1)*5*rd, q = [P(Math.cos(a0), Math.sin(a0), 0), P(Math.cos(a1), Math.sin(a1), 0), P(1.12*Math.cos(a1), 1.12*Math.sin(a1), 0), P(1.12*Math.cos(a0), 1.12*Math.sin(a0), 0)];
+    items.push([(q[0][2] + q[2][2])/2, function(){ x.beginPath(); x.moveTo(q[0][0], q[0][1]); x.lineTo(q[1][0], q[1][1]); x.lineTo(q[2][0], q[2][1]); x.lineTo(q[3][0], q[3][1]); x.closePath();
+      x.fillStyle = Math.floor(i/6) % 2 ? "rgba(245,179,1,.30)" : "rgba(245,179,1,.17)"; x.fill();
+      if(i % 6 === 0){ x.strokeStyle = "rgba(255,213,74,.8)"; x.lineWidth = dpr; x.beginPath(); x.moveTo(q[0][0], q[0][1]); x.lineTo(q[3][0], q[3][1]); x.stroke(); } }]);
+  })(i);
+  for(i = 0; i < 27; i++) (function(i){
+    var a = i*360/27*rd, p1 = P(.95*Math.cos(a), .95*Math.sin(a), 0), p2 = P(Math.cos(a), Math.sin(a), 0), on = i === nkOn;
+    var b0 = P(.9*Math.cos(a + 6.67*rd), .9*Math.sin(a + 6.67*rd), 0);
+    items.push([p1[2], function(){ x.strokeStyle = "rgba(232,236,245,.45)"; x.lineWidth = dpr; x.beginPath(); x.moveTo(p1[0], p1[1]); x.lineTo(p2[0], p2[1]); x.stroke();
+      if(on){ x.beginPath(); for(var t = 0; t <= 8; t++){ var aa = a + t*360/27/8*rd, pp = P(.975*Math.cos(aa), .975*Math.sin(aa), 0); t ? x.lineTo(pp[0], pp[1]) : x.moveTo(pp[0], pp[1]); }
+        x.strokeStyle = "#FFD54A"; x.lineWidth = 3*dpr*p1[3]/foc*Dc; x.stroke();
+        x.font = "700 "+Math.round(9*dpr)+"px "+f; x.fillStyle = "#FFE7A3"; x.textAlign = "center"; x.fillText(L(NAK_AB[i][0], NAK_AB[i][1]), b0[0], b0[1] + 3*dpr); } }]);
+  })(i);
+  for(i = 0; i < 12; i++) (function(i){
+    var a = (i*30 + 15)*rd, p = P(1.06*Math.cos(a), 1.06*Math.sin(a), 0), sz = Math.round(10.5*dpr*p[3]/foc*Dc);
+    items.push([p[2] - .01, function(){ x.font = "800 "+sz+"px "+f; x.textAlign = "center"; x.textBaseline = "middle";
+      var t = L(RASHI[i][0], RASHI[i][1].split(" ")[0]); LB.push([p[0], p[1] + 4*dpr, x.measureText(t).width]);
+      x.fillStyle = "rgba(255,213,74,"+(p[2] < Dc ? 1 : .6)+")"; x.fillText(t, p[0], p[1]); x.textBaseline = "alphabetic"; }]);
+  })(i);
+  /* the spheres (kakshya) of the grahas; the Moon's one tilted, crossing the ecliptic at Rahu and Ketu */
+  ["mo","me","ve","su","ma","ju","sa"].forEach(function(k){
+    var r = U3_K[k][0], pts = [];
+    for(j = 0; j <= 96; j++){ var a = j*3.75*rd, b = k === "mo" ? 5.145*2.5*Math.sin(a - G.sid.ra*rd)*rd : 0; pts.push(P(r*Math.cos(b)*Math.cos(a), r*Math.cos(b)*Math.sin(a), r*Math.sin(b))); }
+    for(j = 0; j < 96; j += 4) (function(s){ items.push([s[2][2], function(){ x.beginPath(); x.moveTo(s[0][0], s[0][1]); for(var t = 1; t < s.length; t++) x.lineTo(s[t][0], s[t][1]);
+      x.strokeStyle = k === "mo" ? "rgba(203,213,225,.5)" : k === "su" ? "rgba(253,184,19,.45)" : "rgba(147,197,253,.22)"; x.lineWidth = dpr; x.stroke(); }]); })(pts.slice(j, j + 5));
+  });
+  /* the grahas */
+  U3.hit = [];
+  GR_ORD.forEach(function(k){
+    var w = pos(k), p = P(w[0], w[1], w[2]), pr = U3_K[k][1]*p[3], col = GRN[k][3];
+    items.push([p[2], function(){
+      if(k === "su"){ var g = x.createRadialGradient(p[0], p[1], pr*.3, p[0], p[1], pr*4); g.addColorStop(0, "rgba(255,200,60,.55)"); g.addColorStop(1, "rgba(255,160,0,0)");
+        x.fillStyle = g; x.beginPath(); x.arc(p[0], p[1], pr*4, 0, 7); x.fill();
+        g = x.createRadialGradient(p[0] - pr*.3, p[1] - pr*.3, 0, p[0], p[1], pr); g.addColorStop(0, "#FFF8DC"); g.addColorStop(.5, "#FDB813"); g.addColorStop(1, "#F08C00");
+        x.fillStyle = g; x.beginPath(); x.arc(p[0], p[1], pr, 0, 7); x.fill(); }
+      else if(k === "mo") u3Ball(x, p[0], p[1], pr, function(a, b, c){ var l = a*SUN[0] + b*SUN[1], v = l > 0 ? 40 + 190*l : 40; U3.c[0] = v; U3.c[1] = v; U3.c[2] = v + 8; });
+      else if(k === "ra" || k === "ke"){ x.fillStyle = "#1F2937"; x.strokeStyle = col; x.lineWidth = 1.5*dpr; x.beginPath(); x.arc(p[0], p[1], pr, 0, 7); x.fill(); x.stroke(); }
+      else {
+        var Lx = SUN[0]*.62 - w[0], Ly = SUN[1]*.62 - w[1], Lz = -w[2], ln = Math.hypot(Lx, Ly, Lz) || 1, hx = (Lx*Rv[0] + Ly*Rv[1])/ln, hy = (Lx*Uv[0] + Ly*Uv[1] + Lz*Uv[2])/ln;
+        var ring = k === "sa" ? [] : null, t;
+        if(ring) for(t = 0; t <= 48; t++){ var aa = t*7.5*rd; ring.push(P(w[0] + .07*Math.cos(aa), w[1] + .07*Math.sin(aa)*.9, w[2] + .07*Math.sin(aa)*.42)); }
+        var half = function(back){ x.beginPath(); var on = false; for(var t = 0; t < ring.length; t++){ var q = ring[t], b = q[2] > p[2]; if(b === back){ on ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); on = true; } else on = false; }
+          x.strokeStyle = "rgba(226,201,140,.85)"; x.lineWidth = 2.2*dpr; x.stroke(); };
+        if(ring) half(true);
+        var g2 = x.createRadialGradient(p[0] + hx*pr*.45, p[1] - hy*pr*.45, pr*.1, p[0], p[1], pr*1.05);
+        g2.addColorStop(0, "#FFFBEA"); g2.addColorStop(.3, col); g2.addColorStop(1, "#0B0F1E");
+        x.fillStyle = g2; x.beginPath(); x.arc(p[0], p[1], pr, 0, 7); x.fill();
+        if(ring) half(false);
+      }
+      lab(L(GRN[k][0], GRN[k][1]), p[0], p[1] + pr + 11*dpr, p[1] - pr - 5*dpr, U3.pick === k ? "#FFD54A" : "rgba(255,255,255,.92)");
+      if(U3.pick === k){ x.strokeStyle = "#FFD54A"; x.lineWidth = 1.5*dpr; x.beginPath(); x.arc(p[0], p[1], pr + 4*dpr, 0, 7); x.stroke(); } }]);
+    U3.hit.push([k, p[0], p[1], pr]);
+  });
+  /* the Earth: land, sea and ice by latitude/longitude, turned by sidereal time; lit by the Sun; the place marked */
+  var A = G.aya*rd, cA = Math.cos(A), sA = Math.sin(A), cE = Math.cos(23.4393*rd), sE = Math.sin(23.4393*rd), gm = U3.gm*rd;
+  var loc = VLOC[VD.loc], la = loc[2]*rd, lo = loc[3]*rd, cut = Math.cos(3.4*rd), lnd = U3.land;
+  var E = P(0, 0, 0), er = .15*E[3];
+  var qe = [Math.cos(la)*Math.cos(lo + gm), Math.cos(la)*Math.sin(lo + gm), Math.sin(la)], qy = qe[1]*cE + qe[2]*sE;   /* the place: equatorial → ecliptic → sidereal */
+  var Q = [qe[0]*cA + qy*sA, -qe[0]*sA + qy*cA, -qe[1]*sE + qe[2]*cE];
+  var NP = [sE*sA, sE*cA, cE];   /* the north pole of the Earth's axis */
+  items.push([Dc, function(){
+    x.shadowColor = "rgba(96,165,250,.8)"; x.shadowBlur = 14*dpr; x.fillStyle = "#0B1E4A"; x.beginPath(); x.arc(E[0], E[1], er, 0, 7); x.fill(); x.shadowBlur = 0;
+    u3Ball(x, E[0], E[1], er, function(a, b, c){
+      var l = a*SUN[0] + b*SUN[1], x1 = a*cA - b*sA, y1 = a*sA + b*cA, ye = y1*cE - c*sE, ze = y1*sE + c*cE;
+      var lon = Math.atan2(ye, x1) - gm, lat = Math.asin(ze), dl = Math.cos(lat)*Math.cos(la)*Math.cos(lon - lo) + Math.sin(lat)*Math.sin(la);
+      var LA = lat/rd, LO = ((lon/rd) % 360 + 540) % 360 - 180, o = U3.c, k;
+      var ld = lnd[Math.min(89, Math.floor((90 - LA)/2))*180 + Math.min(179, Math.floor((LO + 180)/2))];
+      if(dl > cut){ o[0] = 255; o[1] = 59; o[2] = 48; return; }
+      if(ld && Math.abs(LA) > 62 || Math.abs(LA) > 78){ o[0] = 232; o[1] = 240; o[2] = 248; } else if(ld){ o[0] = 86; o[1] = 150; o[2] = 62; } else { o[0] = 30; o[1] = 92; o[2] = 186; }
+      k = l > 0 ? .3 + .7*Math.min(1, l*1.5) : .3*Math.max(0, 1 + l*5);
+      o[0] = o[0]*k + 5*(1 - k); o[1] = o[1]*k + 9*(1 - k); o[2] = o[2]*k + 30*(1 - k);
+    });
+    [1, -1].forEach(function(sg){ var a1 = P(NP[0]*.15*sg, NP[1]*.15*sg, NP[2]*.15*sg), a2 = P(NP[0]*.24*sg, NP[1]*.24*sg, NP[2]*.24*sg);
+      x.strokeStyle = sg > 0 ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.4)"; x.lineWidth = 1.5*dpr; x.beginPath(); x.moveTo(a1[0], a1[1]); x.lineTo(a2[0], a2[1]); x.stroke(); });
+    if(Q[0]*U3.cam.b[0] + Q[1]*U3.cam.b[1] + Q[2]*U3.cam.b[2] > .2){ var m = P(Q[0]*.15, Q[1]*.15, Q[2]*.15);
+      x.fillStyle = "#FFE4E1"; x.textAlign = "left"; x.shadowColor = "rgba(0,0,0,.9)"; x.shadowBlur = 3*dpr; x.fillText(L(loc[0], loc[1]), m[0] + 6*dpr, m[1] - 4*dpr); x.shadowBlur = 0; }
+  }]);
+  U3.hit.push(["earth", E[0], E[1], er]);
+  items.sort(function(a, b){ return b[0] - a[0]; }).forEach(function(it){ it[1](); });
+  lab(L("पृथ्वी","Earth"), E[0], E[1] + er + 12*dpr, E[1] - er - 10*dpr, U3.pick === "earth" ? "#FFD54A" : "#BFDBFE");   /* last, so the Moon never hides it */
+  /* the time shown and the tapped graha */
+  var tt = (U3.sp === 1 ? L("● अहिले · ","● Now · ") : "") + u3When(T);
+  if(tt !== U3.tt){ U3.tt = tt; $("#u3t").textContent = tt; }
+  if(now - U3.it > 500){ U3.it = now; $("#u3i").textContent = u3Info(T, Q, SUN); }
+}
+function u3When(T){ var p = tzParts("Asia/Kathmandu", T), b = p && adToBs(p.y, p.m, p.d);
+  return (b ? L("वि.सं. ","BS ")+npd(b.y)+" "+bsM(b.m-1)+" "+npd(b.d) : p ? p.y+"-"+pad2(p.m)+"-"+pad2(p.d) : "") + " · " + npTime(T); }
+function u3Info(T, Q, S){
+  var k = U3.pick, G = U3.G;
+  if(k === "earth"){ var loc = VLOC[VD.loc], up = Q[0]*S[0] + Q[1]*S[1] + Q[2]*S[2];
+    return L("पृथ्वी — ","Earth — ")+L(loc[0], loc[1])+": "+(up > 0 ? L("☀️ दिन","☀️ day") : L("🌙 रात","🌙 night"))+L(" · अक्ष २३.४° झुकेको · २३ घण्टा ५६ मिनेटमा एक फन्को"," · axis tilted 23.4° · one turn in 23 h 56 min"); }
+  if(k && G){ var lon = G.sid[k], n = Math.floor(lon/(360/27));
+    return L(GRN[k][0], GRN[k][1])+" — "+L(RASHI[Math.floor(lon/30)][0], RASHI[Math.floor(lon/30)][1].split(" ")[0])+" "+degTxt(lon)+" · "+L(NAK[n][0], NAK[n][1])+" "+L("पद ","pada ")+npd(Math.floor((lon % (360/27))/(360/108)) + 1); }
+  return L("👆 तानेर घुमाउनुहोस् · ग्रह वा पृथ्वी छोए विवरण","👆 Drag to turn · tap a graha or the Earth");
 }
 var VD = {loc:0, last:0, P:null, V:null};
 try{ VD.loc = Math.min(VLOC.length - 1, Math.max(0, parseInt(localStorage.getItem("ganak_vloc") || "0", 10) || 0)); }catch(e){}

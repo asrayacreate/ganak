@@ -1,4 +1,4 @@
-var C="ganak-v9-7", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
+var C="ganak-v9-8", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
