@@ -1086,6 +1086,8 @@ body[data-theme="dark"] .vsv.s{color:#86EFAC}body[data-theme="dark"] .vsv.a{colo
 .sg{font-style:normal;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:7px;vertical-align:1px;white-space:nowrap}
 .sg.s{background:#DCFCE7;color:#166534}.sg.a{background:#FEE2E2;color:#991B1B}.sg.n{background:#FEF3C7;color:#92400E}
 .vbar{padding:12px 14px 13px;border-top:1px solid var(--ol)}
+.psait{margin-top:10px;border:1px solid var(--ol);border-radius:14px;background:var(--card);overflow:hidden}
+.psk{padding:9px 14px 0;font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.45}.psait .vbar{border-top:0}
 .vbar-t{position:relative;display:flex;height:16px;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 .vbar-t b{height:100%}.vbar-t b.s{background:#22C55E}.vbar-t b.n{background:#FBBF24}.vbar-t b.a{background:#EF4444}
 .vbar-now{position:absolute;top:-3px;bottom:-3px;width:3px;margin-left:-1.5px;background:var(--ink);border-radius:2px;box-shadow:0 0 0 1.5px var(--card)}
@@ -3513,8 +3515,8 @@ var TOOLS = [
       + '<div class="bcwrap" id="bcw"'+(U3.v !== 2 ? ' hidden' : '')+'><div class="bc" id="vdChakra"></div></div><div class="bcaya" id="vdAya"></div>'
       + '<div class="vdx" id="vdGr"></div>'
       + '<div class="eyebrow" style="margin-top:16px">'+L("दिनका समय","Times of the day")+'</div><div class="vdx" id="vdDay"></div>'
-      + '<div class="note" style="margin-top:10px">ℹ️ '+L("वैदिक समय: एक दिन सूर्योदयदेखि अर्को सूर्योदयसम्म — दिनका १५ र रातका १५ मुहूर्त (३० मुहूर्त = अहोरात्र; १ मुहूर्त = ३० कला, १ कला = ३० काष्ठा — मनुस्मृति १.६४; उज्जैनको विक्रमादित्य वैदिक घडीले पनि ३० मुहूर्त गन्छ)। इष्टकाल: ६० घडी = एक दिन (१ घडी ≈ २४ मिनेट, १ पला ≈ २४ सेकेन्ड)। मुहूर्तका नाम परम्परागत सूचीअनुसार (ग्रन्थअनुसार केही फरक छन्)। ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात; सूर्योदय: NOAA सूत्र (±१ मिनेट)। ३D: बीचमा पृथ्वी आफ्नो २३.४° झुकेको अक्षमा नाक्षत्र समयअनुसार घुम्छ (सूर्यतिरको आधा दिन, रातो थोप्लो = छानिएको स्थान); वरिपरि ग्रहहरू परम्परागत भूकेन्द्रीय कक्षा-क्रममा (चन्द्र, बुध, शुक्र, सूर्य, मङ्गल, गुरु, शनि, अनि नक्षत्र मण्डल) आफ्नो वास्तविक राशि-अंशमा — दूरी र आकार नापअनुसार होइनन्; चन्द्रको कक्षा ५.१° झुकेको (देखिने गरी २.५ गुणा बढाइएको), राहु–केतु त्यसका पात। पञ्चाङ्ग ५D: पाँचै अङ्ग कोणबाट — तिथि = (चन्द्र − सूर्य) ÷ १२°, करण = त्यसको आधा (÷ ६°), नक्षत्र = चन्द्र ÷ १३°२०′, योग = (सूर्य + चन्द्र) ÷ १३°२०′, वार = सूर्योदयदेखि सूर्योदयसम्म (वारेश ग्रह)। ३D आकाश: छानिएको स्थानको आकाशमा आजको सूर्यको बाटो — दिनका १५ मुहूर्त क्षितिजमाथि, रातका १५ मुनि (घडीमा जस्तै), शङ्कुको छाया, र पूर्वी क्षितिजमा उदाउँदै गरेको राशि = लग्न (tan λ = cos θ ÷ −(sin θ cos ε + tan φ sin ε), θ = स्थानीय नाक्षत्र समय)। शुभाशुभ: मुहूर्त — बी. भी. रमणको ‘मुहूर्त’ (दिनका १, २, ४, १०, ११, १२, १५ अशुभ; विधि सोम/शुक्रबार र अर्यमा आइतबार अशुभ) र प्रचलित तालिका (रातका गिरीश, अजपाद, यम अशुभ; बाँकी केहीको नियम नभेटिएकाले ‘सामान्य’); चौघडिया — दिनका ८ र रातका ८ भाग, Drik Panchang को तालिकाजस्तै (अमृत, शुभ, लाभ शुभ; चर सामान्य; उद्वेग, रोग, काल अशुभ); होरा — बृहत्पाराशर होराशास्त्र ३.११ अनुसार सौम्य (गुरु, शुक्र, बुध, शुक्ल पक्षको चन्द्र) वा क्रूर ग्रह; राहुकाल, यमगण्ड, गुलिक चलिरहेको बेला अशुभ। यो परम्परागत नियमको सामान्य जानकारी मात्र हो। होरा: वारको स्वामीबाट शनि–गुरु–मङ्गल–सूर्य–शुक्र–बुध–चन्द्र क्रम; राहुकाल, यमगण्ड, गुलिक: दिनको आठ भागमध्ये वारअनुसारको भाग। स्थानीय पात्रोसँग केही मिनेट फरक पर्न सक्छ — धार्मिक साइतका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
-          "Vedic time: a day runs from sunrise to the next sunrise — 15 day and 15 night muhurtas (30 muhurtas = one day-night; 1 muhurta = 30 kala, 1 kala = 30 kashtha — Manusmriti 1.64; Ujjain's Vikramaditya Vedic Clock also counts 30 muhurtas). Ishtakaal: 60 ghati = one day (1 ghati ≈ 24 min, 1 pala ≈ 24 s). Muhurta names follow the traditional list (texts differ a little). Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node; sunrise: NOAA equations (±1 min). 3D: the Earth in the middle turns on its 23.4° axis by sidereal time (the half facing the Sun is day; the red dot is the chosen place); around it the grahas sit in the traditional geocentric order of spheres (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn, then the nakshatra mandala) at their real sidereal longitudes — distances and sizes are not to scale; the Moon's orbit is tilted 5.1° (drawn 2.5× for visibility) with Rahu and Ketu at its nodes. Panchang 5D: all five limbs from the angles — tithi = (Moon − Sun) ÷ 12°, karana = half of it (÷ 6°), nakshatra = Moon ÷ 13°20′, yoga = (Sun + Moon) ÷ 13°20′, vaar = sunrise to sunrise (its lord graha). 3D sky: today's path of the Sun over the chosen place — the 15 day muhurtas above the horizon and the 15 night ones below it (as on the dial), a gnomon's shadow, and the sign rising on the eastern horizon = lagna (tan λ = cos θ ÷ −(sin θ cos ε + tan φ sin ε), θ = local sidereal time). Good or not: muhurta — B. V. Raman, ‘Muhurtha’ (day muhurtas 1, 2, 4, 10, 11, 12, 15 inauspicious; Vidhi on Monday/Friday and Aryama on Sunday inauspicious) and the common table (at night Girisha, Ajapada, Yama inauspicious; a few with no rule found are shown as ‘neutral’); choghadiya — 8 parts of the day and 8 of the night, as in Drik Panchang's tables (Amrit, Shubh, Labh good; Char neutral; Udveg, Rog, Kaal avoid); hora — benefic (Jupiter, Venus, Mercury, waxing Moon) or malefic lord as in Brihat Parashara Hora Shastra 3.11; Rahu kaal, Yamaganda and Gulika avoided while running. General traditional guidance only. Hora: from the weekday's lord in the order Saturn–Jupiter–Mars–Sun–Venus–Mercury–Moon; Rahu kaal, Yamaganda, Gulika: the weekday's eighth of the daytime. A local panchang may differ by a few minutes — confirm religious muhurtas with an astrologer.")+'</div>';
+      + '<div class="note" style="margin-top:10px">ℹ️ '+L("वैदिक समय: एक दिन सूर्योदयदेखि अर्को सूर्योदयसम्म — दिनका १५ र रातका १५ मुहूर्त (३० मुहूर्त = अहोरात्र; १ मुहूर्त = ३० कला, १ कला = ३० काष्ठा — मनुस्मृति १.६४; उज्जैनको विक्रमादित्य वैदिक घडीले पनि ३० मुहूर्त गन्छ)। इष्टकाल: ६० घडी = एक दिन (१ घडी ≈ २४ मिनेट, १ पला ≈ २४ सेकेन्ड)। मुहूर्तका नाम परम्परागत सूचीअनुसार (ग्रन्थअनुसार केही फरक छन्)। ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात; सूर्योदय: NOAA सूत्र (±१ मिनेट)। ३D: बीचमा पृथ्वी आफ्नो २३.४° झुकेको अक्षमा नाक्षत्र समयअनुसार घुम्छ (सूर्यतिरको आधा दिन, रातो थोप्लो = छानिएको स्थान); वरिपरि ग्रहहरू परम्परागत भूकेन्द्रीय कक्षा-क्रममा (चन्द्र, बुध, शुक्र, सूर्य, मङ्गल, गुरु, शनि, अनि नक्षत्र मण्डल) आफ्नो वास्तविक राशि-अंशमा — दूरी र आकार नापअनुसार होइनन्; चन्द्रको कक्षा ५.१° झुकेको (देखिने गरी २.५ गुणा बढाइएको), राहु–केतु त्यसका पात। पञ्चाङ्ग ५D: पाँचै अङ्ग कोणबाट — तिथि = (चन्द्र − सूर्य) ÷ १२°, करण = त्यसको आधा (÷ ६°), नक्षत्र = चन्द्र ÷ १३°२०′, योग = (सूर्य + चन्द्र) ÷ १३°२०′, वार = सूर्योदयदेखि सूर्योदयसम्म (वारेश ग्रह)। ३D आकाश: छानिएको स्थानको आकाशमा आजको सूर्यको बाटो — दिनका १५ मुहूर्त क्षितिजमाथि, रातका १५ मुनि (घडीमा जस्तै), शङ्कुको छाया, र पूर्वी क्षितिजमा उदाउँदै गरेको राशि = लग्न (tan λ = cos θ ÷ −(sin θ cos ε + tan φ sin ε), θ = स्थानीय नाक्षत्र समय)। शुभाशुभ: मुहूर्त — बी. भी. रमणको ‘मुहूर्त’ (दिनका १, २, ४, १०, ११, १२, १५ अशुभ; विधि सोम/शुक्रबार र अर्यमा आइतबार अशुभ) र प्रचलित तालिका (रातका गिरीश, अजपाद, यम अशुभ; बाँकी केहीको नियम नभेटिएकाले ‘सामान्य’); चौघडिया — दिनका ८ र रातका ८ भाग, Drik Panchang को तालिकाजस्तै (अमृत, शुभ, लाभ शुभ; चर सामान्य; उद्वेग, रोग, काल अशुभ); होरा — बृहत्पाराशर होराशास्त्र ३.११ अनुसार सौम्य (गुरु, शुक्र, बुध, शुक्ल पक्षको चन्द्र) वा क्रूर ग्रह; राहुकाल, यमगण्ड, गुलिक र भद्रा (विष्टि करण) चलिरहेको बेला अशुभ। यो परम्परागत नियमको सामान्य जानकारी मात्र हो। होरा: वारको स्वामीबाट शनि–गुरु–मङ्गल–सूर्य–शुक्र–बुध–चन्द्र क्रम; राहुकाल, यमगण्ड, गुलिक: दिनको आठ भागमध्ये वारअनुसारको भाग। स्थानीय पात्रोसँग केही मिनेट फरक पर्न सक्छ — धार्मिक साइतका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
+          "Vedic time: a day runs from sunrise to the next sunrise — 15 day and 15 night muhurtas (30 muhurtas = one day-night; 1 muhurta = 30 kala, 1 kala = 30 kashtha — Manusmriti 1.64; Ujjain's Vikramaditya Vedic Clock also counts 30 muhurtas). Ishtakaal: 60 ghati = one day (1 ghati ≈ 24 min, 1 pala ≈ 24 s). Muhurta names follow the traditional list (texts differ a little). Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node; sunrise: NOAA equations (±1 min). 3D: the Earth in the middle turns on its 23.4° axis by sidereal time (the half facing the Sun is day; the red dot is the chosen place); around it the grahas sit in the traditional geocentric order of spheres (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn, then the nakshatra mandala) at their real sidereal longitudes — distances and sizes are not to scale; the Moon's orbit is tilted 5.1° (drawn 2.5× for visibility) with Rahu and Ketu at its nodes. Panchang 5D: all five limbs from the angles — tithi = (Moon − Sun) ÷ 12°, karana = half of it (÷ 6°), nakshatra = Moon ÷ 13°20′, yoga = (Sun + Moon) ÷ 13°20′, vaar = sunrise to sunrise (its lord graha). 3D sky: today's path of the Sun over the chosen place — the 15 day muhurtas above the horizon and the 15 night ones below it (as on the dial), a gnomon's shadow, and the sign rising on the eastern horizon = lagna (tan λ = cos θ ÷ −(sin θ cos ε + tan φ sin ε), θ = local sidereal time). Good or not: muhurta — B. V. Raman, ‘Muhurtha’ (day muhurtas 1, 2, 4, 10, 11, 12, 15 inauspicious; Vidhi on Monday/Friday and Aryama on Sunday inauspicious) and the common table (at night Girisha, Ajapada, Yama inauspicious; a few with no rule found are shown as ‘neutral’); choghadiya — 8 parts of the day and 8 of the night, as in Drik Panchang's tables (Amrit, Shubh, Labh good; Char neutral; Udveg, Rog, Kaal avoid); hora — benefic (Jupiter, Venus, Mercury, waxing Moon) or malefic lord as in Brihat Parashara Hora Shastra 3.11; Rahu kaal, Yamaganda, Gulika and Bhadra (Vishti karana) avoided while running. General traditional guidance only. Hora: from the weekday's lord in the order Saturn–Jupiter–Mars–Sun–Venus–Mercury–Moon; Rahu kaal, Yamaganda, Gulika: the weekday's eighth of the daytime. A local panchang may differ by a few minutes — confirm religious muhurtas with an astrologer.")+'</div>';
   },
   init:function(){
     VD.V = null; vdTick(Date.now());
@@ -3861,7 +3863,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v10.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v10.2 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4668,9 +4670,16 @@ function patroBanner(anim){
     + '<div class="pchips">'+chips.join("")+'</div></div></div>'
     + (up.length ? '<div class="pnext"><span class="pnk">'+L("आउँदै गरेका","Coming up")+'</span>' + up.map(function(u){
         return '<button data-pgo="'+u.y+'-'+u.m+'-'+u.d+'">'+evKind(u.k)[0]+' '+esc(L(u.ne, u.en))+' <em>'+esc(relDays(u.days))+'</em></button>'; }).join("")+'</div>' : '')
+    + patroSait(a)
     + '<div class="pact">'+(D.diff >= 0 ? '<button class="mini" id="pRem">🔔 '+L("रिमाइन्डर राख्ने","Set a reminder")+'</button>' : '')
     + '<button class="mini" id="pShare">💬 '+L("यो दिन पठाउने","Share this day")+'</button></div>';
   if(anim && !RMQ.matches){ el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); }
+}
+function patroV(a){ return vedDay(Date.UTC(a.y, a.m-1, a.d, 6, 15), VLOC[VD.loc]); }   /* 12:00 in Nepal → that day, sunrise to sunrise */
+function patroSait(a){   /* the chosen day's panchang at sunrise and its शुभाशुभ bar, for the Vedic clock's place */
+  var loc = VLOC[VD.loc], V = patroV(a), A = angas(grahas(V.rise));
+  return '<div class="psait"><div class="psk">🕉️ '+L("सूर्योदयमा: ","At sunrise: ")+L("योग ","Yoga ")+esc(L(YOGA[A.yg][0], YOGA[A.yg][1]))+' · '+L("करण ","Karana ")+esc(L(KARANA[A.kr][0], KARANA[A.kr][1]))
+    + ' · 📍 '+esc(L(loc[0], loc[1]))+'</div>'+dayBar(V, Date.now())+'</div>';
 }
 function patroDayText(){
   var s = PSEL || TB, D = patroDay(s), a = D.a, A = ["📅 Ganak — " + L("नेपाली पात्रो","Nepali Patro"), "─────────────",
@@ -4678,6 +4687,7 @@ function patroDayText(){
     "🌙 " + L(D.tn[0], D.tn[1]) + " · " + L("नक्षत्र ","Nakshatra ") + L(D.nk[0], D.nk[1])];
   D.ev.forEach(function(h){ var k = evKind(h[2]); A.push(k[0] + " " + L(h[3], h[4]) + " — " + k[1]); });
   if(a.wd === 6) A.push(L("शनिबार — साप्ताहिक बिदा","Saturday — weekly holiday"));
+  var g = goodTimes(patroV(a)); if(g.length) A.push("✓ " + L("शुभ समय (","Good times (") + L(VLOC[VD.loc][0], VLOC[VD.loc][1]) + "): " + g.join(", "));
   A.push("─────────────", "Powered by PRERAK MULTIPURPOSE PVT LTD · Hetauda");
   return A.join("\n");
 }
@@ -4884,7 +4894,7 @@ function hvTick(now){   /* Home's Vedic clock: muhurta : kala : kashtha, its nam
   document.getElementById("hvP").textContent = HV.txt + " · " + L(WDN[HV.V.wd], WDNE[HV.V.wd]);
   var e = document.getElementById("hvS");
   if(now - HV.sat > 30000 || !e.firstChild){ HV.sat = now;   /* what it says now, as on the Vedic clock's card (also after Home is redrawn) */
-    var k = judge(now, HV.V), bad = badAt(now, HV.V), ch = CHOG[chogAt(now, HV.V).c];
+    var k = judge(now, HV.V), bad = badAt(now, HV.V, true), ch = CHOG[chogAt(now, HV.V).c];
     e.className = "hcl-s " + k;
     e.textContent = k === "a" ? "⚠️ " + (bad ? bad[0] + L(" · "+npTime(bad[1])+" सम्म", " · till "+npTime(bad[1])) : L("अशुभ समय","Not a good time"))
       : (k === "s" ? "✓ " + L("शुभ समय","Good time") : "◐ " + L("सामान्य समय","Ordinary time")) + " · " + L(ch[0], ch[1]) + L(" चौघडिया"," choghadiya");
@@ -5044,18 +5054,20 @@ function chogAt(t, V){   /* the choghadiya at time t: its index in CHOG and its 
   var day = t < V.set, a = day ? V.rise : V.set, l = ((day ? V.set : V.next) - a)/8, k = Math.max(0, Math.min(7, Math.floor((t - a)/l)));
   return {c:day ? (V.wd + 5*k) % 7 : (V.wd + 4 + 4*k) % 7, s:a + k*l, e:a + (k + 1)*l};
 }
-function badAt(t, V){   /* राहुकाल, यमगण्ड or गुलिक running at t: [name, end] */
+function badAt(t, V, end){   /* राहुकाल, यमगण्ड, गुलिक or भद्रा (विष्टि करण) running at t: [name, end — for भद्रा only when asked] */
   var l = (V.set - V.rise)/8, r = null;
   [[RAHU8,"राहुकाल","Rahu kaal"],[YAMA8,"यमगण्ड","Yamaganda"],[GULI8,"गुलिक काल","Gulika kaal"]].forEach(function(w){
     var a = V.rise + (w[0][V.wd] - 1)*l; if(!r && t >= a && t < a + l) r = [L(w[1], w[2]), a + l]; });
-  return r;
+  if(r) return r;
+  var ph = phaseAt(t), kn = Math.floor(ph/6);
+  return kn >= 1 && kn <= 56 && (kn - 1) % 7 === 6 ? [L("भद्रा (विष्टि करण)","Bhadra (Vishti karana)"), end ? angAt(phaseAt, t + (6*(kn+1) - ph)/12.19*864e5, 6*(kn+1) % 360, 12.19) : 0] : null;
 }
 function lagnaTrop(ms, lat, lon){   /* the ecliptic point rising in the east: tan λ = cos θ / −(sin θ cos ε + tan φ sin ε), θ = local sidereal time */
   var r = Math.PI/180, th = (gmst(ms) + lon)*r, e = 23.4393*r;
   return grRev(Math.atan2(Math.cos(th), -(Math.sin(th)*Math.cos(e) + Math.tan(lat*r)*Math.sin(e)))/r);
 }
 function lagna(ms, lat, lon){ return grRev(lagnaTrop(ms, lat, lon) - ayanamsa(ms)); }
-function judge(t, W){   /* the plain verdict at t (W = its Vedic day): "a" avoid — Rahu/Yama/Gulika, or muhurta and choghadiya both bad;
+function judge(t, W){   /* the plain verdict at t (W = its Vedic day): "a" avoid — Rahu/Yama/Gulika/Bhadra, or muhurta and choghadiya both bad;
                            "s" good — neither, muhurta not bad and choghadiya Amrit/Shubh/Labh; "n" ordinary otherwise */
   var bad = badAt(t, W), q = muQ(vedTime(t, W).mu, W.wd), c = CHOG[chogAt(t, W).c][2];
   return bad || (q === "a" && c === 0) ? "a" : q !== "a" && c === 2 ? "s" : "n";
@@ -5063,23 +5075,27 @@ function judge(t, W){   /* the plain verdict at t (W = its Vedic day): "a" avoid
 function judgeEdge(a, b, W){   /* where judge() changes between a and b (2 min apart): halve 12 times, to about 30 ms */
   var k = judge(a, W); for(var i = 0; i < 12; i++){ var m = (a + b)/2; if(judge(m, W) === k) a = m; else b = m; } return b;
 }
-function dayBar(now){   /* the whole Vedic day, sunrise to sunrise, coloured by judge() every 2 min, with "now" marked */
-  var V = VD.V, key = V.rise + "|" + VD.loc, span = V.next - V.rise, i;
+function dayRuns(V){   /* a Vedic day as runs of the same verdict [k, start, end], judged every 2 min (cached for one day and place) */
+  var key = V.rise + "|" + VD.loc;
   if(!VD.tl || VD.tl.k !== key){ var runs = [], t, k;
     for(t = V.rise; t < V.next; t += 12e4){ k = judge(t, V);
       if(runs.length && runs[runs.length - 1][0] === k) runs[runs.length - 1][2] = t + 12e4;
       else { var c = runs.length ? judgeEdge(t - 12e4, t, V) : t; if(runs.length) runs[runs.length - 1][2] = c; runs.push([k, c, t + 12e4]); } }
     runs[runs.length - 1][2] = V.next; VD.tl = {k:key, runs:runs}; }
+  return VD.tl.runs;
+}
+function goodTimes(V){ return dayRuns(V).filter(function(r){ return r[0] === "s" && r[2] - r[1] >= 6e5; }).map(function(r){ return npTime(r[1])+"–"+npTime(r[2]); }); }   /* 10 min or more */
+function dayBar(V, now){   /* a whole Vedic day V, sunrise to sunrise, coloured green / amber / red, with "now" marked if inside */
+  var span = V.next - V.rise, good = goodTimes(V);
   function pc(t){ return ((t - V.rise)/span*100).toFixed(2)+"%"; }
-  var good = VD.tl.runs.filter(function(r){ return r[0] === "s" && r[2] - r[1] >= 6e5; }).map(function(r){ return npTime(r[1])+"–"+npTime(r[2]); });
-  return '<div class="vbar"><div class="vbar-t">'+VD.tl.runs.map(function(r){ return '<b class="'+r[0]+'" style="width:'+((r[2] - r[1])/span*100).toFixed(2)+'%"></b>'; }).join("")
-    + '<i class="vbar-now" style="left:'+pc(now)+'"></i></div>'
+  return '<div class="vbar"><div class="vbar-t">'+dayRuns(V).map(function(r){ return '<b class="'+r[0]+'" style="width:'+((r[2] - r[1])/span*100).toFixed(2)+'%"></b>'; }).join("")
+    + (now >= V.rise && now < V.next ? '<i class="vbar-now" style="left:'+pc(now)+'"></i>' : '')+'</div>'
     + '<div class="vbar-l"><span>🌅 '+npTime(V.rise)+'</span><span style="left:'+pc(V.set)+'">🌇 '+npTime(V.set)+'</span><span class="r">🌅 '+npTime(V.next)+'</span></div>'
     + '<div class="vbar-k"><i class="sg s">'+L("शुभ","good")+'</i><i class="sg n">'+L("सामान्य","neutral")+'</i><i class="sg a">'+L("अशुभ","avoid")+'</i></div>'
-    + (good.length ? '<div class="vbar-g">✓ '+L("आजका शुभ समय: ","Good times today: ")+good.join(" · ")+'</div>' : '')+'</div>';
+    + (good.length ? '<div class="vbar-g">✓ '+(now >= V.rise && now < V.next ? L("आजका शुभ समय: ","Good times today: ") : L("यस दिनका शुभ समय: ","Good times this day: "))+good.join(" · ")+'</div>' : '')+'</div>';
 }
 function vdSay(now){   /* each factor with its शुभ/अशुभ mark, a plain verdict, and the next good time */
-  var V = VD.V, loc = VLOC[VD.loc], T = vedTime(now, V), q = muQ(T.mu, V.wd), C = chogAt(now, V), ch = CHOG[C.c], bad = badAt(now, V);
+  var V = VD.V, loc = VLOC[VD.loc], T = vedTime(now, V), q = muQ(T.mu, V.wd), C = chogAt(now, V), ch = CHOG[C.c], bad = badAt(now, V, true);
   var wax = angas(VD.P.G).ti < 15, hq = /ju|ve|me/.test(T.horaLord) || (T.horaLord === "mo" && wax) ? "s" : "a";
   var lg = lagna(now, loc[2], loc[3]), lr = Math.floor(lg/30), le = now, i;
   for(i = 0; i < 120 && Math.floor(lagna(le, loc[2], loc[3])/30) === lr; i++) le += 12e4;   /* till the next rashi rises (about 2 h) */
@@ -5098,9 +5114,9 @@ function vdSay(now){   /* each factor with its शुभ/अशुभ mark, a pl
     + vdRow(L("होरा","Hora"), esc(L(GRN[T.horaLord][0], GRN[T.horaLord][1]))+Q[hq], hq === "s" ? L("सौम्य ग्रह","benefic lord") : L("क्रूर ग्रह","malefic lord"))
     + vdRow(L("लग्न (उदाउँदो राशि)","Lagna (rising sign)"), esc(L(RASHI[lr][0], RASHI[lr][1].split(" ")[0]))+" "+degTxt(lg),
         L("स्वामी ","lord ")+esc(L(GRN[RASHI_LORD[lr]][0], GRN[RASHI_LORD[lr]][1]))+" · "+L(npTime(le)+" सम्म", "till "+npTime(le)))
-    + vdRow(L("राहुकाल · यमगण्ड · गुलिक","Rahu · Yama · Gulika"), bad ? esc(bad[0])+Q.a : L("अहिले छैन","not now")+" ✓")
+    + vdRow(L("राहुकाल · यमगण्ड · गुलिक · भद्रा","Rahu · Yama · Gulika · Bhadra"), bad ? esc(bad[0])+Q.a : L("अहिले छैन","not now")+" ✓", bad ? L(npTime(bad[1])+" सम्म", "till "+npTime(bad[1])) : "")
     + (nx ? vdRow(good ? L("शुभ समय सकिने","Good time ends") : L("अर्को शुभ समय","Next good time"), npTime(nx), good ? "" : L("चौघडिया र मुहूर्त दुवै शुभ हुँदा","when choghadiya and muhurta are both good")) : "")
-    + dayBar(now);
+    + dayBar(V, now);
 }
 function panchang(now){
   var G = grahas(now), s = G.sid, A = angas(G), ph = A.ph, yo = A.yo, kn = A.kn, N = 360/27;
