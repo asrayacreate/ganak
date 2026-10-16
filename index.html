@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ganak">
 <meta property="og:title" content="Ganak — नेपाली हिसाब: निर्माण, जग्गा, सुन, EMI, पात्रो">
-<meta property="og:description" content="५४ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
+<meta property="og:description" content="५५ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
 <meta property="og:url" content="https://asrayacreate.github.io/ganak/">
 <meta property="og:image" content="https://asrayacreate.github.io/ganak/icon-512.png">
 <meta property="og:image:width" content="512"><meta property="og:image:height" content="512">
@@ -1086,6 +1086,12 @@ body[data-theme="dark"] .vsv.s{color:#86EFAC}body[data-theme="dark"] .vsv.a{colo
 .sg{font-style:normal;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:7px;vertical-align:1px;white-space:nowrap}
 .sg.s{background:#DCFCE7;color:#166534}.sg.a{background:#FEE2E2;color:#991B1B}.sg.n{background:#FEF3C7;color:#92400E}
 .vbar{padding:12px 14px 13px;border-top:1px solid var(--ol)}
+.kchart{display:flex;justify-content:center;margin:2px 0 12px}
+.ksvg{width:min(92vw,340px);height:auto;background:var(--card);border-radius:16px;box-shadow:var(--m1)}
+.ksvg rect,.ksvg path{fill:none;stroke:#C79A4B;stroke-width:1.6}
+.ksvg text{text-anchor:middle;dominant-baseline:central;font-family:var(--fs)}
+.ksvg .kn{font-size:11px;font-weight:700;fill:var(--mute)}.ksvg .kg{font-size:14px;font-weight:800;fill:var(--ink)}
+.ksvg .kl{font-size:9px;font-weight:800;fill:#C62828;letter-spacing:.5px}
 .psait{margin-top:10px;border:1px solid var(--ol);border-radius:14px;background:var(--card);overflow:hidden}
 .psk{padding:9px 14px 0;font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.45}.psait .vbar{border-top:0}
 .vbar-t{position:relative;display:flex;height:16px;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
@@ -1530,6 +1536,11 @@ function rupeeWords(x){                                 /* "… रुपैय�
            ew.charAt(0).toUpperCase()+ew.slice(1)+" rupees"+(ps>0 ? " and "+enWords(ps)+" paisa" : "")+" only" ];
 }
 
+var VLOC = [   /* place, latitude, longitude */
+  ["काठमाडौं","Kathmandu",27.7172,85.3240],["पोखरा","Pokhara",28.2096,83.9856],["विराटनगर","Biratnagar",26.4525,87.2718],
+  ["धरान","Dharan",26.8065,87.2846],["जनकपुर","Janakpur",26.7288,85.9263],["वीरगञ्ज","Birgunj",27.0104,84.8770],
+  ["हेटौंडा","Hetauda",27.4287,85.0322],["भरतपुर","Bharatpur",27.6833,84.4333],["बुटवल","Butwal",27.7006,83.4483],
+  ["नेपालगञ्ज","Nepalgunj",28.0500,81.6167],["वीरेन्द्रनगर","Birendranagar",28.6019,81.6339],["धनगढी","Dhangadhi",28.6833,80.6000] ];
 var TOOLS = [
 
 /* ---------------- 1. सिसा / झ्याल ---------------- */
@@ -3541,6 +3552,32 @@ var TOOLS = [
   }},
 
 /* ---------------- विश्व घडी (v8.8) ---------------- */
+/* ---------------- जन्म कुण्डली (चिना) (v10.3) ---------------- */
+{ id:"kundali", cat:"np", ic:"🪔", neu:true,
+  nm:["जन्म कुण्डली (चिना)","Birth chart (Kundali)"],
+  sb:["लग्न, राशि, नक्षत्र, नाम अक्षर र नवग्रह","Lagna, rashi, nakshatra, name letter & the nine grahas"],
+  kw:"kundali kundli chinna chino cheena janma kundali birth chart horoscope lagna rashi nakshatra naam akshar name letter gana nadi graha jyotish",
+  ex:["जन्म मिति, समय र ठाउँबाट लग्न, राशि, नक्षत्र, नाम अक्षर र कुण्डली चक्र","Lagna, rashi, nakshatra, name letter and the chart from the birth date, time and place"],
+  f:[ {k:"by",l:["जन्म साल","Birth year"],u:"BS",d:TB.y,w:1},
+      {k:"bm",l:["महिना","Month"],t:"s",d:String(TB.m),o:BS_MONTH_OPTS,w:1},
+      {k:"bd",l:["गते","Day"],d:TB.d,w:1},
+      {k:"tm",l:["जन्म समय","Birth time"],t:"time",d:"06:00",w:1},
+      {k:"pl",l:["जन्म स्थान","Birth place"],t:"s",d:"0",o:VLOC.map(function(p, i){ return [String(i), [p[0], p[1]]]; })} ],
+  calc:function(v){
+    var y = n(v.by), m = n(v.bm), d = n(v.bd), tm = /^(\d{1,2}):(\d{2})/.exec(String(v.tm || "")), loc = VLOC[+v.pl] || VLOC[0];
+    if(y < BS_START_YEAR || y > BS_MAX_YEAR) return {err:["साल "+npd(BS_START_YEAR)+" देखि "+npd(BS_MAX_YEAR)+" BS सम्म मात्र मिल्छ।","Year must be between "+BS_START_YEAR+" and "+BS_MAX_YEAR+" BS."]};
+    var dim = bsDaysInMonth(y, m);
+    if(d < 1 || d > dim) return {err:[npd(y)+" "+bsM(m-1)+" मा "+npd(dim)+" गते सम्म मात्र हुन्छ।", bsM(m-1)+" "+y+" has only "+dim+" days."]};
+    if(!tm || +tm[1] > 23) return {err:["जन्म समय हाल्नुहोस् (घण्टा : मिनेट)।","Enter the birth time (hours : minutes)."]};
+    var a = bsToAd(y, m, d); if(!a) return {err:["मिति मिलेन — फेरि हेर्नुहोस्।","That date didn't resolve — please check it."]};
+    var off = Date.UTC(a.y, a.m-1, a.d) < Date.UTC(1986, 0, 1) ? 330 : 345;   /* Nepal's clocks: UTC+5:30 till 1985, UTC+5:45 from 1 Jan 1986 */
+    return kundali(Date.UTC(a.y, a.m-1, a.d, +tm[1], +tm[2]) - off*60000, loc);
+  },
+  post:function(out, box){   /* the chart above the slip */
+    if(!out.chart) return;
+    var c = document.createElement("div"); c.className = "kchart"; c.innerHTML = out.chart; box.insertBefore(c, box.querySelector(".slip") || box.firstChild);
+  }},
+
 { id:"wclock", cat:"util", ic:"🕰️", neu:true, custom:true,
   nm:["विश्व घडी","World Clock"],
   sb:["नेपाल समय ↔ विदेशको समय","Nepal time ↔ world time"],
@@ -3863,7 +3900,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v10.2 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v10.3 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3924,6 +3961,7 @@ digits:["नेपाली (१२३) र अंग्रेजी (123) अ�
 patro:["महिनाभरिको नेपाली पात्रो — हरेक दिनको अंग्रेजी मिति, तिथि, चाडपर्व र सार्वजनिक बिदा।","A month of the Nepali calendar — each day's AD date, tithi, festivals and public holidays."],
 uprice:["फरक साइजका प्याकमध्ये कुन सस्तो — प्रति kg, लिटर वा गोटाको मूल्य।","Which pack size is cheaper — price per kg, litre or piece."],
 stackdisc:["छुटमाथि छुटको वास्तविक प्रतिशत र तिर्ने मूल्य — VAT सहित।","The real percentage of stacked discounts and the final price — with VAT."],
+kundali:["जन्म मिति, समय र ठाउँबाट लग्न, राशि, नक्षत्र-पद, नाम अक्षर, गण-नाडी, इष्टकाल र नवग्रहसहितको कुण्डली चक्र।","From the birth date, time and place: lagna, rashi, nakshatra and pada, name letter, gana and nadi, ishtakaal, and the chart with the nine grahas."],
 vedic:["सनातन (वैदिक) समय — सूर्योदयबाट गनिने मुहूर्त, कला, काष्ठा र घडी–पला; आजको पञ्चाङ्ग, नवग्रहको राशि–नक्षत्र र राहुकाल।","Sanatan (Vedic) time — muhurta, kala, kashtha and ghati–pala counted from sunrise; today's panchang, the nine grahas' signs and nakshatras, and Rahu kaal."],
 wclock:["नेपालको समय र विश्वका सहरको समय — असली जस्तो घडीमा हेर्नुहोस्, वा कुनै समय रोजेर अरू ठाउँमा कति बजे मिलाउनुहोस्।","Nepal time and world cities — on a real-looking watch, or pick a time and convert it."],
 gpa:["NEB (SEE, ११–१२) र TU सेमेस्टरको grade, GPA र CGPA — credit hour सहित।","Grades, GPA and CGPA for NEB (SEE, 11–12) and TU semesters — with credit hours."],
@@ -3981,6 +4019,7 @@ patro:"patro calendar tithi chadparba bida holiday dashain tihar mahina",
 uprice:"ekai mulya unit price sasto tulana pack kg litre",
 stackdisc:"chut mathi chut discount double offer sale",
 gpa:"gpa cgpa grade neb see tu result marks",
+kundali:"kundali kundli chino china chinna cheena janma patrika birth chart lagna rashi nakshatra nachhatra naam akshar gana nadi jyotish",
 vedic:"vaidik vedic ghadi muhurta muhurat sait saait ghati pala bipala panchang patro tithi nakshatra nachhatra graha navagraha rashi rahukal rahu kaal hora prahar sunrise suryodaya kundali jyotish sanatan hindu",
 wclock:"ghadi samay time world clock timezone bajyo dubai qatar saudi kuwait malaysia korea japan usa america uk london australia sydney canada portugal converter israel cyprus malta poland romania croatia germany hong kong bahrain oman new zealand china chin beijing",
 nepse:"nepse share sheyar bonus hakprad right wacc kitta"
@@ -4010,6 +4049,7 @@ function patro(by,bm,bd,uh){   /* Moon's nakshatra / pada / rashi and the tithi 
            rashi:Math.floor(sid/30), ti:Math.floor(grRev(G.trop.mo - G.trop.su)/12) };
 }
 var ICONS = {
+  kundali:'<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 4l16 16M20 4L4 20M12 4l8 8-8 8-8-8z"/><circle cx="12" cy="8" r="1.6" fill="#F5B301" stroke="none"/>',
   vedic:'<path d="M3.5 15.5h17"/><path d="M6.5 15.5a5.5 5.5 0 0 1 11 0" fill="#F5B301" stroke="none"/><path d="M6.5 15.5a5.5 5.5 0 0 1 11 0M12 4.5v2.2M5.2 7.8l1.6 1.4M18.8 7.8l-1.6 1.4M3.5 12.5h2M18.5 12.5h2"/><path d="M8 19h8"/>',
   wclock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 6.8V12l3.4 2.1"/><circle cx="12" cy="12" r="1.5" fill="#F5B301" stroke="none"/><path d="M12 2.2v1.6M12 20.2v1.6M2.2 12h1.6M20.2 12h1.6"/>',
   dhalan:'<rect x="3" y="13.5" width="18" height="4" fill="#F5B301" stroke="none"/><rect x="3" y="13.5" width="18" height="4"/><line x1="6" y1="17.5" x2="6" y2="20.5"/><line x1="18" y1="17.5" x2="18" y2="20.5"/><path d="M7 10.5c1-3 3-4.5 5-4.5s4 1.5 5 4.5"/><line x1="12" y1="3.5" x2="12" y2="6"/>',
@@ -4165,8 +4205,8 @@ function fieldHtml(f, val){
     }).join("") + '</select>';
   } else if(f.t === "ta"){
     inp = '<textarea data-k="'+f.k+'" rows="4" spellcheck="false">'+esc(val)+'</textarea>';
-  } else if(f.t === "date"){
-    inp = '<input type="date" data-k="'+f.k+'" value="'+esc(val)+'">';
+  } else if(f.t === "date" || f.t === "time"){
+    inp = '<input type="'+f.t+'" data-k="'+f.k+'" value="'+esc(val)+'">';
   } else {
     inp = '<input type="number" inputmode="decimal" step="any" enterkeyhint="next" data-k="'+f.k+'" value="'+esc(val)+'">';
     if(isMoney(f)) inp += '<span class="fhint">'+esc(moneyHint(val))+'</span>';
@@ -4985,11 +5025,6 @@ function grahas(ms, lite){
 /* ---- वैदिक घडी: the day runs sunrise → sunrise. 15 day + 15 night मुहूर्त (30 = one day, Manusmriti 1.64:
    30 काष्ठा = 1 कला, 30 कला = 1 मुहूर्त, 30 मुहूर्त = अहोरात्र — the units of the Vikramaditya Vedic Clock, Ujjain);
    इष्टकाल in घडी–पला–विपला (60 घडी a day); प्रहर, होरा, राहुकाल; panchang from the grahas ---- */
-var VLOC = [   /* place, latitude, longitude */
-  ["काठमाडौं","Kathmandu",27.7172,85.3240],["पोखरा","Pokhara",28.2096,83.9856],["विराटनगर","Biratnagar",26.4525,87.2718],
-  ["धरान","Dharan",26.8065,87.2846],["जनकपुर","Janakpur",26.7288,85.9263],["वीरगञ्ज","Birgunj",27.0104,84.8770],
-  ["हेटौंडा","Hetauda",27.4287,85.0322],["भरतपुर","Bharatpur",27.6833,84.4333],["बुटवल","Butwal",27.7006,83.4483],
-  ["नेपालगञ्ज","Nepalgunj",28.0500,81.6167],["वीरेन्द्रनगर","Birendranagar",28.6019,81.6339],["धनगढी","Dhangadhi",28.6833,80.6000] ];
 var MUHURTA = [["रुद्र","Rudra"],["आहि","Ahi"],["मित्र","Mitra"],["पितृ","Pitri"],["वसु","Vasu"],["वाराह","Varaha"],["विश्वेदेव","Vishvedeva"],
   ["विधि (अभिजित्)","Vidhi (Abhijit)"],["सतमुखी","Satamukhi"],["पुरुहूत","Puruhuta"],["वाहिनी","Vahini"],["नक्तनकरा","Naktanakara"],["वरुण","Varuna"],
   ["अर्यमा","Aryama"],["भग","Bhaga"],["गिरीश","Girisha"],["अजपाद","Ajapada"],["अहिर्बुध्न्य","Ahirbudhnya"],["पुष्य","Pushya"],["अश्विनी","Ashvini"],
@@ -5067,6 +5102,52 @@ function lagnaTrop(ms, lat, lon){   /* the ecliptic point rising in the east: ta
   return grRev(Math.atan2(Math.cos(th), -(Math.sin(th)*Math.cos(e) + Math.tan(lat*r)*Math.sin(e)))/r);
 }
 function lagna(ms, lat, lon){ return grRev(lagnaTrop(ms, lat, lon) - ayanamsa(ms)); }
+/* ---- जन्म कुण्डली: grahas, लग्न and the panchang at the birth moment; houses whole-sign (the lagna's rashi is the 1st);
+   name letter (NAK), gana and nadi from the Moon's nakshatra (the traditional अवकहडा tables) ---- */
+var GANA = "DMRMDMDDRRMMDRDRDRRMMDRRMMD", NADI = [0, 1, 2, 2, 1, 0];   /* gana per nakshatra; nadi repeats आदि, मध्य, अन्त्य, अन्त्य, मध्य, आदि */
+function kundali(ms, loc){
+  var G = grahas(ms), A = angas(G), lg = lagna(ms, loc[2], loc[3]), lr = Math.floor(lg/30), V = vedDay(ms, loc), T = vedTime(ms, V), rv = {};
+  var mo = G.sid.mo, mr = Math.floor(mo/30), nk = A.nk, nm = NAK[nk][2].split(","), tn = tithiName(A.ti), N = 360/27;
+  var gana = {D:["देव","Deva"], M:["मनुष्य","Manushya"], R:["राक्षस","Rakshasa"]}[GANA.charAt(nk)], nadi = [["आदि","Adi"],["मध्य","Madhya"],["अन्त्य","Antya"]][NADI[nk % 6]];
+  GR_ORD.forEach(function(k){ rv[k] = k !== "ra" && k !== "ke" && retro(k, ms); });
+  function hs(l){ return (Math.floor(l/30) - lr + 12) % 12; }
+  function rs(l){ return L(RASHI[Math.floor(l/30)][0], RASHI[Math.floor(l/30)][1].split(" ")[0]); }
+  function nkp(l){ var q = Math.floor(l/N); return L(NAK[q][0], NAK[q][1])+" "+npd(Math.floor((l % N)/(N/4)) + 1); }
+  function gn(k){ return L(GRN[k][0], GRN[k][1]); }
+  return { rows:[
+      row(["लग्न","Lagna (ascendant)"], L(RASHI[lr][0], RASHI[lr][1])+" "+degTxt(lg), "", "big nw"),
+      row(["जन्म राशि (चन्द्र)","Rashi (Moon sign)"], L(RASHI[mr][0], RASHI[mr][1])+" "+degTxt(mo), ""),
+      row(["नक्षत्र","Nakshatra"], L(NAK[nk][0], NAK[nk][1])+" · "+L("पद ","pada ")+npd(A.pada + 1), ""),
+      row(["नाम अक्षर","Name letter"], nm[A.pada]+"   ("+nm.join(", ")+")", ""),
+      row(["गण · नाडी","Gana · Nadi"], L(gana[0], gana[1])+" · "+L(nadi[0], nadi[1]), ""),
+      row(["राशीश · लग्नेश","Rashi lord · Lagna lord"], gn(RASHI_LORD[mr])+" · "+gn(RASHI_LORD[lr]), ""),
+      row(["तिथि","Tithi"], L(tn[0], tn[1]), A.ti < 15 ? L("शुक्ल पक्ष","waxing") : L("कृष्ण पक्ष","waning"), "sub"),
+      row(["वार","Vaar"], L(WDN[V.wd], WDNE[V.wd]), L("सूर्योदयदेखि","sunrise to sunrise"), "sub"),
+      row(["योग · करण","Yoga · Karana"], L(YOGA[A.yg][0], YOGA[A.yg][1])+" · "+L(KARANA[A.kr][0], KARANA[A.kr][1]), "", "sub"),
+      row(["इष्टकाल","Ishtakaal"], npd(T.gh)+L(" घडी "," ghati ")+npd(T.pa)+L(" पला"," pala"), L("सूर्योदय ","sunrise ")+npTime(V.rise), "sub"),
+      row(["जन्म स्थान","Birth place"], L(loc[0], loc[1]), "", "sub") ],
+    table:{ title:L("🪐 ग्रह स्थिति","🪐 Graha positions"), sub:L("निरयन · लाहिरी","sidereal · Lahiri"),
+      head:[L("ग्रह","Graha"), L("राशि","Rashi"), L("अंश","Degree"), L("नक्षत्र पद","Nakshatra pada"), L("भाव","House")],
+      rows:[[L("लग्न","Lagna"), rs(lg), degTxt(lg), nkp(lg), npd(1)]].concat(GR_ORD.map(function(k){ var l = G.sid[k];
+        return [gn(k)+(rv[k] ? L(" (वक्री)"," (R)") : ""), rs(l), degTxt(l), nkp(l), npd(hs(l) + 1)]; })) },
+    chart:kChart(lr, function(k){ return hs(G.sid[k]); }, rv),
+    note:["ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात। लग्न: स्थानीय नाक्षत्र समयबाट। भाव: राशि नै भाव — लग्नको राशि पहिलो भाव। जन्म समय नेपाली घडीको: १ जनवरी १९८६ (वि.सं. २०४२ पुस १७) भन्दा अघि UTC+५:३०, त्यसपछि UTC+५:४५ मानिन्छ। नाम अक्षर, गण र नाडी: परम्परागत अवकहडा तालिका (परम्पराअनुसार केही अक्षर फरक हुन सक्छन्)। चक्रमा * = वक्री। यो नेपालका सहरका लागि मात्र; विवाह-मिलान वा ठूला निर्णयका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
+      "Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node. Lagna: from local sidereal time. Houses: whole sign — the lagna's rashi is the 1st. Birth time is Nepal clock time: UTC+5:30 before 1 January 1986 (2042 Poush 17 BS), UTC+5:45 after. Name letter, gana and nadi: the traditional Avakahada tables (some letters differ by tradition). * in the chart = retrograde. For Nepal's cities only; confirm matching or big decisions with an astrologer."] };
+}
+function kChart(lr, hs, rv){   /* North-Indian chart: house 1 (the lagna) at the top, then anticlockwise; each house shows its rashi number and its grahas */
+  var C = [[150,74],[75,30],[30,75],[75,150],[30,225],[75,270],[150,226],[225,270],[270,225],[225,150],[270,75],[225,30]];
+  var M = [[150,128],[75,62],[62,75],[128,150],[62,225],[75,238],[150,172],[225,238],[238,225],[172,150],[238,75],[225,62]];
+  var g = [[],[],[],[],[],[],[],[],[],[],[],[]], i, j;
+  GR_ORD.forEach(function(k){ g[hs(k)].push((LANG ? GRN[k][1].slice(0, 2) : GRN[k][2]) + (rv[k] ? "*" : "")); });
+  var h = '<svg viewBox="0 0 300 300" class="ksvg" role="img" aria-label="'+L("जन्म कुण्डली चक्र","Birth chart")+'"><rect x="1" y="1" width="298" height="298" rx="8"/>'
+    + '<path d="M1 1L299 299M299 1L1 299M150 1L299 150L150 299L1 150Z"/><text class="kl" x="150" y="22">'+L("लग्न","LAGNA")+'</text>';
+  for(i = 0; i < 12; i++){
+    var per = i % 3 ? 2 : 3, lines = Math.ceil(g[i].length/per);
+    h += '<text class="kn" x="'+M[i][0]+'" y="'+M[i][1]+'">'+npd((lr + i) % 12 + 1)+'</text>';
+    for(j = 0; j < lines; j++) h += '<text class="kg" x="'+C[i][0]+'" y="'+(C[i][1] + (j - (lines - 1)/2)*16)+'">'+g[i].slice(j*per, j*per + per).join(" ")+'</text>';
+  }
+  return h + '</svg>';
+}
 function judge(t, W){   /* the plain verdict at t (W = its Vedic day): "a" avoid — Rahu/Yama/Gulika/Bhadra, or muhurta and choghadiya both bad;
                            "s" good — neither, muhurta not bad and choghadiya Amrit/Shubh/Labh; "n" ordinary otherwise */
   var bad = badAt(t, W), q = muQ(vedTime(t, W).mu, W.wd), c = CHOG[chogAt(t, W).c][2];
