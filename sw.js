@@ -1,4 +1,4 @@
-var C="ganak-v10-7", D="ganak-days";   /* D: the "आजको मिति" texts written by the page — kept across versions */
+var C="ganak-v10-8", D="ganak-days", F="ganak-fonts";   /* D: the "आजको मिति" texts written by the page; F: the logo font — both kept across versions */
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
@@ -8,7 +8,7 @@ self.addEventListener("install",function(e){
 });
 self.addEventListener("activate",function(e){
   e.waitUntil(caches.keys().then(function(ks){
-    return Promise.all(ks.filter(function(k){return k!==C&&k!==D;}).map(function(k){return caches.delete(k);}));
+    return Promise.all(ks.filter(function(k){return k!==C&&k!==D&&k!==F;}).map(function(k){return caches.delete(k);}));
   }));
   self.clients.claim();
 });
@@ -31,10 +31,11 @@ self.addEventListener("fetch",function(e){
     return;
   }
   if(/^fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)){
-    /* logo font: cache-first so the header still looks right offline; analytics etc. go straight to network */
+    /* logo font: cache-first so the header still looks right offline, in its own cache so a new version
+       doesn't send every phone back to Google for it; analytics etc. go straight to network */
     e.respondWith(caches.match(req).then(function(hit){
       return hit || fetch(req).then(function(res){
-        var cp=res.clone(); caches.open(C).then(function(c){ c.put(req,cp); });
+        var cp=res.clone(); if(res.ok || res.type==="opaque") caches.open(F).then(function(c){ c.put(req,cp); });   /* the stylesheet comes back opaque (no-cors) */
         return res;
       });
     }));
