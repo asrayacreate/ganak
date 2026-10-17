@@ -1,4 +1,4 @@
-var C="ganak-v10-8", D="ganak-days", F="ganak-fonts";   /* D: the "आजको मिति" texts written by the page; F: the logo font — both kept across versions */
+var C="ganak-v10-9", D="ganak-days", F="ganak-fonts";   /* D: the "आजको मिति" texts written by the page; F: the logo font — both kept across versions */
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(C).then(function(c){
     /* cache:"reload" skips the browser's HTTP cache, so a new version never precaches a stale page */
