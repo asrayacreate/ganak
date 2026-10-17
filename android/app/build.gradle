@@ -4,6 +4,15 @@ plugins {
     id "com.android.application"
 }
 
+/* versionName = the web app's version (its footer: "Ganak v10.5"), so the Play listing never lags behind the
+   site again (it sat at 9.7 while the web was 10.5); -PversionName=… overrides */
+def webVersion = {
+    def f = new File(rootDir, "../index.html")
+    if (!f.exists()) return "0.0"
+    def m = java.util.regex.Pattern.compile("Ganak v(\\d+(?:\\.\\d+)+)").matcher(f.getText("UTF-8"))
+    return m.find() ? m.group(1) : "0.0"
+}()
+
 android {
     namespace "io.github.asrayacreate.twa"
     compileSdk 36
@@ -14,7 +23,7 @@ android {
         targetSdk 36
         /* must be higher than the version now on Play — CI passes 1000 + the run number */
         versionCode((project.findProperty("versionCode") ?: "1000") as int)
-        versionName "10.5"
+        versionName((project.findProperty("versionName") ?: webVersion) as String)
     }
 
     signingConfigs {
