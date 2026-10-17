@@ -3966,7 +3966,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v10.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v10.6 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -4999,23 +4999,35 @@ function hwText(T){
 }
 /* one animation loop turns the hands of every watch on screen; it stops when none is visible
    (restarted by the home screen and the विश्व घडी tool) */
-var CLK = {raf:0, sec:-1}, ZOFF = {};
+var CLK = {raf:0, sec:-1, v:{}, on:{}}, ZOFF = {}, CLK_IDS = ["wcWatch","hwWatch","hvDial","vdDial","u3c"];
+if(window.IntersectionObserver) CLK.io = new IntersectionObserver(function(es){   /* shown or not (a huge margin, so scrolling doesn't count), worked out by the browser */
+  es.forEach(function(e){ var t = e.target;
+    if(e.isIntersecting && t.isConnected) CLK.on[t.id] = t; else { if(CLK.on[t.id] === t) CLK.on[t.id] = null; if(!t.isConnected) CLK.io.unobserve(t); } });
+  clockStart();
+}, {rootMargin:"100000px"});
 function zoneNow(k, now){   /* wall-clock time in zone k (its UTC offset re-read every 30 s — daylight saving) */
   var c = ZOFF[k]; if(!c || now - c[1] > 30000) c = ZOFF[k] = [tzOff(wzOf(k)[6], now), now];
   var t = new Date(now + c[0]*60000);
   return {h:t.getUTCHours(), mi:t.getUTCMinutes(), s:t.getUTCSeconds() + t.getUTCMilliseconds()/1000};
 }
-function clockStart(){ if(typeof CLK === "object" && !CLK.raf) CLK.raf = requestAnimationFrame(clockTick); }
+function clockStart(){   /* (re)start the loop; watches drawn since are watched too */
+  if(typeof CLK !== "object") return;
+  if(CLK.io) CLK_IDS.forEach(function(id){ var e = document.getElementById(id); if(e && !e._ck){ e._ck = 1; CLK.io.observe(e); } });
+  CLK.sec = -1; if(!CLK.raf) CLK.raf = requestAnimationFrame(clockTick);
+}
 function clockTick(){
-  var now = Date.now(), sec = Math.floor(now/1000), tick = sec !== CLK.sec, any = false, p;
-  var tw = document.getElementById("wcWatch"), hw = document.getElementById("hwWatch");
-  if(tw && tw.offsetParent){ any = true;
-    if(WC.mode === "live"){ p = zoneNow(WC.z, now); handsTo(tw, p.h, p.mi, p.s); if(tick){ wcText(now); wcFill(now); } } }
-  if(hw && hw.offsetParent){ any = true; p = zoneNow(WC.z, now); handsTo(hw, p.h, p.mi, p.s); if(tick) hwText(now); }
-  var hv = document.getElementById("hvDial"); if(hv && hv.offsetParent){ any = true; if(tick) hvTick(now); }
-  var vd = document.getElementById("vdDial"); if(vd && vd.offsetParent){ any = true; if(tick) vdTick(now); }
-  var u3 = document.getElementById("u3c"); if(u3 && u3.offsetParent && U3.vis){ any = true; u3Frame(now); }
-  CLK.sec = sec; CLK.raf = any ? requestAnimationFrame(clockTick) : 0;
+  var now = Date.now(), sec = Math.floor(now/1000), p, V = CLK.v;
+  if(sec !== CLK.sec){   /* once a second: which watches are shown (from CLK.on — reading offsetParent here would force a layout) */
+    V = CLK.v = {}; CLK_IDS.forEach(function(id){ var e = CLK.on[id] || (CLK.io ? null : document.getElementById(id)); if(e && e.isConnected && (CLK.io || e.offsetParent)) V[id] = e; });
+    if(V.wcWatch && WC.mode === "live"){ wcText(now); wcFill(now); }
+    if(V.hwWatch) hwText(now);
+    if(V.hvDial) hvTick(now);
+    if(V.vdDial) vdTick(now);
+  }
+  if(V.wcWatch && WC.mode === "live"){ p = zoneNow(WC.z, now); handsTo(V.wcWatch, p.h, p.mi, p.s); }
+  if(V.hwWatch){ p = zoneNow(WC.z, now); handsTo(V.hwWatch, p.h, p.mi, p.s); }
+  if(V.u3c && U3.vis) u3Frame(now);
+  CLK.sec = sec; CLK.raf = V.wcWatch || V.hwWatch || V.hvDial || V.vdDial || (V.u3c && U3.vis) ? requestAnimationFrame(clockTick) : 0;
 }
 
 /* ---- ग्रह: positions of the nine grahas — Paul Schlyter, "How to compute planetary positions"

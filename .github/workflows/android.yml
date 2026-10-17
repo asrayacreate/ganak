@@ -57,6 +57,12 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: gradle --no-daemon -PversionCode=$((1000 + GITHUB_RUN_NUMBER)) testDebugUnitTest assembleDebug bundleRelease assembleRelease
 
+      - name: Version (versionName comes from index.html's "Ganak vX.Y")
+        working-directory: android
+        run: |
+          echo "web: $(grep -o 'Ganak v[0-9.]*' ../index.html | head -1)"
+          "$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)/aapt2" dump badging app/build/outputs/apk/debug/*.apk | head -1 || true
+
       - name: Upload key certificate for Play Console (only if the secrets are set)
         if: env.KEYSTORE_FILE != ''
         env:
