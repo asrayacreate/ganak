@@ -74,7 +74,7 @@ jobs:
           A="$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)/aapt2"
           R=$("$A" dump resources app/build/outputs/apk/release/*.apk)
           for r in layout/widget_small layout/widget_wide xml/date_widget_info drawable/splash drawable/ic_notification_icon drawable/w_tile; do
-            echo "$R" | grep -q "$r" || { echo "resource dropped: $r"; exit 1; }
+            grep -q "$r" <<< "$R" || { echo "resource dropped: $r"; exit 1; }
           done
           ls -l app/build/outputs/apk/release/*.apk app/build/outputs/bundle/release/*.aab
           echo "R8 check passed"
