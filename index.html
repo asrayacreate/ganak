@@ -127,18 +127,19 @@ header{background:var(--ink);color:#fff;padding:14px 16px 12px;position:sticky;t
 .ex b{font-weight:700}
 .ex button{flex:0 0 auto;margin-left:auto;background:var(--ink);color:#fff;border:0;border-radius:6px;
   padding:5px 9px;font-size:11.5px;font-weight:700;font-family:var(--fs);cursor:pointer}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}   /* minmax(0,…): a date input's ~166px minimum can't push a half column off a 320px screen */
 .f{display:flex;flex-direction:column;gap:4px;grid-column:span 2}
 .f.half{grid-column:span 1}
 .fl{font-size:12.5px;font-weight:600;color:var(--ink2)}
 .fl em{font-style:normal;font-family:var(--fm);font-size:11px;color:var(--mute);font-weight:400}
-.f input,.f select{width:100%;font-size:16px;font-family:var(--fm);padding:10px 11px;
+.f input,.f select{width:100%;min-width:0;font-size:16px;font-family:var(--fm);padding:10px 11px;
   border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
 .f select{font-family:var(--fs);font-size:14.5px;appearance:none;
   background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);
   background-position:calc(100% - 16px) 18px,calc(100% - 11px) 18px;background-size:5px 5px;background-repeat:no-repeat}
 .f input:focus,.f select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(245,179,1,.28)}
 .f input[type=date]{font-family:var(--fm)}
+@media (max-width:360px){.f input[type=date],.f input[type=time]{padding-left:7px;padding-right:5px;font-size:15px}}   /* the whole date fits a half column on small phones */
 .f textarea{width:100%;font-size:15.5px;font-family:var(--fs);padding:10px 11px;resize:vertical;min-height:88px;
   border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);line-height:1.55}
 .f textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(245,179,1,.28)}
@@ -3977,7 +3978,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v11.0 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v11.1 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
