@@ -10,11 +10,11 @@ android {
 
     defaultConfig {
         applicationId "io.github.asrayacreate.twa"
-        minSdk 21
+        minSdk 24
         targetSdk 36
         /* must be higher than the version now on Play — CI passes 1000 + the run number */
         versionCode((project.findProperty("versionCode") ?: "1000") as int)
-        versionName "9.7"
+        versionName "10.5"
     }
 
     signingConfigs {
