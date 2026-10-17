@@ -39,7 +39,11 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            /* R8 (Play Console: "enable R8 optimisation"): shrinks and optimises the libraries; our own small
+               package is kept whole (proguard-rules.pro), resources no code uses are dropped */
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             if (System.getenv("KEYSTORE_FILE")) signingConfig signingConfigs.release
         }
     }
@@ -56,6 +60,7 @@ android {
 tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
 
 dependencies {
-    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+    /* 2.7.x: edge-to-edge splash for Android 15+ (Play Console's edge-to-edge notices), launcher hardening */
+    implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.7.4"
     testImplementation "junit:junit:4.13.2"
 }

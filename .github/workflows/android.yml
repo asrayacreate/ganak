@@ -63,6 +63,22 @@ jobs:
           echo "web: $(grep -o 'Ganak v[0-9.]*' ../index.html | head -1)"
           "$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)/aapt2" dump badging app/build/outputs/apk/debug/*.apk | head -1 || true
 
+      - name: R8 check (the release build still has our classes, the widget and the splash)
+        working-directory: android
+        run: |
+          set -e
+          M=app/build/outputs/mapping/release/mapping.txt
+          for c in LauncherActivity DateBarActivity DateWidget DateBar Today NepaliCal CalendarData; do
+            grep -q "^io.github.asrayacreate.twa.$c -> io.github.asrayacreate.twa.$c:" "$M" || { echo "missing or renamed: $c"; exit 1; }
+          done
+          A="$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)/aapt2"
+          R=$("$A" dump resources app/build/outputs/apk/release/*.apk)
+          for r in layout/widget_small layout/widget_wide xml/date_widget_info drawable/splash drawable/ic_notification_icon drawable/w_tile; do
+            echo "$R" | grep -q "$r" || { echo "resource dropped: $r"; exit 1; }
+          done
+          ls -l app/build/outputs/apk/release/*.apk app/build/outputs/bundle/release/*.aab
+          echo "R8 check passed"
+
       - name: Upload key certificate for Play Console (only if the secrets are set)
         if: env.KEYSTORE_FILE != ''
         env:
