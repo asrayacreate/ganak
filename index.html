@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ganak">
 <meta property="og:title" content="Ganak — नेपाली हिसाब: निर्माण, जग्गा, सुन, EMI, पात्रो">
-<meta property="og:description" content="५६ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
+<meta property="og:description" content="५७ वटा नि:शुल्क हिसाब tools — इँटा, सिमेन्ट, रोपनी-बिघा, सुनको मूल्य, EMI, आयकर, नेपाली पात्रो। Offline चल्छ, नतिजा WhatsApp मा।">
 <meta property="og:url" content="https://asrayacreate.github.io/ganak/">
 <meta property="og:image" content="https://asrayacreate.github.io/ganak/icon-512.png">
 <meta property="og:image:width" content="512"><meta property="og:image:height" content="512">
@@ -1543,6 +1543,47 @@ var VLOC = [   /* place, latitude, longitude */
   ["नेपालगञ्ज","Nepalgunj",28.0500,81.6167],["वीरेन्द्रनगर","Birendranagar",28.6019,81.6339],["धनगढी","Dhangadhi",28.6833,80.6000] ];
 var VLOC_OPTS = VLOC.map(function(p, i){ return [String(i), [p[0], p[1]]]; });
 var NAK=[["अश्विनी","Ashwini","चु,चे,चो,ला"],["भरणी","Bharani","ली,लू,ले,लो"],["कृत्तिका","Krittika","अ,ई,उ,ए"],["रोहिणी","Rohini","ओ,वा,वी,वू"],["मृगशिरा","Mrigashira","वे,वो,का,की"],["आर्द्रा","Ardra","कु,घ,ङ,छ"],["पुनर्वसु","Punarvasu","के,को,हा,ही"],["पुष्य","Pushya","हु,हे,हो,ड"],["अश्लेषा","Ashlesha","डी,डू,डे,डो"],["मघा","Magha","मा,मी,मू,मे"],["पूर्वफाल्गुनी","Purva Phalguni","मो,टा,टी,टू"],["उत्तरफाल्गुनी","Uttara Phalguni","टे,टो,पा,पी"],["हस्त","Hasta","पू,ष,ण,ठ"],["चित्रा","Chitra","पे,पो,रा,री"],["स्वाती","Swati","रू,रे,रो,ता"],["विशाखा","Vishakha","ती,तू,ते,तो"],["अनुराधा","Anuradha","ना,नी,नू,ने"],["ज्येष्ठा","Jyeshtha","नो,या,यी,यू"],["मूल","Mula","ये,यो,भा,भी"],["पूर्वाषाढा","Purva Ashadha","भू,धा,फा,ढा"],["उत्तराषाढा","Uttara Ashadha","भे,भो,जा,जी"],["श्रवण","Shravan","खी,खू,खे,खो"],["धनिष्ठा","Dhanishtha","गा,गी,गू,गे"],["शतभिषा","Shatabhisha","गो,सा,सी,सू"],["पूर्वभाद्रपद","Purva Bhadrapad","से,सो,दा,दी"],["उत्तरभाद्रपद","Uttara Bhadrapad","दू,थ,झ,ञ"],["रेवती","Revati","दे,दो,च,ची"]];
+var WZ = [   /* key, flag, country, city (ne/en), IANA zone, extra search words, the city's latitude, longitude */
+  ["np","🇳🇵","नेपाल","Nepal","काठमाडौं","Kathmandu","Asia/Kathmandu","nepal kathmandu",27.7172,85.324],
+  ["in","🇮🇳","भारत","India","दिल्ली","Delhi","Asia/Kolkata","india bharat delhi mumbai",28.6139,77.209],
+  ["ae","🇦🇪","UAE","UAE","दुबई","Dubai","Asia/Dubai","uae dubai abu dhabi",25.2048,55.2708],
+  ["qa","🇶🇦","कतार","Qatar","दोहा","Doha","Asia/Qatar","qatar katar doha",25.2854,51.531],
+  ["sa","🇸🇦","साउदी अरब","Saudi Arabia","रियाद","Riyadh","Asia/Riyadh","saudi saudi arab riyadh jeddah",24.7136,46.6753],
+  ["kw","🇰🇼","कुवेत","Kuwait","कुवेत सिटी","Kuwait City","Asia/Kuwait","kuwait kuwet",29.3759,47.9774],
+  ["bh","🇧🇭","बहराइन","Bahrain","मनामा","Manama","Asia/Bahrain","bahrain manama",26.2285,50.586],
+  ["om","🇴🇲","ओमान","Oman","मस्कट","Muscat","Asia/Muscat","oman muscat",23.588,58.3829],
+  ["il","🇮🇱","इजरायल","Israel","तेल अभिभ","Tel Aviv","Asia/Jerusalem","israel ijrayal tel aviv",32.0853,34.7818],
+  ["my","🇲🇾","मलेसिया","Malaysia","क्वालालम्पुर","Kuala Lumpur","Asia/Kuala_Lumpur","malaysia malesiya kuala lumpur",3.139,101.6869],
+  ["cn","🇨🇳","चीन","China","बेइजिङ","Beijing","Asia/Shanghai","china chin cheen beijing shanghai",39.9042,116.4074],
+  ["hk","🇭🇰","हङकङ","Hong Kong","हङकङ","Hong Kong","Asia/Hong_Kong","hong kong hongkong",22.3193,114.1694],
+  ["kr","🇰🇷","दक्षिण कोरिया","South Korea","सोल","Seoul","Asia/Seoul","korea koriya seoul",37.5665,126.978],
+  ["jp","🇯🇵","जापान","Japan","टोकियो","Tokyo","Asia/Tokyo","japan tokyo",35.6762,139.6503],
+  ["au","🇦🇺","अस्ट्रेलिया","Australia","सिड्नी","Sydney","Australia/Sydney","australia sydney melbourne",-33.8688,151.2093],
+  ["nz","🇳🇿","न्युजिल्यान्ड","New Zealand","अकल्यान्ड","Auckland","Pacific/Auckland","new zealand auckland",-36.8485,174.7633],
+  ["gb","🇬🇧","बेलायत (UK)","United Kingdom","लन्डन","London","Europe/London","uk england belayat london britain",51.5074,-0.1278],
+  ["pt","🇵🇹","पोर्चुगल","Portugal","लिस्बन","Lisbon","Europe/Lisbon","portugal lisbon",38.7223,-9.1393],
+  ["de","🇩🇪","जर्मनी","Germany","बर्लिन","Berlin","Europe/Berlin","germany berlin",52.52,13.405],
+  ["mt","🇲🇹","माल्टा","Malta","भ्यालेटा","Valletta","Europe/Malta","malta",35.8989,14.5146],
+  ["hr","🇭🇷","क्रोएसिया","Croatia","जाग्रेब","Zagreb","Europe/Zagreb","croatia zagreb",45.815,15.9819],
+  ["pl","🇵🇱","पोल्यान्ड","Poland","वार्सा","Warsaw","Europe/Warsaw","poland warsaw",52.2297,21.0122],
+  ["ro","🇷🇴","रोमानिया","Romania","बुखारेस्ट","Bucharest","Europe/Bucharest","romania bucharest",44.4268,26.1025],
+  ["cy","🇨🇾","साइप्रस","Cyprus","निकोसिया","Nicosia","Asia/Nicosia","cyprus nicosia",35.1856,33.3823],
+  ["us","🇺🇸","अमेरिका (पूर्व)","USA (East)","न्युयोर्क","New York","America/New_York","usa us america amerika new york",40.7128,-74.006],
+  ["usw","🇺🇸","अमेरिका (पश्चिम)","USA (West)","लस एन्जलस","Los Angeles","America/Los_Angeles","usa us america amerika california los angeles",34.0522,-118.2437],
+  ["ca","🇨🇦","क्यानडा","Canada","टोरन्टो","Toronto","America/Toronto","canada toronto",43.6532,-79.3832] ];
+/* birth places abroad (कुण्डली, मिलान): the world clock's cities, then more where many Nepalis are born; any other place by
+   latitude/longitude and its country's zone. Times are turned into UTC with the zone's own history (daylight saving included). */
+var BIRTHW = WZ.slice(1).concat([
+  ["in","🇮🇳","भारत","India","दार्जिलिङ","Darjeeling","Asia/Kolkata","",27.0410,88.2663],["in","🇮🇳","भारत","India","सिलगुढी","Siliguri","Asia/Kolkata","",26.7271,88.3953],
+  ["in","🇮🇳","भारत","India","गान्तोक","Gangtok","Asia/Kolkata","",27.3389,88.6065],["in","🇮🇳","भारत","India","कोलकाता","Kolkata","Asia/Kolkata","",22.5726,88.3639],
+  ["in","🇮🇳","भारत","India","पटना","Patna","Asia/Kolkata","",25.5941,85.1376],["in","🇮🇳","भारत","India","वाराणसी","Varanasi","Asia/Kolkata","",25.3176,82.9739],
+  ["in","🇮🇳","भारत","India","लखनऊ","Lucknow","Asia/Kolkata","",26.8467,80.9462],["in","🇮🇳","भारत","India","देहरादून","Dehradun","Asia/Kolkata","",30.3165,78.0322],
+  ["in","🇮🇳","भारत","India","गुवाहाटी","Guwahati","Asia/Kolkata","",26.1445,91.7362],["in","🇮🇳","भारत","India","मुम्बई","Mumbai","Asia/Kolkata","",19.0760,72.8777],
+  ["in","🇮🇳","भारत","India","बेङ्गलुरु","Bengaluru","Asia/Kolkata","",12.9716,77.5946],["bt","🇧🇹","भुटान","Bhutan","थिम्पु","Thimphu","Asia/Thimphu","",27.4728,89.6390],
+  ["bd","🇧🇩","बङ्गलादेश","Bangladesh","ढाका","Dhaka","Asia/Dhaka","",23.8103,90.4125],["au","🇦🇺","अस्ट्रेलिया","Australia","मेलबर्न","Melbourne","Australia/Melbourne","",-37.8136,144.9631],
+  ["us","🇺🇸","अमेरिका","USA","डालस","Dallas","America/Chicago","",32.7767,-96.7970] ]);
+var BIRTH_OPTS = VLOC_OPTS.concat(BIRTHW.map(function(z, i){ return ["w"+i, [z[1]+" "+z[4]+" · "+z[2], z[1]+" "+z[5]+" · "+z[3]]]; }),
+  [["x", ["🌐 अन्य ठाउँ — अक्षांश / देशान्तर","🌐 Other place — latitude / longitude"]]]);
 var TOOLS = [
 
 /* ---------------- 1. सिसा / झ्याल ---------------- */
@@ -3560,14 +3601,10 @@ var TOOLS = [
   sb:["लग्न, राशि, नक्षत्र, नाम अक्षर र नवग्रह","Lagna, rashi, nakshatra, name letter & the nine grahas"],
   kw:"kundali kundli chinna chino cheena janma kundali birth chart horoscope lagna rashi nakshatra naam akshar name letter gana nadi graha jyotish",
   ex:["जन्म मिति, समय र ठाउँबाट लग्न, राशि, नक्षत्र, नाम अक्षर र कुण्डली चक्र","Lagna, rashi, nakshatra, name letter and the chart from the birth date, time and place"],
-  f:[ {k:"by",l:["जन्म साल","Birth year"],u:"BS",d:TB.y,w:1},
-      {k:"bm",l:["महिना","Month"],t:"s",d:String(TB.m),o:BS_MONTH_OPTS,w:1},
-      {k:"bd",l:["गते","Day"],d:TB.d,w:1},
-      {k:"tm",l:["जन्म समय","Birth time"],t:"time",d:"06:00",w:1},
-      {k:"pl",l:["जन्म स्थान","Birth place"],t:"s",d:"0",o:VLOC_OPTS} ],
+  f:birthF("b", ["जन्म मिति","Birth date"], 0),
   calc:function(v){
-    var ms = birthAt(v.by, v.bm, v.bd, v.tm);
-    return ms.err ? ms : kundali(ms, VLOC[+v.pl] || VLOC[0]);
+    var b = birthAt(v, "b");
+    return b.err ? b : kundali(b.ms, b.loc);
   },
   post:function(out, box){   /* the chart above the slip */
     if(!out.chart) return;
@@ -3580,10 +3617,31 @@ var TOOLS = [
   sb:["केटा-केटीको अष्टकूट गुण र दोष","Ashtakoota gunas & doshas for a couple"],
   kw:"kundali milan kundli milan guna milan gun milan ashtakoot ashtakoota ashta koota 36 guna chhattis gun bihe vivah marriage matching match making compatibility nadi dosha bhakoot gana yoni mangal dosha manglik mangalik",
   ex:["केटा-केटीको जन्म मिति-समय (वा नक्षत्र) बाट ३६ मध्ये कति गुण मिल्छ","How many of the 36 gunas match, from both birth dates and times (or nakshatras)"],
-  f:milanF("b", ["👦 केटा","👦 Boy"], 27).concat(milanF("g", ["👧 केटी","👧 Girl"], 24)),
+  f:birthF("b", ["👦 केटा — जन्म विवरण","👦 Boy — birth details"], 27, true).concat(birthF("g", ["👧 केटी — जन्म विवरण","👧 Girl — birth details"], 24, true)),
   calc:function(v){
     var b = milanSide(v, "b", ["👦 केटा: ","👦 Boy: "]); if(b.err) return b;
     var g = milanSide(v, "g", ["👧 केटी: ","👧 Girl: "]); return g.err ? g : milan(b, g);
+  }},
+
+/* ---------------- शुभ साइत — महिनाका शुभ दिन (v10.5) ---------------- */
+{ id:"sait", cat:"np", ic:"🌟", neu:true,
+  nm:["शुभ साइत (महिनाका शुभ दिन)","Auspicious days (month)"],
+  sb:["सर्वार्थसिद्धि, अमृतसिद्धि र दोष — महिनाभरि","Siddhi yogas and doshas through a month"],
+  kw:"sait saait sahit sait din shubh din subha din shubh muhurat muhurta auspicious day good day sarvartha siddhi amrit siddhi guru pushya ravi pushya bhadra rikta panchak griha pravesh yatra byapar",
+  ex:["यो महिना कुन कुन दिन शुभ योग छ — घर, यात्रा वा व्यापारका लागि","Which days this month carry a good yoga — for a house, travel or business"],
+  f:[ {k:"y",l:["साल","Year"],u:"BS",d:TB.y,w:1},
+      {k:"m",l:["महिना","Month"],t:"s",d:String(TB.m),o:BS_MONTH_OPTS,w:1},
+      {k:"k",l:["कामका लागि","For"],t:"s",d:"all",o:[["all",["सबै शुभ काम","Any good work"]],["d",["घर, जग्गा, गृहप्रवेश, मङ्गल काम","House, land, grihapravesh, celebrations"]],
+        ["c",["यात्रा, सवारी साधन","Travel, vehicles"]],["k",["व्यापार, पसल, पढाइ, औषधि","Business, shop, study, medicine"]]]},
+      {k:"pl",l:["स्थान (सूर्योदयका लागि)","Place (for sunrise)"],t:"s",d:"0",o:VLOC_OPTS} ],
+  calc:function(v){
+    var y = n(v.y), m = n(v.m) || 1, loc = VLOC[+v.pl] || VLOC[0], want = {all:"", d:"dr", c:"ckr", k:"kd"}[v.k] || "";
+    if(y < BS_START_YEAR || y > BS_MAX_YEAR) return {err:["साल "+npd(BS_START_YEAR)+" देखि "+npd(BS_MAX_YEAR)+" BS सम्म मात्र मिल्छ।","Year must be between "+BS_START_YEAR+" and "+BS_MAX_YEAR+" BS."]};
+    return saitMonth(y, m, loc, want);
+  },
+  post:function(out, box){   /* a listed day opens in the पात्रो (its sait bar and good times) */
+    var dom = box.querySelectorAll(".slip > .row");
+    if(dom.length === out.rows.length) out.rows.forEach(function(r, i){ if(r.pd){ dom[i].dataset.sd = r.pd; dom[i].classList.add("prow"); } });
   }},
 
 { id:"wclock", cat:"util", ic:"🕰️", neu:true, custom:true,
@@ -3908,7 +3966,7 @@ function brandHtml(){
     + ' · <a href="tel:9855069733" onclick="try{gtag(\'event\',\'call_click\')}catch(e){}" style="color:inherit;text-decoration:none">📞 9855069733</a></div></div>';
 }
 function footHtml(){
-  return '<footer>Ganak v10.4 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
+  return '<footer>Ganak v10.5 · '+TOOLS.length+' '+S(UI.ntool)+' · '+S(UI.offline)
     + '<br>© 2026 PRERAK MULTIPURPOSE PVT LTD · Hetauda</footer>';
 }
 
@@ -3969,8 +4027,9 @@ digits:["नेपाली (१२३) र अंग्रेजी (123) अ�
 patro:["महिनाभरिको नेपाली पात्रो — हरेक दिनको अंग्रेजी मिति, तिथि, चाडपर्व र सार्वजनिक बिदा।","A month of the Nepali calendar — each day's AD date, tithi, festivals and public holidays."],
 uprice:["फरक साइजका प्याकमध्ये कुन सस्तो — प्रति kg, लिटर वा गोटाको मूल्य।","Which pack size is cheaper — price per kg, litre or piece."],
 stackdisc:["छुटमाथि छुटको वास्तविक प्रतिशत र तिर्ने मूल्य — VAT सहित।","The real percentage of stacked discounts and the final price — with VAT."],
+sait:["महिनाका हरेक दिनको सर्वार्थसिद्धि, अमृतसिद्धि, गुरुपुष्य योग (समयसहित) र दोष (रिक्ता, औंसी, व्यतीपात, भद्रा) — घर, यात्रा वा व्यापारका लागि कुन दिन राम्रो।","Each day of a month: Sarvartha Siddhi, Amrit Siddhi and Guru Pushya yogas (with times) and doshas (Rikta, Aunsi, Vyatipata, Bhadra) — which days suit a house, travel or business."],
 milan:["केटा-केटीको जन्म मिति-समय (वा नक्षत्र-चरण) बाट वर्ण, वश्य, तारा, योनि, ग्रह मैत्री, गण, भकूट र नाडी — ३६ मध्ये कति गुण, नाडी-भकूट-गण दोष र मङ्गल दोष।","From both birth dates and times (or nakshatra and pada): Varna, Vashya, Tara, Yoni, Graha maitri, Gana, Bhakoot and Nadi — how many of the 36 gunas, the Nadi, Bhakoot and Gana doshas, and Mangal dosha."],
-kundali:["जन्म मिति, समय र ठाउँबाट लग्न, राशि, नक्षत्र-पद, नाम अक्षर, गण-नाडी, इष्टकाल र नवग्रहसहितको कुण्डली चक्र।","From the birth date, time and place: lagna, rashi, nakshatra and pada, name letter, gana and nadi, ishtakaal, and the chart with the nine grahas."],
+kundali:["जन्म मिति (BS वा AD), समय र ठाउँ (नेपाल वा विदेश) बाट लग्न, राशि, नक्षत्र-पद, नाम अक्षर, गण-नाडी, इष्टकाल र नवग्रहसहितको कुण्डली चक्र।","From the birth date (BS or AD), time and place (in Nepal or abroad): lagna, rashi, nakshatra and pada, name letter, gana and nadi, ishtakaal, and the chart with the nine grahas."],
 vedic:["सनातन (वैदिक) समय — सूर्योदयबाट गनिने मुहूर्त, कला, काष्ठा र घडी–पला; आजको पञ्चाङ्ग, नवग्रहको राशि–नक्षत्र र राहुकाल।","Sanatan (Vedic) time — muhurta, kala, kashtha and ghati–pala counted from sunrise; today's panchang, the nine grahas' signs and nakshatras, and Rahu kaal."],
 wclock:["नेपालको समय र विश्वका सहरको समय — असली जस्तो घडीमा हेर्नुहोस्, वा कुनै समय रोजेर अरू ठाउँमा कति बजे मिलाउनुहोस्।","Nepal time and world cities — on a real-looking watch, or pick a time and convert it."],
 gpa:["NEB (SEE, ११–१२) र TU सेमेस्टरको grade, GPA र CGPA — credit hour सहित।","Grades, GPA and CGPA for NEB (SEE, 11–12) and TU semesters — with credit hours."],
@@ -4028,8 +4087,9 @@ patro:"patro calendar tithi chadparba bida holiday dashain tihar mahina",
 uprice:"ekai mulya unit price sasto tulana pack kg litre",
 stackdisc:"chut mathi chut discount double offer sale",
 gpa:"gpa cgpa grade neb see tu result marks",
+sait:"sait saait sahit shubh sait subha sait shubh din subha din shubh dinharu muhurat muhurt auspicious good day sarvartha siddhi sarbartha amrit amrit siddhi guru pushya ravi pushya bhadra rikta panchak grihapravesh griha pravesh ghar sarne yatra gadi kinne byapar pasal",
 milan:"kundali milan kundli milan kundali milaun guna milan gun milan gun milaun ashtakoot ashtakut astakoot 36 guna chhattis gun bihe bibaha vivah marriage matching nadi dosh bhakut bhakoot gana yoni mangal dosh mangalik mangle manglik",
-kundali:"kundali kundli chino china chinna cheena janma patrika birth chart lagna rashi nakshatra nachhatra naam akshar gana nadi jyotish",
+kundali:"kundali kundli chino china chinna cheena janma patrika birth chart lagna rashi nakshatra nachhatra naam akshar gana nadi jyotish bidesh videsh abroad foreign born india usa america uk australia japan korea dubai qatar malaysia",
 vedic:"vaidik vedic ghadi muhurta muhurat sait saait ghati pala bipala panchang patro tithi nakshatra nachhatra graha navagraha rashi rahukal rahu kaal hora prahar sunrise suryodaya kundali jyotish sanatan hindu",
 wclock:"ghadi samay time world clock timezone bajyo dubai qatar saudi kuwait malaysia korea japan usa america uk london australia sydney canada portugal converter israel cyprus malta poland romania croatia germany hong kong bahrain oman new zealand china chin beijing",
 nepse:"nepse share sheyar bonus hakprad right wacc kitta"
@@ -4058,6 +4118,7 @@ function patro(by,bm,bd,uh){   /* Moon's nakshatra / pada / rashi and the tithi 
            rashi:Math.floor(sid/30), ti:Math.floor(grRev(G.trop.mo - G.trop.su)/12) };
 }
 var ICONS = {
+  sait:'<path d="M12 3l2.4 5.2 5.6.6-4.2 3.8 1.2 5.6L12 15.4 7 18.2l1.2-5.6L4 8.8l5.6-.6z"/><path d="M4 21h16"/>',
   milan:'<circle cx="9" cy="14" r="5.5"/><circle cx="15" cy="14" r="5.5"/><circle cx="12" cy="4.6" r="1.8" fill="#F5B301" stroke="none"/>',
   kundali:'<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 4l16 16M20 4L4 20M12 4l8 8-8 8-8-8z"/><circle cx="12" cy="8" r="1.6" fill="#F5B301" stroke="none"/>',
   vedic:'<path d="M3.5 15.5h17"/><path d="M6.5 15.5a5.5 5.5 0 0 1 11 0" fill="#F5B301" stroke="none"/><path d="M6.5 15.5a5.5 5.5 0 0 1 11 0M12 4.5v2.2M5.2 7.8l1.6 1.4M18.8 7.8l-1.6 1.4M3.5 12.5h2M18.5 12.5h2"/><path d="M8 19h8"/>',
@@ -4196,7 +4257,7 @@ function negErr(t, v){
   var fs = visFields(t, v);
   for(var i = 0; i < fs.length; i++){
     var f = fs[i];
-    if(!f.t && parseFloat(v[f.k]) < 0)
+    if(!f.t && !f.neg && parseFloat(v[f.k]) < 0)   /* f.neg: this one box may be negative (latitude, longitude) */
       return {err:["“"+f.l[0]+"” मा ऋणात्मक (−) संख्या हाल्न मिल्दैन।","“"+f.l[1]+"” can't be negative."]};
   }
   return null;
@@ -4369,7 +4430,7 @@ function openTool(id){
   /* same tool drawn again (language switch, "fill example" reset): no slide, stay where you were */
   var redraw = (SHOWN === id && toolEl.style.display === "block"), keepY = window.pageYOffset || 0;
   cur = t;
-  if(!redraw) PSEL = null;   /* पात्रो opens on "आज" */
+  if(!redraw){ PSEL = PGO; PGO = null; }   /* पात्रो opens on "आज", or on the day tapped in शुभ साइत */
   if(!t.custom){
     /* saved inputs may come from an older version: fill new fields with their default
        and reset a select whose stored value is no longer one of its options */
@@ -4614,7 +4675,7 @@ document.addEventListener("pointerover", logoSpin);
 document.addEventListener("animationend", function(e){ if(e.animationName === "coinspin"){ var r = e.target.closest(".brandrow"); if(r) r.classList.remove("spin"); } });
 
 /* ---- पात्रो: tappable dates + a day banner at the top ("आज" or the tapped date) ---- */
-var PSEL = null;   /* tapped date {y,m,d}; null = today */
+var PSEL = null, PGO = null;   /* tapped date {y,m,d}; null = today. PGO: the date to open the पात्रो on next */
 var WDN = ["आइतबार","सोमबार","मङ्गलबार","बुधबार","बिहीबार","शुक्रबार","शनिबार"], WDNE = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 function relDays(n){ return n === 0 ? L("आज","today") : n === 1 ? L("भोलि","tomorrow") : n === -1 ? L("हिजो","yesterday")
   : n > 0 ? L(npd(n)+" दिनपछि", "in "+n+" days") : L(npd(-n)+" दिनअघि", (-n)+" days ago"); }
@@ -4741,6 +4802,11 @@ function patroDayText(){
   A.push("─────────────", "Powered by PRERAK MULTIPURPOSE PVT LTD · Hetauda");
   return A.join("\n");
 }
+toolEl.addEventListener("click", function(e){   /* शुभ साइत: a day → that day in the पात्रो */
+  var g = cur && cur.id === "sait" && e.target.closest("[data-sd]"); if(!g) return;
+  var q = g.dataset.sd.split("-").map(Number), v = state.patro || (state.patro = {});
+  v.y = String(q[0]); v.m = String(q[1]); PGO = {y:q[0], m:q[1], d:q[2]}; saveState(); openedInApp = true; location.hash = "#patro";
+});
 toolEl.addEventListener("click", function(e){
   if(!cur || cur.id !== "patro") return;
   var t = e.target;
@@ -4772,34 +4838,6 @@ toolEl.addEventListener("touchend", function(e){
 }, {passive:true});
 
 /* ---- विश्व घडी: time in any zone via Intl (handles daylight saving) ---- */
-var WZ = [   /* key, flag, country, city (ne/en), IANA zone, extra search words */
-  ["np","🇳🇵","नेपाल","Nepal","काठमाडौं","Kathmandu","Asia/Kathmandu","nepal kathmandu"],
-  ["in","🇮🇳","भारत","India","दिल्ली","Delhi","Asia/Kolkata","india bharat delhi mumbai"],
-  ["ae","🇦🇪","UAE","UAE","दुबई","Dubai","Asia/Dubai","uae dubai abu dhabi"],
-  ["qa","🇶🇦","कतार","Qatar","दोहा","Doha","Asia/Qatar","qatar katar doha"],
-  ["sa","🇸🇦","साउदी अरब","Saudi Arabia","रियाद","Riyadh","Asia/Riyadh","saudi saudi arab riyadh jeddah"],
-  ["kw","🇰🇼","कुवेत","Kuwait","कुवेत सिटी","Kuwait City","Asia/Kuwait","kuwait kuwet"],
-  ["bh","🇧🇭","बहराइन","Bahrain","मनामा","Manama","Asia/Bahrain","bahrain manama"],
-  ["om","🇴🇲","ओमान","Oman","मस्कट","Muscat","Asia/Muscat","oman muscat"],
-  ["il","🇮🇱","इजरायल","Israel","तेल अभिभ","Tel Aviv","Asia/Jerusalem","israel ijrayal tel aviv"],
-  ["my","🇲🇾","मलेसिया","Malaysia","क्वालालम्पुर","Kuala Lumpur","Asia/Kuala_Lumpur","malaysia malesiya kuala lumpur"],
-  ["cn","🇨🇳","चीन","China","बेइजिङ","Beijing","Asia/Shanghai","china chin cheen beijing shanghai"],
-  ["hk","🇭🇰","हङकङ","Hong Kong","हङकङ","Hong Kong","Asia/Hong_Kong","hong kong hongkong"],
-  ["kr","🇰🇷","दक्षिण कोरिया","South Korea","सोल","Seoul","Asia/Seoul","korea koriya seoul"],
-  ["jp","🇯🇵","जापान","Japan","टोकियो","Tokyo","Asia/Tokyo","japan tokyo"],
-  ["au","🇦🇺","अस्ट्रेलिया","Australia","सिड्नी","Sydney","Australia/Sydney","australia sydney melbourne"],
-  ["nz","🇳🇿","न्युजिल्यान्ड","New Zealand","अकल्यान्ड","Auckland","Pacific/Auckland","new zealand auckland"],
-  ["gb","🇬🇧","बेलायत (UK)","United Kingdom","लन्डन","London","Europe/London","uk england belayat london britain"],
-  ["pt","🇵🇹","पोर्चुगल","Portugal","लिस्बन","Lisbon","Europe/Lisbon","portugal lisbon"],
-  ["de","🇩🇪","जर्मनी","Germany","बर्लिन","Berlin","Europe/Berlin","germany berlin"],
-  ["mt","🇲🇹","माल्टा","Malta","भ्यालेटा","Valletta","Europe/Malta","malta"],
-  ["hr","🇭🇷","क्रोएसिया","Croatia","जाग्रेब","Zagreb","Europe/Zagreb","croatia zagreb"],
-  ["pl","🇵🇱","पोल्यान्ड","Poland","वार्सा","Warsaw","Europe/Warsaw","poland warsaw"],
-  ["ro","🇷🇴","रोमानिया","Romania","बुखारेस्ट","Bucharest","Europe/Bucharest","romania bucharest"],
-  ["cy","🇨🇾","साइप्रस","Cyprus","निकोसिया","Nicosia","Asia/Nicosia","cyprus nicosia"],
-  ["us","🇺🇸","अमेरिका (पूर्व)","USA (East)","न्युयोर्क","New York","America/New_York","usa us america amerika new york"],
-  ["usw","🇺🇸","अमेरिका (पश्चिम)","USA (West)","लस एन्जलस","Los Angeles","America/Los_Angeles","usa us america amerika california los angeles"],
-  ["ca","🇨🇦","क्यानडा","Canada","टोरन्टो","Toronto","America/Toronto","canada toronto"] ];
 var TZF = {};
 function wzHay(z){ return (z[2]+" "+z[3]+" "+z[4]+" "+z[5]+" "+z[7]).toLowerCase(); }   /* search text of a zone */
 function wzOf(k){ for(var i = 0; i < WZ.length; i++) if(WZ[i][0] === k) return WZ[i]; return WZ[0]; }
@@ -5062,10 +5100,11 @@ function sunRS(day0, lat, lon){   /* sunrise / sunset (UTC ms) for the UTC date 
   var ha = Math.acos(Math.cos(90.833*r)/(Math.cos(lat*r)*Math.cos(de)) - Math.tan(lat*r)*Math.tan(de))/r, noon = 720 - 4*lon - eq;
   return [day0 + (noon - 4*ha)*60000, day0 + (noon + 4*ha)*60000];
 }
-function vedDay(now, loc){   /* the Vedic day containing "now": its sunrise, sunset, next sunrise and civil date */
-  var p = tzParts("Asia/Kathmandu", now), base = Date.UTC(p.y, p.m-1, p.d), s = sunRS(base, loc[2], loc[3]);
-  if(now < s[0]){ base -= 864e5; s = sunRS(base, loc[2], loc[3]); }
-  return {rise:s[0], set:s[1], next:sunRS(base + 864e5, loc[2], loc[3])[0], base:base, wd:new Date(base).getUTCDay()};
+function vedDay(now, loc){   /* the Vedic day containing "now": its sunrise, sunset, next sunrise and civil date (any longitude) */
+  var p = tzParts("Asia/Kathmandu", now), base = Date.UTC(p.y, p.m-1, p.d), s = sunRS(base, loc[2], loc[3]), x = sunRS(base + 864e5, loc[2], loc[3]);
+  if(now < s[0]){ base -= 864e5; x = s; s = sunRS(base, loc[2], loc[3]); }
+  else if(now >= x[0]){ base += 864e5; s = x; x = sunRS(base + 864e5, loc[2], loc[3]); }   /* far west: Nepal's date is a day ahead */
+  return {rise:s[0], set:s[1], next:x[0], base:base, wd:new Date(base).getUTCDay()};
 }
 function vedTime(now, V){   /* muhurta (0–29) + kala + kashtha, ghati–pala–vipala, prahar, hora, dial angle */
   var day = now < V.set, f = day ? (now - V.rise)/(V.set - V.rise) : (now - V.set)/(V.next - V.set);
@@ -5134,15 +5173,15 @@ function kundali(ms, loc){
       row(["तिथि","Tithi"], L(tn[0], tn[1]), A.ti < 15 ? L("शुक्ल पक्ष","waxing") : L("कृष्ण पक्ष","waning"), "sub"),
       row(["वार","Vaar"], L(WDN[V.wd], WDNE[V.wd]), L("सूर्योदयदेखि","sunrise to sunrise"), "sub"),
       row(["योग · करण","Yoga · Karana"], L(YOGA[A.yg][0], YOGA[A.yg][1])+" · "+L(KARANA[A.kr][0], KARANA[A.kr][1]), "", "sub"),
-      row(["इष्टकाल","Ishtakaal"], npd(T.gh)+L(" घडी "," ghati ")+npd(T.pa)+L(" पला"," pala"), L("सूर्योदय ","sunrise ")+npTime(V.rise), "sub"),
-      row(["जन्म स्थान","Birth place"], L(loc[0], loc[1]), "", "sub") ],
+      row(["इष्टकाल","Ishtakaal"], npd(T.gh)+L(" घडी "," ghati ")+npd(T.pa)+L(" पला"," pala"), L("सूर्योदय ","sunrise ")+tmIn(loc[4], V.rise), "sub"),
+      row(["जन्म स्थान","Birth place"], L(loc[0], loc[1]), utcTxt(tzOff(loc[4], ms)), "sub") ],
     table:{ title:L("🪐 ग्रह स्थिति","🪐 Graha positions"), sub:L("निरयन · लाहिरी","sidereal · Lahiri"),
       head:[L("ग्रह","Graha"), L("राशि","Rashi"), L("अंश","Degree"), L("नक्षत्र पद","Nakshatra pada"), L("भाव","House")],
       rows:[[L("लग्न","Lagna"), rs(lg), degTxt(lg), nkp(lg), npd(1)]].concat(GR_ORD.map(function(k){ var l = G.sid[k];
         return [gn(k)+(rv[k] ? L(" (वक्री)"," (R)") : ""), rs(l), degTxt(l), nkp(l), npd(hs(l) + 1)]; })) },
     chart:kChart(lr, function(k){ return hs(G.sid[k]); }, rv),
-    note:["ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात। लग्न: स्थानीय नाक्षत्र समयबाट। भाव: राशि नै भाव — लग्नको राशि पहिलो भाव। जन्म समय नेपाली घडीको: १ जनवरी १९८६ (वि.सं. २०४२ पुस १७) भन्दा अघि UTC+५:३०, त्यसपछि UTC+५:४५ मानिन्छ। नाम अक्षर, गण र नाडी: परम्परागत अवकहडा तालिका (परम्पराअनुसार केही अक्षर फरक हुन सक्छन्)। चक्रमा * = वक्री। यो नेपालका सहरका लागि मात्र; विवाह-मिलान वा ठूला निर्णयका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
-      "Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node. Lagna: from local sidereal time. Houses: whole sign — the lagna's rashi is the 1st. Birth time is Nepal clock time: UTC+5:30 before 1 January 1986 (2042 Poush 17 BS), UTC+5:45 after. Name letter, gana and nadi: the traditional Avakahada tables (some letters differ by tradition). * in the chart = retrograde. For Nepal's cities only; confirm matching or big decisions with an astrologer."] };
+    note:["ग्रह: Paul Schlyter को कक्षा-तत्त्व विधि (±१–२ कला), लाहिरी अयनांश, राहु = मध्यम पात। लग्न: स्थानीय नाक्षत्र समयबाट। भाव: राशि नै भाव — लग्नको राशि पहिलो भाव। जन्म समय त्यहीँको घडीको: नेपालमा १ जनवरी १९८६ (वि.सं. २०४२ पुस १७) भन्दा अघि UTC+५:३०, त्यसपछि UTC+५:४५; विदेशमा त्यस देशको त्यो दिनको समय (daylight saving सहित, फोनको समय-क्षेत्र तालिकाबाट)। सूचीमा नभएको ठाउँ: ‘अन्य ठाउँ’ छानेर अक्षांश-देशान्तर (Google Maps मा थिचेर मिल्छ) र देश हाल्नुहोस्। नाम अक्षर, गण र नाडी: परम्परागत अवकहडा तालिका (परम्पराअनुसार केही अक्षर फरक हुन सक्छन्)। चक्रमा * = वक्री। विवाह-मिलान वा ठूला निर्णयका लागि ज्योतिषीसँग पुष्टि गर्नुहोस्।",
+      "Grahas: Paul Schlyter's orbital-element method (±1–2′), Lahiri ayanamsa, Rahu = mean node. Lagna: from local sidereal time. Houses: whole sign — the lagna's rashi is the 1st. Birth time is the local clock: in Nepal UTC+5:30 before 1 January 1986 (2042 Poush 17 BS), UTC+5:45 after; abroad, that country's offset on that day (daylight saving included, from the phone's time-zone tables). A place not in the list: pick ‘Other place’ and enter its latitude/longitude (long-press it in Google Maps) and country. Name letter, gana and nadi: the traditional Avakahada tables (some letters differ by tradition). * in the chart = retrograde. Confirm matching or big decisions with an astrologer."] };
 }
 function kChart(lr, hs, rv){   /* North-Indian chart: house 1 (the lagna) at the top, then anticlockwise; each house shows its rashi number and its grahas */
   var C = [[150,74],[75,30],[30,75],[75,150],[30,225],[75,270],[150,226],[225,270],[270,225],[225,150],[270,75],[225,30]];
@@ -5158,17 +5197,58 @@ function kChart(lr, hs, rv){   /* North-Indian chart: house 1 (the lagna) at the
   }
   return h + '</svg>';
 }
-function birthAt(y, m, d, t, who){   /* a BS birth date and Nepal clock time → ms (UTC+5:30 till 1985, UTC+5:45 from 1 Jan 1986 = 2042 Poush 17), or {err} */
-  var tm = /^(\d{1,2}):(\d{2})/.exec(String(t || "")), w = who || ["", ""], a, dim;
-  function e(ne, en){ return {err:[w[0]+ne, w[1]+en]}; }
-  y = n(y); m = n(m); d = n(d);
-  if(y < BS_START_YEAR || y > BS_MAX_YEAR) return e("साल "+npd(BS_START_YEAR)+" देखि "+npd(BS_MAX_YEAR)+" BS सम्म मात्र मिल्छ।", "Year must be between "+BS_START_YEAR+" and "+BS_MAX_YEAR+" BS.");
-  dim = bsDaysInMonth(y, m);
-  if(d < 1 || d > dim) return e(npd(y)+" "+bsM(m-1)+" मा "+npd(dim)+" गते सम्म मात्र हुन्छ।", bsM(m-1)+" "+y+" has only "+dim+" days.");
-  if(!tm || +tm[1] > 23) return e("जन्म समय हाल्नुहोस् (घण्टा : मिनेट)।", "Enter the birth time (hours : minutes).");
-  a = bsToAd(y, m, d); if(!a) return e("मिति मिलेन — फेरि हेर्नुहोस्।", "That date didn't resolve — please check it.");
-  return Date.UTC(a.y, a.m-1, a.d, +tm[1], +tm[2]) - (Date.UTC(a.y, a.m-1, a.d) < Date.UTC(1986, 0, 1) ? 330 : 345)*60000;
+function birthF(p, lab, age, nak){   /* birth fields: BS or AD date, time, place (Nepal, a city abroad, or any latitude/longitude + zone);
+                                          with nak, "only the nakshatra and pada" too */
+  function k(v){ return v[p+"k"] || "d"; }
+  function bs(v){ return k(v) === "d"; }
+  function ad(v){ return k(v) === "a"; }
+  function dt(v){ return k(v) !== "n"; }
+  function cu(v){ return dt(v) && v[p+"p"] === "x"; }
+  function nk(v){ return k(v) === "n"; }
+  return [ {k:p+"k", l:lab, t:"s", d:"d", o:[["d", ["वि.सं. (BS) मिति र समय","BS date & time"]], ["a", ["ई.सं. (AD) मिति र समय","AD (Gregorian) date & time"]]]
+      .concat(nak ? [["n", ["नक्षत्र र चरण मात्र थाहा छ","Only the nakshatra & pada"]]] : [])},
+    {k:p+"y", l:["जन्म साल","Birth year"], u:"BS", d:TB.y - age, w:1, sif:bs},
+    {k:p+"m", l:["महिना","Month"], t:"s", d:String(TB.m), o:BS_MONTH_OPTS, w:1, sif:bs},
+    {k:p+"d", l:["गते","Day"], d:Math.min(TB.d, 29), w:1, sif:bs},
+    {k:p+"a", l:["जन्म मिति (AD)","Birth date (AD)"], t:"date", d:(new Date().getFullYear() - age)+"-01-15", w:1, sif:ad},
+    {k:p+"t", l:["जन्म समय","Birth time"], t:"time", d:"06:00", w:1, sif:dt},
+    {k:p+"p", l:["जन्म स्थान","Birth place"], t:"s", d:"0", o:BIRTH_OPTS, sif:dt},
+    {k:p+"la", l:["अक्षांश (उत्तर +, दक्षिण −)","Latitude (N +, S −)"], d:27.7172, w:1, neg:true, sif:cu},
+    {k:p+"lo", l:["देशान्तर (पूर्व +, पश्चिम −)","Longitude (E +, W −)"], d:85.324, w:1, neg:true, sif:cu},
+    {k:p+"z", l:["त्यहाँको समय क्षेत्र (देश)","Its time zone (country)"], t:"s", d:"np", o:WZ.map(function(z){ return [z[0], [z[1]+" "+z[2]+" · "+z[4], z[1]+" "+z[3]+" · "+z[5]]]; }), sif:cu} ]
+    .concat(nak ? [{k:p+"n", l:["नक्षत्र","Nakshatra"], t:"s", d:"0", o:NAK.map(function(x, i){ return [String(i), [x[0], x[1]]]; }), w:1, sif:nk},
+      {k:p+"q", l:["चरण (पद)","Pada"], t:"s", d:"1", o:[1, 2, 3, 4].map(function(i){ return [String(i), [np(i), String(i)]]; }), w:1, sif:nk}] : []);
 }
+function birthLoc(v, p){   /* [name ne, name en, latitude, longitude, IANA zone] */
+  var k = String(v[p+"p"] || "0"), w;
+  if(k === "x"){ var la = n(v[p+"la"]), lo = n(v[p+"lo"]), z = wzOf(v[p+"z"]);
+    if(Math.abs(la) > 65 || Math.abs(lo) > 180) return {err:["अक्षांश −६५ देखि ६५, देशान्तर −१८० देखि १८० सम्म हुनुपर्छ।","Latitude must be within ±65 and longitude within ±180."]};
+    var ll = function(ne){ return Math.abs(la).toFixed(2)+"°"+(la < 0 ? (ne ? "द" : "S") : (ne ? "उ" : "N"))+" "+Math.abs(lo).toFixed(2)+"°"+(lo < 0 ? (ne ? "प" : "W") : (ne ? "पू" : "E")); };
+    return [z[1]+" "+np(ll(1)), z[1]+" "+ll(0), la, lo, z[6]]; }
+  if(k.charAt(0) === "w" && (w = BIRTHW[+k.slice(1)])) return [w[1]+" "+w[4]+" · "+w[2], w[1]+" "+w[5]+" · "+w[3], w[8], w[9], w[6]];
+  w = VLOC[+k] || VLOC[0]; return [w[0], w[1], w[2], w[3], "Asia/Kathmandu"];
+}
+function birthAt(v, p, who){   /* the birth moment (UTC ms) and place, or {err}: Nepal's clock was UTC+5:30 till 1985 and UTC+5:45 from
+                                  1 Jan 1986 (2042 Poush 17); abroad, the zone's own offset that day (daylight saving included) */
+  var tm = /^(\d{1,2}):(\d{2})/.exec(String(v[p+"t"] || "")), w = who || ["", ""], loc = birthLoc(v, p), a, y, m, d, dim, q;
+  function e(ne, en){ return {err:[w[0]+ne, w[1]+en]}; }
+  if(v[p+"k"] === "a"){
+    q = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v[p+"a"] || ""));
+    if(!q || +q[1] < 1900 || +q[1] > 2100) return e("जन्म मिति (AD) हाल्नुहोस् — सन् १९०० देखि २१०० सम्म।", "Enter the birth date (AD), 1900 to 2100.");
+    a = {y:+q[1], m:+q[2], d:+q[3]};
+  } else {
+    y = n(v[p+"y"]); m = n(v[p+"m"]); d = n(v[p+"d"]);
+    if(y < BS_START_YEAR || y > BS_MAX_YEAR) return e("साल "+npd(BS_START_YEAR)+" देखि "+npd(BS_MAX_YEAR)+" BS सम्म मात्र मिल्छ।", "Year must be between "+BS_START_YEAR+" and "+BS_MAX_YEAR+" BS.");
+    dim = bsDaysInMonth(y, m);
+    if(d < 1 || d > dim) return e(npd(y)+" "+bsM(m-1)+" मा "+npd(dim)+" गते सम्म मात्र हुन्छ।", bsM(m-1)+" "+y+" has only "+dim+" days.");
+    a = bsToAd(y, m, d); if(!a) return e("मिति मिलेन — फेरि हेर्नुहोस्।", "That date didn't resolve — please check it.");
+  }
+  if(!tm || +tm[1] > 23) return e("जन्म समय हाल्नुहोस् (घण्टा : मिनेट)।", "Enter the birth time (hours : minutes).");
+  if(loc.err) return e(loc.err[0], loc.err[1]);
+  return {loc:loc, ms:loc[4] === "Asia/Kathmandu" ? Date.UTC(a.y, a.m-1, a.d, +tm[1], +tm[2]) - (Date.UTC(a.y, a.m-1, a.d) < Date.UTC(1986, 0, 1) ? 330 : 345)*60000
+    : tzToUtc(loc[4], a.y, a.m, a.d, +tm[1], +tm[2])};
+}
+function utcTxt(min){ var a = Math.abs(min); return "UTC"+(min < 0 ? "−" : "+")+npd(Math.floor(a/60))+":"+npd(pad2(a % 60)); }
 /* ---- कुण्डली मिलान: the eight कूट (अष्टकूट) from the two Moons — वर्ण 1, वश्य 2, तारा 3, योनि 4, ग्रह मैत्री 5, गण 6, भकूट 7,
    नाडी 8 = 36. योनि: the 14-animal table as in Maitreya/Saravali; वश्य: AstroYogi's table (bride × groom), the भक्ष्य (prey) pairs at ½;
    गण: as OnlineJyotish (bride × groom; देव bride with राक्षस groom 0, the reverse 1); ग्रह मैत्री: BPHS natural friendship (both friends 5,
@@ -5185,26 +5265,13 @@ var YONI = "0123345256678989AA4BCBD0D71",   /* per nakshatra, base 14 → YONI_N
     GANA_P = [[6,5,0],[6,6,0],[1,0,6]],   /* bride's row, groom's column: देव, मनुष्य, राक्षस */
     MAITRI = {su:"SFFNFEE", mo:"FSNFNNN", ma:"FFSEFNN", me:"FENSNFN", ju:"FFFESEN", ve:"EENFNSF", sa:"EEEFNFS"},   /* to su mo ma me ju ve sa */
     TARA_N = [["जन्म","Janma"],["सम्पत्","Sampat"],["विपत्","Vipat"],["क्षेम","Kshema"],["प्रत्यरि","Pratyari"],["साधक","Sadhaka"],["वध","Vadha"],["मित्र","Mitra"],["परम मित्र","Param mitra"]];
-function milanF(p, who, age){   /* one person's fields: the birth date and time (place for मङ्गल दोष), or a known nakshatra and pada */
-  function bd(v){ return v[p+"k"] !== "n"; }
-  function nk(v){ return v[p+"k"] === "n"; }
-  return [ {k:p+"k", l:[who[0]+" — जन्म विवरण", who[1]+" — birth details"], t:"s", d:"d",
-      o:[["d", ["जन्म मिति र समयबाट","From the birth date & time"]], ["n", ["नक्षत्र र चरण थाहा छ","I know the nakshatra & pada"]]]},
-    {k:p+"y", l:["जन्म साल","Birth year"], u:"BS", d:TB.y - age, w:1, sif:bd},
-    {k:p+"m", l:["महिना","Month"], t:"s", d:String(TB.m), o:BS_MONTH_OPTS, w:1, sif:bd},
-    {k:p+"d", l:["गते","Day"], d:Math.min(TB.d, 29), w:1, sif:bd},
-    {k:p+"t", l:["जन्म समय","Birth time"], t:"time", d:"06:00", w:1, sif:bd},
-    {k:p+"p", l:["जन्म स्थान","Birth place"], t:"s", d:"0", o:VLOC_OPTS, sif:bd},
-    {k:p+"n", l:["नक्षत्र","Nakshatra"], t:"s", d:"0", o:NAK.map(function(x, i){ return [String(i), [x[0], x[1]]]; }), w:1, sif:nk},
-    {k:p+"q", l:["चरण (पद)","Pada"], t:"s", d:"1", o:[1, 2, 3, 4].map(function(i){ return [String(i), [np(i), String(i)]]; }), w:1, sif:nk} ];
-}
 function milanSide(v, p, who){   /* one person's Moon (and मङ्गल's houses when the birth moment is known); a known pada → its middle */
   var mo, mg = null, N = 360/27;
   if(v[p+"k"] === "n") mo = (n(v[p+"n"])*4 + Math.max(0, Math.min(3, n(v[p+"q"]) - 1)) + .5)*N/4;
   else {
-    var ms = birthAt(v[p+"y"], v[p+"m"], v[p+"d"], v[p+"t"], who); if(ms.err) return ms;
-    var G = grahas(ms), loc = VLOC[+v[p+"p"]] || VLOC[0], mr = Math.floor(G.sid.ma/30);
-    mo = G.sid.mo; mg = [(mr - Math.floor(lagna(ms, loc[2], loc[3])/30) + 12) % 12 + 1, (mr - Math.floor(mo/30) + 12) % 12 + 1];
+    var b = birthAt(v, p, who); if(b.err) return b;
+    var G = grahas(b.ms), mr = Math.floor(G.sid.ma/30);
+    mo = G.sid.mo; mg = [(mr - Math.floor(lagna(b.ms, b.loc[2], b.loc[3])/30) + 12) % 12 + 1, (mr - Math.floor(mo/30) + 12) % 12 + 1];
   }
   return {mo:mo, r:Math.floor(mo/30), nk:Math.floor(mo/N), pada:Math.floor((mo % N)/(N/4)), mg:mg};
 }
@@ -5250,6 +5317,68 @@ function milan(b, g){
           b.mg || g.mg ? [[L("मङ्गल भाव","Mars house"), L("लग्न · चन्द्र","lagna · Moon"), mgTxt(b), mgTxt(g)]] : []) },
     note:["अष्टकूट गुण मिलान: दुवैको चन्द्र राशि र नक्षत्रबाट (तारा: केटीको नक्षत्रदेखि केटाको र उल्टो गन्दा ३, ५, ७ अशुभ)। तालिका: योनि — Maitreya/Saravali; वश्य — AstroYogi (भक्ष्य जोडी ½); गण — OnlineJyotish; ग्रह मैत्री — BPHS नैसर्गिक मित्रता। परम्पराअनुसार वश्य र गणका केही अङ्क फरक हुन्छन्, त्यसैले अरू पात्रोसँग ½–१ गुण फरक पर्न सक्छ। १८ भन्दा माथि स्वीकार्य, २५ भन्दा माथि राम्रो मानिन्छ। मङ्गल दोष: लग्न वा चन्द्रबाट १, २, ४, ७, ८, १२औँ भावमा मङ्गल (जन्म समय र स्थान चाहिन्छ)। नक्षत्र मात्र दिँदा चरणको बीचको अंश लिइन्छ। विवाहजस्तो ठूलो निर्णय ज्योतिषीसँग पूरा कुण्डली हेराएर मात्र गर्नुहोस्।",
       "Ashtakoota guna milan from both Moon signs and nakshatras (Tara: counting from the girl's nakshatra to the boy's and back, 3, 5 and 7 are bad). Tables: Yoni — Maitreya/Saravali; Vashya — AstroYogi (prey pairs ½); Gana — OnlineJyotish; Graha maitri — BPHS natural friendship. Vashya and Gana points differ a little by tradition, so other panchangs may differ by ½–1 guna. 18+ is taken as acceptable, 25+ as good. Mangal dosha: Mars in the 1st, 2nd, 4th, 7th, 8th or 12th from the lagna or the Moon (needs the birth time and place). With only a nakshatra, the middle of the pada is used. Decide something as big as a marriage only after an astrologer has read both full charts."] };
+}
+/* ---- शुभ साइत: वार + नक्षत्र — सर्वार्थसिद्धि (Drik Panchang's table; traditions differ a little), अमृतसिद्धि (one nakshatra per
+   weekday), गुरुपुष्य / रविपुष्य; दोष at sunrise — रिक्ता तिथि (चौथी, नवमी, चतुर्दशी), औंसी, व्यतीपात / वैधृति योग — and भद्रा in the
+   daytime; पञ्चक (Moon in कुम्भ–मीन) only noted. The nakshatra's nature (ध्रुव, चर, क्षिप्र, मृदु, मिश्र, उग्र, तीक्ष्ण) says which work suits it. ---- */
+var SSY = ["0,7,11,12,18,20,25","3,4,7,16,21","0,2,8,25","2,3,4,12,16","0,6,7,16,26","0,6,16,21,26","3,14,21"].map(function(x){ return x.split(",").map(Number); }),
+    ASY = [12, 4, 0, 16, 7, 26, 3],   /* Sun → Sat */
+    NK_CLS = "kumdrtcktuudkrcmrttudcccudr",   /* per nakshatra → NK_KIND */
+    NK_KIND = {d:["ध्रुव","Dhruva","घर, जग्गा, गृहप्रवेश, स्थायी काम","house, land, grihapravesh, lasting work"], c:["चर","Chara","यात्रा, सवारी साधन","travel, vehicles"],
+      k:["क्षिप्र","Kshipra","व्यापार, पढाइ, औषधि","business, study, medicine"], r:["मृदु","Mridu","मङ्गल काम, लुगा-गहना, मित्रता","celebrations, clothes & jewellery, friendship"],
+      m:["मिश्र","Mishra","दैनिक काम","everyday work"], u:["उग्र","Ugra","",""], t:["तीक्ष्ण","Tikshna","",""]};
+function saitDay(a, loc){   /* one day (AD a) at loc, sunrise to sunrise: nakshatra spans, siddhi yogas, doshas */
+  var V = vedDay(Date.UTC(a.y, a.m-1, a.d, 6, 15), loc), N = 360/27, sp = [], t = V.rise, i, nk, e, kn;
+  function moonSid(x){ return grahas(x, true).sid.mo; }
+  for(i = 0; i < 3 && t < V.next - 6e4; i++){
+    nk = Math.floor(moonSid(t + 6e4)/N);
+    e = angAt(moonSid, t + ((nk + 1)*N - moonSid(t + 6e4))/13.2*864e5, (nk + 1)*N % 360, 13.2);
+    sp.push([nk, t, Math.min(e, V.next)]); t = e;
+  }
+  var A = angas(grahas(V.rise, true)), ys = [], bh = null;
+  sp.forEach(function(q){   /* an hour or more — a few minutes before dawn is no use */
+    if(q[2] - q[1] < 36e5) return;
+    if(ASY[V.wd] === q[0]) ys.push(["a", q]); else if(SSY[V.wd].indexOf(q[0]) >= 0) ys.push(["s", q]);
+  });
+  for(t = V.rise, i = 0; i < 4 && t < V.set; i++){   /* karanas through the daytime: भद्रा = विष्टि */
+    kn = Math.floor(phaseAt(t + 6e4)/6); e = angAt(phaseAt, t + (6*(kn + 1) - phaseAt(t + 6e4))/12.19*864e5, 6*(kn + 1) % 360, 12.19);
+    if(kn >= 1 && kn <= 56 && (kn - 1) % 7 === 6) bh = [t, Math.min(e, V.set)];
+    t = e;
+  }
+  return {V:V, A:A, sp:sp, ys:ys, bh:bh, rikta:[3, 8, 13].indexOf(A.ti % 15) >= 0 && A.ti !== 29, amav:A.ti === 29, vy:A.yg === 16 || A.yg === 26,
+    panchak:grahas(V.rise, true).sid.mo >= 300};
+}
+function saitMonth(y, m, loc, want){
+  var dim = bsDaysInMonth(y, m), rows = [], tb = [], good = 0, d;
+  function till(q){ var a = tzParts("Asia/Kathmandu", q[1]), b = tzParts("Asia/Kathmandu", q[2]);   /* "– भोलि ६:०५ बिहान" when it runs into the next day */
+    return npTime(q[1])+" – "+(a && b && a.d !== b.d ? L("भोलि ","next ") : "")+npTime(q[2]); }
+  for(d = 1; d <= dim; d++){
+    var a = bsToAd(y, m, d), S = saitDay(a, loc), wd = S.V.wd, tn = tithiName(S.A.ti), nk0 = NAK[S.sp[0][0]];
+    var ds = [].concat(S.rikta ? [L("रिक्ता तिथि","Rikta tithi")] : [], S.amav ? [L("औंसी","Aunsi")] : [], S.vy ? [L(YOGA[S.A.yg][0]+" योग", YOGA[S.A.yg][1]+" yoga")] : []);
+    var ys = S.ys.filter(function(x){ return !want || want.indexOf(NK_CLS.charAt(x[1][0])) >= 0; });
+    var best = ys.some(function(x){ return x[0] === "a"; }) ? "a" : ys.length ? "s" : "";
+    var mark = !best ? (ds.length ? "✗ " + ds[0] : "") : ds.length ? "⚠️" : best === "a" ? "🌟" : "✓";
+    tb.push([npd(d)+" "+L(WDN[wd].replace("बार", ""), WDNE[wd].slice(0, 3)), L(tn[0], tn[1]), L(nk0[0], nk0[1]), mark]);
+    if(!best) continue;
+    if(!ds.length) good++;
+    var nm = ys.map(function(x){ var q = x[1];
+      return (q[0] === 7 && (wd === 4 || wd === 0) ? L(wd === 4 ? "गुरुपुष्य" : "रविपुष्य", wd === 4 ? "Guru Pushya" : "Ravi Pushya") : x[0] === "a" ? L("अमृतसिद्धि","Amrit Siddhi") : L("सर्वार्थसिद्धि","Sarvartha Siddhi")); });
+    var r = row([npd(d)+" "+L(WDN[wd], WDNE[wd])+" · "+AD_MONTHS[a.m-1].slice(0, 3)+" "+a.d, d+" "+WDNE[wd]+" · "+AD_MONTHS[a.m-1].slice(0, 3)+" "+a.d],
+      (ds.length ? "⚠️ " : best === "a" ? "🌟 " : "✓ ") + nm.filter(function(x, j){ return nm.indexOf(x) === j; }).join(", "), "", ds.length ? "sub" : "");
+    r.pd = y+"-"+m+"-"+d; rows.push(r);
+    ys.forEach(function(x){ var q = x[1], k = NK_KIND[NK_CLS.charAt(q[0])];
+      rows.push(row(["   "+NAK[q[0]][0]+" ("+k[0]+")", "   "+NAK[q[0]][1]+" ("+k[1]+")"], till(q), k[2] ? L(k[2], k[3]) : "", "sub")); });
+    if(ds.length) rows.push(row(["   "+L("दोष","Dosha"), "   "+L("दोष","Dosha")], ds.join(", "), L("सूर्योदयमा","at sunrise"), "sub"));
+    if(S.bh) rows.push(row(["   "+L("भद्रा (टार्नुहोस्)","Bhadra (avoid)"), "   "+L("भद्रा (टार्नुहोस्)","Bhadra (avoid)")], till([0, S.bh[0], S.bh[1]]), "", "sub"));
+    if(S.panchak) rows.push(row(["   "+L("पञ्चक","Panchak"), "   "+L("पञ्चक","Panchak")], L("छ","yes"), L("दक्षिण यात्रा, छाना, दाउरा टार्ने","avoid south travel, roofing, firewood"), "sub"));
+  }
+  if(!rows.length) rows.push(row(["यो महिना","This month"], L("यो कामका लागि शुभ योग भेटिएन","No good yoga for this work"), "", ""));
+  return { rows:[row(["शुभ दिन (दोषबिना)","Good days (no dosha)"], npd(good)+L(" दिन"," days"), "", "big nw"),
+      row(["महिना","Month"], npd(y)+" "+bsM(m-1)+" · "+L(loc[0], loc[1]), "", "sub")].concat(rows),
+    table:{ title:L("🌟 महिनाभरको साइत","🌟 The month at a glance"), sub:npd(y)+" "+bsM(m-1),
+      head:[L("गते","Day"), L("तिथि","Tithi"), L("नक्षत्र","Nakshatra"), L("साइत","Sait")], rows:tb },
+    note:["गणना: वार र नक्षत्र मिलेर बन्ने योग — सर्वार्थसिद्धि (Drik Panchang को तालिका; परम्पराअनुसार केही नक्षत्र फरक), अमृतसिद्धि (आइत–हस्त, सोम–मृगशिरा, मङ्गल–अश्विनी, बुध–अनुराधा, बिही–पुष्य, शुक्र–रेवती, शनि–रोहिणी), गुरुपुष्य र रविपुष्य; योग त्यो नक्षत्र रहेसम्म मात्र (समय दिइएको)। दोष: सूर्योदयमा रिक्ता तिथि (चौथी, नवमी, चतुर्दशी), औंसी, व्यतीपात वा वैधृति योग; दिनमा भद्राको समय टार्नुहोस्। नक्षत्रको स्वभाव (ध्रुव, चर, क्षिप्र, मृदु) अनुसार कामको सुझाव। १ दिन = सूर्योदयदेखि अर्को सूर्योदयसम्म। दिन थिच्दा पात्रोमा त्यो दिनको शुभ समय देखिन्छ। ⚠️ विवाह, व्रतबन्ध, पास्नी जस्ता संस्कारको साइत नेपाल पञ्चाङ्ग निर्णायक समितिको पात्रो वा पुरोहितबाट मात्र लिनुहोस् — त्यसमा लग्न, गुरु-शुक्र अस्त, मास आदि पनि हेरिन्छ।",
+      "Computed: weekday + nakshatra yogas — Sarvartha Siddhi (Drik Panchang's table; a few nakshatras differ by tradition), Amrit Siddhi (Sun–Hasta, Mon–Mrigashira, Tue–Ashwini, Wed–Anuradha, Thu–Pushya, Fri–Revati, Sat–Rohini), Guru and Ravi Pushya; a yoga lasts only while its nakshatra does (times given). Doshas: Rikta tithi (4th, 9th, 14th), Aunsi, Vyatipata or Vaidhriti yoga at sunrise; avoid the Bhadra hours in the day. Work suggested by the nakshatra's nature (Dhruva, Chara, Kshipra, Mridu). A day = sunrise to the next sunrise. Tap a day to see its good times in the Patro. ⚠️ Take the sait for weddings, bratabandha, pasni and other samskaras only from the Nepal Panchang Nirnayak Samiti's patro or a priest — those also weigh the lagna, Jupiter/Venus setting, the month and more."] };
 }
 function judge(t, W){   /* the plain verdict at t (W = its Vedic day): "a" avoid — Rahu/Yama/Gulika/Bhadra, or muhurta and choghadiya both bad;
                            "s" good — neither, muhurta not bad and choghadiya Amrit/Shubh/Labh; "n" ordinary otherwise */
@@ -5319,7 +5448,8 @@ function panchang(now){
 function retro(k, now){ if(k === "ra" || k === "ke") return true; if(k === "su" || k === "mo") return false;
   var a = grahas(now - 432e5).trop[k], b = grahas(now + 432e5).trop[k]; return ((b - a + 540) % 360 - 180) < 0; }
 function degTxt(lon){ var d = Math.floor(lon % 30), mn = Math.floor((lon % 1)*60); return npd(d)+"°"+npd(pad2(mn))+"′"; }
-function npTime(ms){ var p = tzParts("Asia/Kathmandu", ms); return p ? hm12(p.h, p.mi) : ""; }
+function tmIn(tz, ms){ var p = tzParts(tz, ms); return p ? hm12(p.h, p.mi) : ""; }
+function npTime(ms){ return tmIn("Asia/Kathmandu", ms); }
 function vdArcP(r, a){ var t = a*Math.PI/180; return (150 + r*Math.cos(t)).toFixed(2)+" "+(150 - r*Math.sin(t)).toFixed(2); }
 function vdSeg(r1, r2, a0, a1){   /* ring segment from math angle a0 clockwise to a1 */
   return "M"+vdArcP(r2, a0)+"A"+r2+" "+r2+" 0 0 1 "+vdArcP(r2, a1)+"L"+vdArcP(r1, a1)+"A"+r1+" "+r1+" 0 0 0 "+vdArcP(r1, a0)+"Z";
@@ -5815,17 +5945,18 @@ function tnDays(){   /* the next 60 days: short title, details, and (first 14 da
   for(i = 0; i < 60; i++){
     var t = Date.UTC(p.y, p.m-1, p.d + i), a = new Date(t), y = a.getUTCFullYear(), m = a.getUTCMonth()+1, d = a.getUTCDate(), b = adToBs(y, m, d);
     if(!b) continue;
-    var tn = tithiName(patro(y, m, d, 0.25).ti), rs = sunRS(t, loc[2], loc[3]);
+    var tn = tithiName(patro(y, m, d, 0.25).ti), rs = sunRS(t, loc[2], loc[3]), gt = i < 14 ? goodTimes(vedDay(t + 375*60000, loc)) : [];   /* 12:00 in Nepal → that day */
     var ev = (HOLI[b.y] || []).filter(function(h){ return h[0] === b.m && h[1] === b.d; }).map(function(h){ return (h[2] === "h" ? "🔴 " : "🟡 ") + L(h[3], h[4]); });
     out[y+"-"+pad2(m)+"-"+pad2(d)] = { t:L("आज ","Today ") + bsM(b.m-1)+" "+npd(b.d)+" · "+L(WDN[b.wd], WDNE[b.wd]),
-      b:L("वि.सं. ","BS ") + npd(b.y) + " · " + L(tn[0], tn[1]) + (ev.length ? " · " + ev.join(", ") : "") + "\n" + AD_MONTHS[m-1]+" "+d+", "+y + " · 🌅 " + npTime(rs[0]) + " · 🌇 " + npTime(rs[1]),
+      b:L("वि.सं. ","BS ") + npd(b.y) + " · " + L(tn[0], tn[1]) + (ev.length ? " · " + ev.join(", ") : "") + "\n" + AD_MONTHS[m-1]+" "+d+", "+y + " · 🌅 " + npTime(rs[0]) + " · 🌇 " + npTime(rs[1])
+        + (gt.length ? "\n✨ " + L("शुभ समय: ","Good times: ") + gt.slice(0, 4).map(function(g){ return g.replace(/^(\S+) (\S+)–(\S+) \2$/, "$1–$3 $2"); }).join(", ") + (gt.length > 4 ? " …" : "") : ""),
       ic:i < 14 ? tnTile(b, true) : "", bd:i < 14 ? tnTile(b, false) : "" };
   }
   return out;
 }
 function tnSync(force){   /* save the texts for the service worker (rebuilt once a day, or after a language / place change), then show or clear today's */
   if(!("serviceWorker" in navigator) || !window.caches) return;
-  var key = TN.web ? todayISO() + "|" + LANG + "|" + VD.loc : "off";
+  var key = TN.web ? todayISO() + "|" + LANG + "|" + VD.loc + "|g" : "off";   /* "|g": texts with the good times */
   caches.open("ganak-days").then(function(c){
     return c.match("./__days.json").then(function(r){ return r ? r.json() : {}; }).catch(function(){ return {}; }).then(function(old){
       if(old && old.v === key && !force) return;
